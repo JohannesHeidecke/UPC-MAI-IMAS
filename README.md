@@ -35,7 +35,3 @@ Deliveries: PDF, 10-15 minute presentation slides
 **Due Date:** January 16th, 2017, 23:55h
 
 Delivieries: NetBeans project, final report, 10-15 minute presentation slides 
-
-
-new line to teach git.
-
