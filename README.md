@@ -36,4 +36,6 @@ Deliveries: PDF, 10-15 minute presentation slides
 
 Delivieries: NetBeans project, final report, 10-15 minute presentation slides 
 
-neow line to teach git.
+
+new line to teach git.
+
