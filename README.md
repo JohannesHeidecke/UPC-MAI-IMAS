@@ -37,3 +37,7 @@ Deliveries: PDF, 10-15 minute presentation slides
 Delivieries: NetBeans project, final report, 10-15 minute presentation slides 
 
 new line to teach git.
+
+
+
+Creating a conflict
