@@ -1,0 +1,17 @@
+Analyze the characteristics of the environment that the practical exercise presents:
+
+	•	Accessible or inaccessible.
+	•	Deterministic or non-deterministic.
+	•	Episodic or non-episodic.
+	•	Static or dynamic.
+	•	Discrete or continuous.
+	•	
+Analyze also the properties that each type of agents in the practical exercise must incorporate in order to fulfill all their objectives, based on their architecture and the environment characteristics
+
+Written report detailing the study and analysis of:
+
+	•	Characteristics of the environment.
+	•	Best kind of architecture to apply to each type of agents.
+	•	Properties that should be exhibited by each type of agents.
+	•	
+Oral presentation
