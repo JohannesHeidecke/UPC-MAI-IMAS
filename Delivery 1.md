@@ -3,6 +3,7 @@
 Analyze the characteristics of the environment that the practical exercise presents:
 
 Used as source: https://www.doc.ic.ac.uk/project/examples/2005/163/g0516302/environments/environments.html
+
 Definitions come from the lecture slides (Lecture 2)
 
 ## Accessible or inaccessible.
@@ -14,6 +15,7 @@ An accessible environment is one in which the agent can obtain complete, accurat
 ### Examples
 
 Inaccessible environment: physical world: information about any event on earth 
+
 Accessible environment: empty room which state is defined by its temperature and agents can measure it. 
 
 #### Sara
@@ -29,6 +31,7 @@ A deterministic environment is one in which any action has a single guaranteed e
 ### Examples
 
 Non-deterministic environment: physical world: Robot on Mars 
+
 Deterministic environment: Tic Tac Toe game 
 
 #### Sara
@@ -44,6 +47,7 @@ In an episodic environment, the performance of an agent is dependent on a number
 ### Examples
 
 Episodic environment: mail sorting system 
+
 Non-episodic environment: chess game 
 
 #### Sara
@@ -55,11 +59,13 @@ Non-episodic environment: chess game
 ### Definition
 
 A static environment is one that can be assumed to remain unchanged except by the performance of actions by the agent
+
 A dynamic environment is one that has other processes operating on it, and which hence changes in ways beyond the agent’s control
 
 ### Examples
 
 Dynamic environment: physical world 
+
 Static environment: empty office with no moving objects
 
 #### Sara
@@ -75,6 +81,7 @@ An environment is discrete if there is a fixed, finite number of actions and per
 ### Examples
 
 Discrete environment: A game of chess or checkers where there are a set number of moves. 
+
 Continuous environment: Taxi driving. There could be a route from to anywhere to anywhere else. 
 
 #### Sara
