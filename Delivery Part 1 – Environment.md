@@ -46,5 +46,7 @@ The System Agent adds new garbage to the map in a random and dynamic way
 
 ## Discrete or Continuous
 
+Discrete
 
+Limited number of actions
 
