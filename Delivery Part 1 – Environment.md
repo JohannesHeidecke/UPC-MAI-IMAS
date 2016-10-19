@@ -12,13 +12,13 @@ Fully observable and accessible to the System Agent
 
 Only partially observable and inaccessible to all the other agents
 
-Therefore, globally, in general, accessible
+Therefore, globally, in general, **accessible**
 
 
 
 ## Deterministic, strategic or Non-deterministic
 
-Strategic
+**Strategic**
 
 The environment is deterministic, because its next state is perfectly predictable given knowledge of the previous state and the agent's action. 
 
@@ -30,7 +30,7 @@ The only unpredictable action is garbage popping up, which is determined by the 
 
 ## Episodic or Sequential (Non-episodic)
 
-Sequential
+**Sequential**
 
 Next action is dependent on previous
 
@@ -48,7 +48,7 @@ Doubts: Could the environment actually be static, because in between steps, whil
 
 ## Discrete or Continuous
 
-Discrete
+**Discrete**
 
 Limited number of actions
 
