@@ -29,11 +29,30 @@
 
 - Does have a complete representation of the environment
   (which elements currently exist and their specific status)
-- Decides if garbage is appearing
+- Decides if garbage is appearing, what type, where and how much
 - Keeps state of the city
 - Executes orders to update the state of the world
 
-Architecture: Deliberative
+#### Architecture
+
+Has to be discussed: it does have an overview of the world, but not any specific goal and basically receives order to update its state.
+
+What does »decide« mean?
+
+Is is autonomous?
+
+#### Properties
+
+1. Flexibility — NO
+2. Reactivity — YES
+3. Proactiveness — NO
+4. Social Ability — YES
+5. Rationality — NO
+6. Reasoning capabilites
+7. Learning — NO
+8. Autonomy
+9. Temporal continuity — YES
+10. Mobility — NO
 
 
 
@@ -48,6 +67,19 @@ Architecture: Deliberative
 
 Architecture: Reactive
 
+#### Properties
+
+1. Flexibility — NO
+2. Reactivity — YES
+3. Proactiveness — NO
+4. Social Ability — YES
+5. Rationality — NO
+6. Reasoning capabilites — NO
+7. Learning — NO
+8. Autonomy — NO
+9. Temporal continuity — YES
+10. Mobility — NO
+
 
 
 ## ScoutCoordinator
@@ -57,7 +89,22 @@ Architecture: Reactive
 - Have a map of the explored area
 - Make decisions
 
-Architecture: Deliberative
+#### Architecture
+
+Deliberative
+
+#### Properties
+
+1. Flexibility — YES
+2. Reactivity — YES
+3. Proactiveness — YES
+4. Social Ability — YES
+5. Rationality — YES
+6. Reasoning capabilites — YES
+7. Learning — Would be interesting
+8. Autonomy — YES
+9. Temporal continuity — YES
+10. Mobility — NO
 
 
 
@@ -68,7 +115,22 @@ Architecture: Deliberative
 - Assign harvester to building to with garbage 
   (depending on the kind and amount of garbage, the capacity of the harvester and their location)
 
-Architecture: Deliberative
+#### Architecture
+
+Deliberative
+
+#### Properties
+
+1. Flexibility — YES
+2. Reactivity — YES
+3. Proactiveness — YES
+4. Social Ability — YES
+5. Rationality — YES
+6. Reasoning capabilites — YES
+7. Learning — Would be interesting
+8. Autonomy — YES
+9. Temporal continuity — YES
+10. Mobility — NO
 
 
 
@@ -76,7 +138,22 @@ Architecture: Deliberative
 
 - Limited vision (8 adjacent cells)
 
-Architecture: Reactive
+#### Architecture
+
+Reactive
+
+#### Properties
+
+1. Flexibility — YES
+2. Reactivity — YES
+3. Proactiveness — YES
+4. Social Ability — YES
+5. Rationality — NO
+6. Reasoning capabilites — NO
+7. Learning — NO
+8. Autonomy — YES
+9. Temporal continuity — YES
+10. Mobility — NO
 
 
 
@@ -84,5 +161,20 @@ Architecture: Reactive
 
 - Limited vision (8 adjacent cells)
 
-Architecture: Deliberative, but maybe hybrid, in case we want that »a HarvesterAgent with a stated plan can change it to collect some other garbage before continuing its own path«
+#### Architecture
+
+Deliberative, but maybe hybrid, in case we want that »a HarvesterAgent with a stated plan can change it to collect some other garbage before continuing its own path«
+
+#### Properties
+
+1. Flexibility — YES
+2. Reactivity — YES
+3. Proactiveness — YES
+4. Social Ability — YES
+5. Rationality — YES
+6. Reasoning capabilites — YES
+7. Learning — Would be interesting (to remember routes that it has done before)
+8. Autonomy — NO
+9. Temporal continuity — YES
+10. Mobility — NO
 
