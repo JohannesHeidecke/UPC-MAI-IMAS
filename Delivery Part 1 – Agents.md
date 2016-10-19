@@ -2,6 +2,29 @@
 
 
 
+##### Architectures
+
+- Reactive
+- Deliberative
+- Hybrid
+
+
+
+##### Properties
+
+1. Flexibility
+2. Reactivity
+3. Proactiveness
+4. Social Ability
+5. Rationality
+6. Reasoning capabilites
+7. Learning
+8. Autonomy
+9. Temporal continuity
+10. Mobility
+
+
+
 ## SystemAgent
 
 - Does have a complete representation of the environment
