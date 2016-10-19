@@ -13,6 +13,7 @@
 ##### Properties
 
 1. Flexibility
+   The agent’s actions are not scripted, it is able to dynamically choose which actions to invoke, and in what sequence, in response to the state of it’s external environment (Ingham, 1997, p. 4)
 2. Reactivity
 3. Proactiveness
 4. Social Ability
@@ -167,7 +168,7 @@ Deliberative, but maybe hybrid, in case we want that »a HarvesterAgent with a s
 
 #### Properties
 
-1. Flexibility — YES
+1. Flexibility — NO
 2. Reactivity — YES
 3. Proactiveness — YES
 4. Social Ability — YES
