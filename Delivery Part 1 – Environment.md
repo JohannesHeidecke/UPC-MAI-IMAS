@@ -38,6 +38,10 @@ Next action is dependent on previous
 
 ## Static or Dynamic
 
+Dynamic
+
+The System Agent adds new garbage to the map in a random and dynamic way
+
 
 
 ## Discrete or Continuous
