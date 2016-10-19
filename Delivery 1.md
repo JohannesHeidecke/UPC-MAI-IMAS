@@ -35,6 +35,9 @@ Agreed, **inaccessible** (**partially observable** according to [Source 2][2]).
 ##### Johannes
 I only agree partially. In my opinion it is **both accessible and inaccessible**, depending on which agent we are looking at. For the system agent, the environment is completely accessible. He has access to the simulation's configuration settings which "define the whole simulation properties". He controls the state of the environment and its changes. Thus the environment is accessible for this agent. For all other agents, the environment is inaccessible. ScoutAgents only have a vision range of 8 blocks. They are the only agents that can detect new trash (ignoring the omniscient SystemAgent from now on) and all other agents can only obtain new information about state changes via the information chain flowing from the ScoutAgents to ScoutCoordinator to CoordinatorAgent to HarvestCoordinator to HarvesterAgents. This means all other agents are indirectly limited by the limitations of the ScoutAgents and thus for them the environment is also inaccessible. They probably want us to focus on how the environment is for the non-system agents, but we should at least elaborate that the same environment can have different properties for different agents, like in this case.
 
+##### Helen
+I'm unsure re this one but lean towards Fully Observable/Accessible. In a fully observable environment, the state of a system is knwon at all times. I think we don't need to look at this agent-by-agent as I agree the environment is only partially accessible to Scout Agent, Harvester Agent. However as this is a Multi-Agent System, and the System Agent knows state of city at all times and shows to user via graphical interface I think it must be fully observable. The environment is finite, iscrete and well-described (it's not like a real-world scenario where we could have random peopl, objects etc), which also makes me think it is fully observable. And furthermore, I think if our environment is only partially observable it will be a lot harder to build/code.
+
 ## Deterministic or non-deterministic.
 
 ### Definition
@@ -72,6 +75,11 @@ Another argument for a strategic environment: If a HarvesterAgent gets the order
 
 It is probably best to make our case for strategic (we have to find a good definition for that in a reputable source) and emphasize that with perfect information flow between the agents along the chain from Scouts to Harvesters, actions will be deterministic.
 
+##### Helen
+
+I think this is Strategic.
+The next state is completely determined by current state and actions by agents. There's nothing else in the environment that can affect the next state as far as I can tell. 
+
 ## Episodic or non-episodic.
 
 ### Definition
@@ -99,6 +107,10 @@ Let’s analyze the examples: a mail sorting system is episodic, because with ea
 ##### Johannes
 
 I tend to agree with Sebastian here. While the Harvester and Scouts simply do what they are told (you could count their orders as part of their current state and then say the environment is episodic for them), the CoordinatorAgents will have to do planning that involves more than one step. Since they have to take past states into account (e.g. where have Scouts already been recently) their environment is non-episodic.
+
+##### Helen
+
+Sequential - next action is dependent on previous. 
 
 ## Static or dynamic.
 
