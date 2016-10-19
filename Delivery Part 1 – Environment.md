@@ -28,7 +28,11 @@ The only unpredictable action is garbage popping up, which is determined by the 
 
 
 
-## Episodic or Non-episodic
+## Episodic or Sequential (Non-episodic)
+
+Sequential
+
+Next action is dependent on previous
 
 
 
