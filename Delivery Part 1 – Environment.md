@@ -42,6 +42,8 @@ Dynamic
 
 The System Agent adds new garbage to the map in a random and dynamic way
 
+Doubts: Could the environment actually be static, because in between steps, while all the agents are deliberating (calculating, preparing the next step) nothing happens. Also, the environment does not change until an agent takes an action. There are no other processes operating on the environment other than the agents.
+
 
 
 ## Discrete or Continuous
