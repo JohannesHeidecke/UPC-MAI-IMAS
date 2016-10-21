@@ -32,7 +32,7 @@ An example of non-episodic planning is the ScoutCoordinator sending ScoutAgents 
 
 ## Static or Dynamic
 
-The environment is **static**, since the enviroment doesn't change while the agents are deciding what to do next. According to the project description, the SystemAgent only proceeds with the next simulation step after all coordinaton tasks have been completed. The CoordinatorAgents "need not keep looking at the world while [they are] deciding on an action, nor need [they] worry about the passage of time" (compare Russel, Norvig, p.44). 
+The environment is **static**, since the enviroment doesn't change while the agents are deciding what to do next. According to the project description, the SystemAgent only proceeds with the next simulation step after all coordinaton tasks have been completed. Changes of the environment only happen between decisions. The coordinating agents "need not keep looking at the world while [they are] deciding on an action, nor need [they] worry about the passage of time" (compare Russel, Norvig, p.44). 
 
 ## Discrete or Continuous
 
