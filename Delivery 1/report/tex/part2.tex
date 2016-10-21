@@ -1,0 +1,141 @@
+\section{Agent Architectures \& Properties}
+
+In this section we describe the properties and architectures of the different agents present in the environment.
+
+\subsection{HarvesterAgent}
+
+HarvesterAgents are responsible for picking up garbage from detected garbage locations and bringing it to recycling centers. They communicate their current plan to the HarvesterCoordinator and receive orders detailing where to pick up garbage next and where to recycle it. In addition, they can ask the HarvesterCoordinator for permission to pick up additional garbage on the way.
+
+\subsubsection*{Architecture}
+
+HarvesterAgents have to plan the shortest path to the garbage and recycling centers. Since the agent should always react to potential additional garbage on its current path, a \textbf{hybrid} architecture with a reactive component is required.
+
+\subsubsection*{Properties}
+
+\begin{itemize}
+	\item Flexibility — \textbf{No.} The agent is following orders and needs the coordinator's permission to change its plan.
+	\item Reactivity — \textbf{Yes.} The agent maintains an ongoing interaction with its environment by picking up additional garbage on its way.
+	\item Pro-activeness — \textbf{Yes.} The agent can act proactively by making changes to its current plan, to pick up additional garbage in order to maximize points obtained at the recycling center.
+	\item Social Ability — \textbf{Yes.} It is both coordinated by the HarvesterCoordinator and negotiates possible detours.
+	\item Rationality — \textbf{Yes.} The agent only acts in ways that contribute to achieving its goals. For example, it will not make unnecessary detours.
+	\item Reasoning Capabilities \textbf{Yes.} It needs path-finding capabilities and needs to reason about when small detours are justified for picking up additional garbage.
+	\item Learning — \textbf{No.} There is no capability to improve performance by learning.
+	\item Autonomy — \textbf{Yes.} The agent has autonomy of choosing paths and picking up additional garbage. The autonomy is limited, since it also has to follow orders by the coordinator. It can not decide which garbage to pick up and where to recycle it.
+	\item Temporal Continuity — \textbf{Yes.} The agent is continuously active.
+	\item Mobility — \textbf{No.} The agent is always executed on the same machine.
+\end{itemize}
+
+\subsection{ScoutAgent}
+
+ScoutAgents are responsible for moving through the city in order to detect garbage that has to be recycled. They will obtain a route from the ScoutCoordinators which they have to follow, and report the detected garbage back to the coordinator.
+
+\subsubsection*{Architecture}
+
+The required architecture is \textbf{reactive}. The agent follows the given route step by step and reacts to orders from the coordinator by updating the route. Whenever garbage is detected, it reactively reports it to the coordinator.
+
+\subsubsection*{Properties}
+
+\begin{itemize}
+	\item Flexibility — \textbf{No.} The agent does not perform flexible actions.
+	\item Reactivity — \textbf{Yes.} The agent reacts to detected garbage.
+	\item Pro-activeness — \textbf{No.} The agent only follows orders by other agents and does not act proactively.
+	\item Social Ability — \textbf{Yes.} The agent is coordinated by the ScoutCoordinator and follows its orders.
+	\item Rationality — \textbf{Yes.} The agent always follows its instructions from the ScoutCoordinator in order to maximize its goal of finding garbage.
+	\item Reasoning Capabilities \textbf{No.} The agent is only following orders without reasoning itself.
+	\item Learning — \textbf{No.} There is no learning involved.
+	\item Autonomy — \textbf{No.} The agent only follows orders.
+	\item Temporal Continuity — \textbf{Yes.} The agent is continuously active.
+	\item Mobility — \textbf{No.} The agent is always executed on the same machine.
+\end{itemize}
+
+\subsection{HarvesterCoordinator}
+
+The HarvesterCoordinator keeps track of all HarvesterAgents. It will assign them with new garbage and recycling centers when they do not have a job. It will try to maximize the benefits (points received for recycling) and minimize the average time for collecting garbage. It will also provide all HarvesterAgents with information about the currently known state of the city that it obtains from the CoordinatorAgent. When HarvesterAgents recognize opportunities for picking up new garbage with small detours to their current planned routes, the HarvesterCoordinator will negotiate if those detours are permitted.
+
+\subsubsection*{Architecture}
+
+The agent requires a \textbf{hybrid} architecture since there is both a lot of planning involved and reactive communication to other agents.
+
+\subsubsection*{Properties}
+
+\begin{itemize}
+	\item Flexibility — \textbf{Yes.} The agent has to flexibly react to HarvesterAgents asking for permissions to pick up additional garbage.
+	\item Reactivity — \textbf{Yes.} The agent reacts to new information about garbage distribution and to requests by the HarvesterAgents.
+	\item Pro-activeness — \textbf{Yes.} The agent is proactive since it is looking for ways to maximize the ''benefits'' (points received for recycling) and minimize the average time for collecting garbage.
+	\item Social Ability — \textbf{Yes.} The agent is communicating with HarvesterAgents and other coordinators. It coordinates and negotiates with the HarvesterAgents.
+	\item Rationality — \textbf{Yes.} The agent will never act in a way that does not contribute to achieving its goals.
+	\item Reasoning Capabilities \textbf{Yes.} In order to optimally distribute the HarvesterAgents, it needs to reason.
+	\item Learning — \textbf{Potentially.} We will explore later, if there are some ways to improve performance by learning.
+	\item Autonomy — \textbf{Yes.} The agent acts autonomously.
+	\item Temporal Continuity — \textbf{Yes.} The agent is continuously active.
+	\item Mobility — \textbf{No.} The agent is always executed on the same machine.
+\end{itemize}
+
+\subsection{ScoutCoordinator}
+
+The ScoutCoordinator makes an intelligent plan of distributing the available ScoutAgents in order to achieve the highest coverage of the city. It receives the information about newly detected garbage and passes it to the other coordinators.
+
+\subsubsection*{Architecture}
+
+The agent needs both a deliberative component to plan the optimal distribution and a reactive component to process communication between the other agents. Hence, it requires a \textbf{hybrid} architecture.
+
+\subsubsection*{Properties}
+
+\begin{itemize}
+	\item Flexibility — \textbf{No.} The agent does not have to change its plans based on changes in the environment's states.
+	\item Reactivity — \textbf{Yes.} The agent reacts to new information and passes it to other agents.
+	\item Pro-activeness — \textbf{Yes.} The agent proactively plans the optimal way of achieving the highest coverage of the city.
+	\item Social Ability — \textbf{Yes.} The agent is responsible to pass important information to other agents. It coordinates the ScoutAgents.
+	\item Rationality — \textbf{Yes.} The agent always acts rationally.
+	\item Reasoning Capabilities \textbf{Yes.} Reasoning capabilities are required to plan the optimal routes for the ScoutAgents.
+	\item Learning — \textbf{No.} There is no capability to improve performance by learning.
+	\item Autonomy — \textbf{Yes.} The agents acts autonomously.
+	\item Temporal Continuity — \textbf{Yes.} The agent is continuously active.
+	\item Mobility — \textbf{No.} The agent is always executed on the same machine.
+\end{itemize}
+
+\subsection{CoordinatorAgent}
+
+The CoordinatorAgent communicates between the SystemAgent and the other coordinators.
+
+\subsubsection*{Architecture}
+
+All communication can be handled purely reactively, hence a \textbf{reactive} architecture is suitable.
+
+\subsubsection*{Properties}
+
+\begin{itemize}
+	\item Flexibility — \textbf{No.} The agent does not flexibly change its behavior based on environment changes.
+	\item Reactivity — \textbf{Yes.} The agent reacts to received information and passes it forward.
+	\item Pro-activeness — \textbf{No.} The agent does not act proactively.
+	\item Social Ability — \textbf{Minimal.} The agent communicates with other agents but does not actually coordinate or cooperate with them in finding decisions. It is only passing information.
+	\item Rationality — \textbf{Yes.} It never acts in a way to harm its goal of passing information.
+	\item Reasoning Capabilities \textbf{No.} There are no reasoning capabilities involved.
+	\item Learning — \textbf{No.} There is no capability to improve performance by learning.
+	\item Autonomy — \textbf{No.} The agent does not act autonomously and only passes information.
+	\item Temporal Continuity — \textbf{Yes.} The agent is continuously active.
+	\item Mobility — \textbf{No.} The agent is always executed on the same machine.
+\end{itemize}
+
+\subsection{SystemAgent}
+
+The SystemAgent has a complete representation of the environment. It is responsible for randomly adding new garbage in the city. It updates the city based on the performed actions.
+
+\subsubsection*{Architecture}
+
+All actions performed by the SystemAgent can be performed without planning. A \textbf{reactive} architecture is sufficient.
+
+\subsubsection*{Properties}
+
+\begin{itemize}
+	\item Flexibility — \textbf{No.} No flexible behavior is required.
+	\item Reactivity — \textbf{Yes.} The agent has to react to recorded actions of other agents and received messages.
+	\item Pro-activeness — \textbf{No.} The agent is not pro-active.
+	\item Social Ability — \textbf{Minimal.} The agent communicates with other agents. No coordination/cooperation or negotioation is performed.
+	\item Rationality — \textbf{Yes.} The agent only acts in ways that contribute to its goals.
+	\item Reasoning Capabilities \textbf{No.} here are no reasoning capabilities necessary.
+	\item Learning — \textbf{No.} There is no capability to improve performance by learning.
+	\item Autonomy — \textbf{Yes.} The agent is fully autonomous.
+	\item Temporal Continuity — \textbf{Yes.} The agent is continuously active.
+	\item Mobility — \textbf{No.} The agent is always executed on the same machine.
+\end{itemize}
