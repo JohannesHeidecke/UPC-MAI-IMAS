@@ -29,6 +29,13 @@
 \setlength{\parskip}{1.5em}
 \renewcommand{\baselinestretch}{1.1}
 
+\usepackage[
+backend=biber,
+style=alphabetic,
+sorting=ynt
+]{biblatex}
+\addbibresource{lib.bib}
+
 \begin{document}
 
 \input{./tex/title.tex}
@@ -40,6 +47,9 @@
 
 \input{./tex/part1.tex}
 \input{./tex/part2.tex}
+
+\nocite{*}
+\printbibliography
 
 
 
