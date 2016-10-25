@@ -4,7 +4,7 @@ In this section we describe the properties and architectures of the different ag
 
 \subsection{HarvesterAgent}
 
-HarvesterAgents are responsible for picking up garbage from detected garbage locations and bringing it to recycling centers. They communicate their current plan to the HarvesterCoordinator and receive orders detailing where to pick up garbage next and where to recycle it. In addition, they can ask the HarvesterCoordinator for permission to pick up additional garbage on the way.
+HarvesterAgents are responsible for picking up garbage from detected garbage locations and bringing it to recycling centers. They receive orders which garbage to pick up and where to recycle it from the HarvesterCoordinator, plan how to best achieve that goal, and then communicate their current plan to their coordinator. HarvesterAgents reactively filter newly detected garbage for promising candidates of improving their current plans. They will then ask the HarvesterCoordinator for permission to pick up additional garbage on the way.
 
 \subsubsection*{Architecture}
 
@@ -50,7 +50,7 @@ The required architecture is \textbf{reactive}. The agent follows the given rout
 
 \subsection{HarvesterCoordinator}
 
-The HarvesterCoordinator keeps track of all HarvesterAgents. It will assign them with new garbage and recycling centers when they do not have a job. It will try to maximize the benefits (points received for recycling) and minimize the average time for collecting garbage. It will also provide all HarvesterAgents with information about the currently known state of the city that it obtains from the CoordinatorAgent. When HarvesterAgents recognize opportunities for picking up new garbage with small detours to their current planned routes, the HarvesterCoordinator will negotiate if those detours are permitted.
+The HarvesterCoordinator keeps track of all HarvesterAgents. It will assign them with new garbage and recycling centers when they do not have a job. It will try to maximize the benefits (points received for recycling) and minimize the average time for collecting garbage. It will also provide all HarvesterAgents with information about the currently known state of the city, including newly found garbage. When HarvesterAgents recognize opportunities for picking up new garbage with small detours to their current planned routes, the HarvesterCoordinator will negotiate if those detours are permitted. This will prevent situations where several HarvesterAgents try to pick up the same garbage.
 
 \subsubsection*{Architecture}
 
