@@ -22,11 +22,13 @@ import cat.urv.imas.onthology.GameSettings;
 import cat.urv.imas.gui.GraphicInterface;
 import cat.urv.imas.behaviour.system.RequestResponseBehaviour;
 import cat.urv.imas.map.Cell;
+import cat.urv.imas.onthology.GarbageType;
 import jade.core.*;
 import jade.domain.*;
 import jade.domain.FIPAAgentManagement.*;
 import jade.domain.FIPANames.InteractionProtocol;
 import jade.lang.acl.*;
+import jade.wrapper.AgentController;
 import jade.wrapper.ContainerController;
 import jade.wrapper.StaleProxyException;
 import java.util.List;
@@ -142,15 +144,20 @@ public class SystemAgent extends ImasAgent {
 
         // 4. Create other agents:
         ContainerController cc = this.getContainerController();
+        AgentController agentController;
         try {
             // Coordinator
-            cc.createNewAgent("Coordinator", "cat.urv.imas.agent.CoordinatorAgent", null);
+            agentController = cc.createNewAgent("Coordinator", "cat.urv.imas.agent.CoordinatorAgent", null);
+            agentController.start();
             // Scout Coordinator
-            cc.createNewAgent("ScoutCoordinator", "cat.urv.imas.agent.ScoutCoordinatorAgent", null);
+            agentController = cc.createNewAgent("ScoutCoordinator", "cat.urv.imas.agent.ScoutCoordinatorAgent", null);
+            agentController.start();
             // Harvester Coordinator
-            cc.createNewAgent("HarvesterCoordinator", "cat.urv.imas.agent.HarvesterCoordinatorAgent", null);
+            agentController = cc.createNewAgent("HarvesterCoordinator", "cat.urv.imas.agent.HarvesterCoordinatorAgent", null);
+            agentController.start();
             // Create Harvesters and Scouts according to game settings:
             Map<AgentType, List<Cell>> agents = this.game.getAgentList();
+            GarbageType[][] garbageTypes = this.game.getAllowedGarbageTypePerHarvester();
             for (AgentType agentType : agents.keySet()) {
                 String className;
                 switch (agentType) {
@@ -163,19 +170,25 @@ public class SystemAgent extends ImasAgent {
                     default:
                         Logger.getLogger(SystemAgent.class.getName()).log(Level.SEVERE, null,
                                 "The game configuration AgentList contained an agent "
-                                        + "other than Scout or Harvester");
+                                + "other than Scout or Harvester");
                         continue;
                 }
                 List<Cell> agentTypeCells = agents.get(agentType);
-                int counter = 1;
+                int counter = 0;
                 for (Cell cell : agentTypeCells) {
-                    cc.createNewAgent(agentType.getShortString()+"_"+counter, className, null);
+                    Object[] args = new Object[]{cell, null};
+                    if (agentType.equals(AgentType.HARVESTER)) {
+                        args[1] = garbageTypes[counter];
+                    }
+                    agentController = cc.createNewAgent(agentType.getShortString() + "-" + counter, className, args);
+                    agentController.start();
                     counter++;
                 }
             }
         } catch (StaleProxyException ex) {
             Logger.getLogger(SystemAgent.class.getName()).log(Level.SEVERE, null, ex);
         }
+        log("Agents created");
 
         // search CoordinatorAgent
         ServiceDescription searchCriterion = new ServiceDescription();

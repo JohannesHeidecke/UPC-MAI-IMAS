@@ -5,14 +5,29 @@
  */
 package cat.urv.imas.agent;
 
+import cat.urv.imas.map.Cell;
+import cat.urv.imas.onthology.GarbageType;
+import java.util.Arrays;
+
 /**
  *
  * @author johannesheidecke
  */
 public class HarvesterAgent extends ImasAgent {
     
+    private Cell location;
+    private GarbageType[] garbageTypes;
+
     public HarvesterAgent() {
         super(AgentType.HARVESTER);
+
     }
-    
+
+    @Override
+    protected void setup() {
+        this.location = (Cell) this.getArguments()[0];
+        this.garbageTypes = (GarbageType[]) this.getArguments()[1];
+        log(Arrays.toString(garbageTypes));
+    }
+
 }

@@ -5,14 +5,23 @@
  */
 package cat.urv.imas.agent;
 
+import cat.urv.imas.map.Cell;
+
 /**
  *
  * @author johannesheidecke
  */
 public class ScoutAgent extends ImasAgent {
     
+    private Cell location;
+    
     public ScoutAgent() {
         super(AgentType.SCOUT);
+    }
+    
+    @Override
+    protected void setup() {
+        this.location = (Cell) this.getArguments()[0];
     }
     
 }
