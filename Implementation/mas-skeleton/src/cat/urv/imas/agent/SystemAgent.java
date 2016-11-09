@@ -21,12 +21,18 @@ import cat.urv.imas.onthology.InitialGameSettings;
 import cat.urv.imas.onthology.GameSettings;
 import cat.urv.imas.gui.GraphicInterface;
 import cat.urv.imas.behaviour.system.RequestResponseBehaviour;
+import cat.urv.imas.map.Cell;
 import jade.core.*;
 import jade.domain.*;
 import jade.domain.FIPAAgentManagement.*;
 import jade.domain.FIPANames.InteractionProtocol;
 import jade.lang.acl.*;
-
+import jade.wrapper.ContainerController;
+import jade.wrapper.StaleProxyException;
+import java.util.List;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * System agent that controls the GUI and loads initial configuration settings.
@@ -40,8 +46,8 @@ public class SystemAgent extends ImasAgent {
      */
     private GraphicInterface gui;
     /**
-     * Game settings. At the very beginning, it will contain the loaded
-     * initial configuration settings.
+     * Game settings. At the very beginning, it will contain the loaded initial
+     * configuration settings.
      */
     private GameSettings game;
     /**
@@ -58,21 +64,21 @@ public class SystemAgent extends ImasAgent {
     }
 
     /**
-     * A message is shown in the log area of the GUI, as well as in the 
-     * stantard output.
+     * A message is shown in the log area of the GUI, as well as in the stantard
+     * output.
      *
      * @param log String to show
      */
     @Override
     public void log(String log) {
         if (gui != null) {
-            gui.log(getLocalName()+ ": " + log + "\n");
+            gui.log(getLocalName() + ": " + log + "\n");
         }
         super.log(log);
     }
-    
+
     /**
-     * An error message is shown in the log area of the GUI, as well as in the 
+     * An error message is shown in the log area of the GUI, as well as in the
      * error output.
      *
      * @param error Error to show
@@ -80,7 +86,7 @@ public class SystemAgent extends ImasAgent {
     @Override
     public void errorLog(String error) {
         if (gui != null) {
-            gui.log("ERROR: " + getLocalName()+ ": " + error + "\n");
+            gui.log("ERROR: " + getLocalName() + ": " + error + "\n");
         }
         super.errorLog(error);
     }
@@ -93,7 +99,7 @@ public class SystemAgent extends ImasAgent {
     public GameSettings getGame() {
         return this.game;
     }
-    
+
     /**
      * Agent setup method - called when it first come on-line. Configuration of
      * language to use, ontology and initialization of behaviours.
@@ -109,7 +115,7 @@ public class SystemAgent extends ImasAgent {
         sd1.setType(AgentType.SYSTEM.toString());
         sd1.setName(getLocalName());
         sd1.setOwnership(OWNER);
-        
+
         DFAgentDescription dfd = new DFAgentDescription();
         dfd.addServices(sd1);
         dfd.setName(getAID());
@@ -134,6 +140,43 @@ public class SystemAgent extends ImasAgent {
             e.printStackTrace();
         }
 
+        // 4. Create other agents:
+        ContainerController cc = this.getContainerController();
+        try {
+            // Coordinator
+            cc.createNewAgent("Coordinator", "cat.urv.imas.agent.CoordinatorAgent", null);
+            // Scout Coordinator
+            cc.createNewAgent("ScoutCoordinator", "cat.urv.imas.agent.ScoutCoordinatorAgent", null);
+            // Harvester Coordinator
+            cc.createNewAgent("HarvesterCoordinator", "cat.urv.imas.agent.HarvesterCoordinatorAgent", null);
+            // Create Harvesters and Scouts according to game settings:
+            Map<AgentType, List<Cell>> agents = this.game.getAgentList();
+            for (AgentType agentType : agents.keySet()) {
+                String className;
+                switch (agentType) {
+                    case HARVESTER:
+                        className = HarvesterAgent.class.getName();
+                        break;
+                    case SCOUT:
+                        className = ScoutAgent.class.getName();
+                        break;
+                    default:
+                        Logger.getLogger(SystemAgent.class.getName()).log(Level.SEVERE, null,
+                                "The game configuration AgentList contained an agent "
+                                        + "other than Scout or Harvester");
+                        continue;
+                }
+                List<Cell> agentTypeCells = agents.get(agentType);
+                int counter = 1;
+                for (Cell cell : agentTypeCells) {
+                    cc.createNewAgent(agentType.getShortString()+"_"+counter, className, null);
+                    counter++;
+                }
+            }
+        } catch (StaleProxyException ex) {
+            Logger.getLogger(SystemAgent.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
         // search CoordinatorAgent
         ServiceDescription searchCriterion = new ServiceDescription();
         searchCriterion.setType(AgentType.COORDINATOR.toString());
@@ -149,7 +192,7 @@ public class SystemAgent extends ImasAgent {
         // Setup finished. When the last inform is received, the agent itself will add
         // a behaviour to send/receive actions
     }
-    
+
     public void updateGUI() {
         this.gui.updateGame();
     }
