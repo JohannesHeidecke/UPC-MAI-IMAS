@@ -17,6 +17,8 @@ public class HarvesterAgent extends ImasAgent {
     
     private Cell location;
     private GarbageType[] garbageTypes;
+    
+    private static int capacity;
 
     public HarvesterAgent() {
         super(AgentType.HARVESTER);
@@ -28,6 +30,10 @@ public class HarvesterAgent extends ImasAgent {
         this.location = (Cell) this.getArguments()[0];
         this.garbageTypes = (GarbageType[]) this.getArguments()[1];
         log(Arrays.toString(garbageTypes));
+    }
+    
+    public static void setCapacity(int c) {
+        capacity = c;
     }
 
 }

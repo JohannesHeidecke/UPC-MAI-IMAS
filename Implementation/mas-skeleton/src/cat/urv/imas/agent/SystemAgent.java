@@ -158,6 +158,7 @@ public class SystemAgent extends ImasAgent {
             // Create Harvesters and Scouts according to game settings:
             Map<AgentType, List<Cell>> agents = this.game.getAgentList();
             GarbageType[][] garbageTypes = this.game.getAllowedGarbageTypePerHarvester();
+            HarvesterAgent.setCapacity(this.game.getHarvestersCapacity());
             for (AgentType agentType : agents.keySet()) {
                 String className;
                 switch (agentType) {
