@@ -22,6 +22,7 @@ public class ScoutAgent extends ImasAgent {
     @Override
     protected void setup() {
         this.location = (Cell) this.getArguments()[0];
+        log("["+location.getCol()+"|"+location.getRow()+"]");
     }
     
 }

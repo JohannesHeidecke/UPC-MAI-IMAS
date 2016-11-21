@@ -29,7 +29,7 @@ public class HarvesterAgent extends ImasAgent {
     protected void setup() {
         this.location = (Cell) this.getArguments()[0];
         this.garbageTypes = (GarbageType[]) this.getArguments()[1];
-        log(Arrays.toString(garbageTypes));
+        log("["+location.getCol()+"|"+location.getRow()+"]\t"+Arrays.toString(garbageTypes));
     }
     
     public static void setCapacity(int c) {
