@@ -17,7 +17,7 @@ Deliveries: PDF, 10-15 minute presentation slides
 
 [description on moodle](https://moodle.urv.cat/moodle/mod/assign/view.php?id=1726594)
 
-**Due Date:** November 23th, 2016, 23:55h
+**Due Date:** November 22nd, 2016, 23:55h
 
 Delivieries: NetBeans project
 
@@ -25,6 +25,8 @@ Delivieries: NetBeans project
 [description on moodle](https://moodle.urv.cat/moodle/mod/page/view.php?id=1726587)
 
 **Due Date:** December 12th, 2016, 23:55h
+
+Presentation: December 14th during lab
 
 Deliveries: PDF, 10-15 minute presentation slides
 
