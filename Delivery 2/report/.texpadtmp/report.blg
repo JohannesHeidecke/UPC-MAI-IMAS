@@ -1,0 +1,15 @@
+[0] Config.pm:343> INFO - This is Biber 2.5
+[1] Config.pm:346> INFO - Logfile is '/Users/johannesheidecke/Development/UPC-MAI-IMAS/Delivery 2/report/.texpadtmp/report.blg'
+[71] biber-darwin:290> INFO - === Mon Nov 28, 2016, 21:06:34
+[106] Biber.pm:351> INFO - Reading '/Users/johannesheidecke/Development/UPC-MAI-IMAS/Delivery 2/report/.texpadtmp/report.bcf'
+[238] Biber.pm:773> INFO - Using all citekeys in bib section 0
+[258] Biber.pm:3493> INFO - Processing section 0
+[283] Biber.pm:3657> INFO - Looking for bibtex format file '/Users/johannesheidecke/Development/UPC-MAI-IMAS/Delivery 2/report/lib.bib' for section 0
+[285] bibtex.pm:1187> INFO - Decoding LaTeX character macros into UTF-8
+[287] bibtex.pm:1048> INFO - Found BibTeX data source '/Users/johannesheidecke/Development/UPC-MAI-IMAS/Delivery 2/report/lib.bib'
+[322] UCollate.pm:66> INFO - Overriding locale 'en-US' defaults 'variable = shifted' with 'variable = non-ignorable'
+[322] UCollate.pm:66> INFO - Overriding locale 'en-US' defaults 'normalization = NFD' with 'normalization = prenormalized'
+[322] Biber.pm:3306> INFO - Sorting list 'ynt/global/' of type 'entry' with scheme 'ynt' and locale 'en-US'
+[323] Biber.pm:3310> INFO - No sort tailoring available for locale 'en-US'
+[326] bbl.pm:526> INFO - Writing '/Users/johannesheidecke/Development/UPC-MAI-IMAS/Delivery 2/report/.texpadtmp/report.bbl' with encoding 'UTF-8'
+[327] bbl.pm:619> INFO - Output to /Users/johannesheidecke/Development/UPC-MAI-IMAS/Delivery 2/report/.texpadtmp/report.bbl

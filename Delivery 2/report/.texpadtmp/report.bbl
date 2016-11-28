@@ -1,0 +1,118 @@
+% $ biblatex auxiliary file $
+% $ biblatex bbl format version 2.7 $
+% Do not modify the above lines!
+%
+% This is an auxiliary file used by the 'biblatex' package.
+% This file may safely be deleted. It will be recreated by
+% biber as required.
+%
+\begingroup
+\makeatletter
+\@ifundefined{ver@biblatex.sty}
+  {\@latex@error
+     {Missing 'biblatex' package}
+     {The bibliography requires the 'biblatex' package.}
+      \aftergroup\endinput}
+  {}
+\endgroup
+
+
+\refsection{0}
+  \sortlist[entry]{ynt/global/}
+    \entry{Bellifemine2001}{inbook}{}
+      \name{author}{3}{}{%
+        {{hash=55eedefeddfb151440e0de5050fa4f1a}{%
+           family={Bellifemine},
+           family_i={B\bibinitperiod},
+           given={Fabio},
+           given_i={F\bibinitperiod}}}%
+        {{hash=e52c0a3da31500ba02578fc4d3954044}{%
+           family={Poggi},
+           family_i={P\bibinitperiod},
+           given={Agostino},
+           given_i={A\bibinitperiod}}}%
+        {{hash=c1a38988743822c96eb2a8dfdabc50c2}{%
+           family={Rimassa},
+           family_i={R\bibinitperiod},
+           given={Giovanni},
+           given_i={G\bibinitperiod}}}%
+      }
+      \name{editor}{2}{}{%
+        {{hash=a24812b383b49717becceb68cf16ea7c}{%
+           family={Castelfranchi},
+           family_i={C\bibinitperiod},
+           given={Cristiano},
+           given_i={C\bibinitperiod}}}%
+        {{hash=3be782177725228e1cfc53a6407f17cd}{%
+           family={Lespérance},
+           family_i={L\bibinitperiod},
+           given={Yves},
+           given_i={Y\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {Springer Berlin Heidelberg}%
+      }
+      \strng{namehash}{2c4a6752261958f4de67dbb0558a13b0}
+      \strng{fullhash}{2c4a6752261958f4de67dbb0558a13b0}
+      \field{labelalpha}{BPR01}
+      \field{sortinit}{2}
+      \field{sortinithash}{8343b463aacf48517c044b4d2c9c45ed}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{booktitle}{Intelligent Agents VII Agent Theories Architectures and Languages: 7th International Workshop, ATAL 2000 Boston, 2000 Proceedings}
+      \field{title}{Developing Multi-agent Systems with JADE}
+      \field{year}{2001}
+      \field{pages}{89\bibrangedash 103}
+      \range{pages}{15}
+    \endentry
+    \entry{Woolridge2009}{book}{}
+      \name{author}{1}{}{%
+        {{hash=1dbead6bb535576afc14adfe5a5c42bb}{%
+           family={Wooldridge},
+           family_i={W\bibinitperiod},
+           given={Michael},
+           given_i={M\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {Wiley}%
+      }
+      \strng{namehash}{1dbead6bb535576afc14adfe5a5c42bb}
+      \strng{fullhash}{1dbead6bb535576afc14adfe5a5c42bb}
+      \field{labelalpha}{Woo09}
+      \field{sortinit}{2}
+      \field{sortinithash}{8343b463aacf48517c044b4d2c9c45ed}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{An Introduction to MultiAgent Systems}
+      \field{year}{2009}
+    \endentry
+    \entry{RusselNorvig2010}{book}{}
+      \name{author}{2}{}{%
+        {{hash=143fa183327d9fcd9de18eec99d6ca97}{%
+           family={Russell},
+           family_i={R\bibinitperiod},
+           given={Stuart},
+           given_i={S\bibinitperiod}}}%
+        {{hash=5de798d5fa3c0236c0478134cd23f52a}{%
+           family={Norvig},
+           family_i={N\bibinitperiod},
+           given={Peter},
+           given_i={P\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {Pearson}%
+      }
+      \strng{namehash}{b280605b721b4ebcba5395298499f924}
+      \strng{fullhash}{b280605b721b4ebcba5395298499f924}
+      \field{labelalpha}{RN10}
+      \field{sortinit}{2}
+      \field{sortinithash}{8343b463aacf48517c044b4d2c9c45ed}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{Artificial Intelligence: International Version: A Modern Approach}
+      \field{year}{2010}
+    \endentry
+  \endsortlist
+\endrefsection
+\endinput
+

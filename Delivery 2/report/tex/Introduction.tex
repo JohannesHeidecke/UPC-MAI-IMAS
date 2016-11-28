@@ -1,0 +1,19 @@
+\section{Introduction}
+
+In this report we analyze the cooperation mechanisms of the multi agent system (MAS) described in the previous report with the task of recycling the garbage in a virtual city.
+
+\subsection{Goal Definition}
+
+All the agents in our MAS are contributing to the goal of recycling the garbage in the city in an efficient manner (except for the SystemAgent, which is solely taking care of the state of the virtual city and not further interacting with it). In order for several agents to contribute towards solving a distributed problem, they need to be coherent (working towards the same goal) and competent (knowledge how to work together). While we define the competence of the agents in the following sections, we start with defining the common goal of the MAS, that ensures coherent behavior.
+
+According to the project description, the MAS ought to maximize the benefits (points received by recycling centers) while minimizing the time to recycle garbage. The agents' decisions will be based on evaluating different possible plans with with this goal and often there will be a trade off between achieving maximum points or minimal waiting time. 
+
+For all possible plans of actions $ p \in \mathbb{P} $: \[ \max_{p \in \mathbb{P}} b(p)\] with $ b(p) $ being the sum of benefit points achieved with the plan $p$ and \[ \min_{p \in \mathbb{P}} t(p)\] with $t(p)$ being an evaluation of the waiting time corresponding to $p$. Looking at the specific domain of garbage recycling, it makes sense to punish exceptionally long waiting times over-proportionately. Hence $ t(p) $ will be the sum of squared waiting times of all garbages between showing up and being picked up by a HarvesterAgent.
+
+Combining our two subgoals, we get \[ \max_{p \in \mathbb{P}} \theta_1 \cdot b(p) - \theta_2 \cdot t(p)\] with $ \theta_1 $ and $ \theta_2 $ weighting the relative importance of benefits and weighting time.
+
+\subsection{Analysis of necessary cooperation}
+
+The MAS is cooperative-benevolent, i.e. all agents work towards the same goal.
+
+% TODO: why not emergent / independent-self interested
