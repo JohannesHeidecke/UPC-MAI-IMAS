@@ -8,7 +8,7 @@ All the agents in our MAS are contributing to the goal of recycling the garbage 
 
 According to the project description, the MAS ought to maximize the benefits (points received by recycling centers) while minimizing the time to recycle garbage. The agents' decisions will be based on evaluating different possible plans with with this goal and often there will be a trade off between achieving maximum points or minimal waiting time. 
 
-For all possible plans of actions $ p \in \mathbb{P} $: \[ \max_{p \in \mathbb{P}} b(p)\] with $ b(p) $ being the sum of benefit points achieved with the plan $p$ and \[ \min_{p \in \mathbb{P}} t(p)\] with $t(p)$ being an evaluation of the waiting time corresponding to $p$. Looking at the specific domain of garbage recycling, it makes sense to punish exceptionally long waiting times over-proportionately. Hence $ t(p) $ will be the sum of squared waiting times of all garbages between showing up and being picked up by a HarvesterAgent.
+For all possible plans of actions $ p \in \mathbb{P} $: \[ \max_{p \in \mathbb{P}} b(p)\] with $ b(p) $ being the sum of benefit points achieved with the plan $p$, and \[ \min_{p \in \mathbb{P}} t(p)\] with $t(p)$ being an evaluation of the waiting time corresponding to $p$. Looking at the specific domain of garbage recycling, it makes sense to punish exceptionally long waiting times over-proportionately. Hence $ t(p) $ will be the sum of squared waiting times of all garbages between showing up and being picked up by a HarvesterAgent.
 
 Combining our two subgoals, we get \[ \max_{p \in \mathbb{P}} \theta_1 \cdot b(p) - \theta_2 \cdot t(p)\] with $ \theta_1 $ and $ \theta_2 $ weighting the relative importance of benefits and weighting time.
 
@@ -17,3 +17,9 @@ Combining our two subgoals, we get \[ \max_{p \in \mathbb{P}} \theta_1 \cdot b(p
 The MAS is cooperative-benevolent, i.e. all agents work towards the same goal.
 
 % TODO: why not emergent / independent-self interested
+
+\begin{itemize}
+	\item \textbf{Harvesting Coordination}
+	\item \textbf{Scouting Coordination}
+	\item \textbf{Vehicle Coordination}
+\end{itemize}
