@@ -10,7 +10,7 @@ These agents work independently to further their own interests, sometimes at the
 The scout agents could reactively search for garbage. Their only goal is to find the garbage. This would be a suboptimal mechanism for the scout agents as it may lead to multiple scout agents searching in one place and leave areas of the map not searched. 
 
 ***
-	
+
 We have assumed our agents are benevolent (cooperative) - our best interest is their best interest - this is a much simpler design and they cooperate with explicit communication. Next, we summarise and analyse possible cooperative coordination mechanisms. 
 
 
@@ -92,7 +92,7 @@ We will use **GPGP** for vehicle coordination. Each SA and HA includes their cur
 
 2. Harvester Agent moving to recycling centre (to recycle garbage)
 
-3. Harvester Agent moving to garbage location (to harvester garbage)
+3. Harvester Agent moving to garbage location (to harvest garbage)
 
 4. Scout Agent 
 
