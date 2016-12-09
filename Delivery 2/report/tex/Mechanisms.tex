@@ -4,12 +4,12 @@
 
 \subsection{Contract Net}
 
-\subsubsection*{General Description}
+\subsubsection{General Description}
 
 The Contract Net protocol was developed by R.G.Smith in 1980 \cite{Smith:1980:CNP:1311969.1312903} and is based on the way in which companies put contracts out to tender. There are five phases the protocol runs through to resolve a certain task:
 
 \begin{itemize}
-	\item \textbf{Recognition}: An agent (called the ``manager'') recognizes a task that has to be done and that it cannot solve or does not want to solve.	
+	\item \textbf{Recognition}: An agent (called the ``manager'') recognizes a task that has to be done and that it cannot solve or does not want to solve.
 	\item \textbf{Announcement}: The manager announces the task to all agents (general broadcast), a group of agents (limited broadcast), or specific agents (point-to-point announcement). The specification of the task includes a description of the task, constraints, and meta-information.
 	\item \textbf{Bidding}: When an agent receives a task evaluate the task with respect to their specific properties and, if they are able and willing to solve the task, they submit a tender to the manager, indicating the relevant capabilities of the agent to solve the task.
 	\item \textbf{Awarding}: A manager may receive several tenders for a task. Based on the information provided in the tenders, it chooses the best fitting agent or agents to execute the task. Chosen agents are called contractors for this task.
@@ -18,7 +18,24 @@ The Contract Net protocol was developed by R.G.Smith in 1980 \cite{Smith:1980:CN
 
 The Contract Net is based on a mutual selection process: Managers can select the best fitting tender and contractors can decide, for which announced tasks they want to create a tender.  
 
-\subsubsection*{Application to Practical Work}
+\subsubsection{Application to Practical Work}
+
+\textbf{Harvesting Coordination:} The coordination of harvesting garbage can be solved by using a Contract Net protocol. Newly detected occurrences of garbage are recognized by the Harvester Coordinator and then announced to Harvester Agents. This announcement can either be a limited broadcast to all Harvester Agents or even a point-to-point announcement to specific Harvesters of the right type that are currently idle. The Harvesters can individually evaluate which of the announced tasks fit well enough to their current situation (based on garbage types, current location, free capacity, planned route, etc.) and then submit tenders for these tasks. The HarvesterCoordinator can then choose the most suitable candidate(s) to take care of the garbage. If several HarvesterAgents are selected to solve a single task (e.g. because their individual capacity does not allow one HarvesterAgent to take the entire trash), they can use further coordination mechanisms to split up the task among them, or the Harvester Coordinator assigns the exact distribution of splitting up the task. Since the bidding process is based on several attributes (distance, capacity, targeted recycling center, etc.), we are facing a multi-attribute negotiation.
+
+\textbf{Scouting Coordination:} The Scout Coordinator could use a Contract Net to announce the tasks of visiting cells that have been idle for a long time (and thus have a high probability of neighboring a building with garbage). Scout Agents can then submit tenders, e.g. containing how many steps they need to reach the idle cell and a numeric evaluation of the “idleness” of the path to this cell. This would be a multi-attribute-negotiation.
+
+\textbf{Vehicle Coordination:} Potentially, when an upcoming collision of two vehicles is detected, the CoordinatorAgent can announce a task to the involved Agents (or their Coordinators) to resolve this collision in the best way they can come up with. The Coordinator Agent then chooses the best plan of avoiding the collision, based on a metric such as the number of extra steps required.
+
+\subsubsection{Advantages and Disadvantages}
+
+The Contract Net is well applicable for this problem, because:
+
+\begin{itemize}
+	\item The goal of collecting all garbage is dividable into several subgoals: one for each occurrence of garbage in the city
+	\item The subtasks of collecting individual garbage are sufficiently complex and it is worthwhile to spend effort into distributing them efficiently. 
+\end{itemize}
+
+The disadvantages are the computational effort due to the exchange of messages, and the time delay for deliberation and waiting for responses
 
 \subsection{Auctions}
 

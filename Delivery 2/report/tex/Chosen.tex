@@ -1,4 +1,23 @@
-\section{Choice of Cooperation Mechanisms}
+\section{Chosen Cooperation Mechanisms}
+
+
+\subsection{Scouting Coordination}
+
+As part of the global goal definition of the MAS (see section \ref{sub:goal}), one important subtask is to efficiently detect new garbage on the map. New garbage should be quickly detected in order to allow its harvesting. As rational agents, Scout Agents and the Scout Coordinator want to maximize the expected performance of this task.
+
+We have chosen to employ a combination of cooperation mechanisms in order to best fit the scouting coordination task. This task is a special case of the multi agent patrolling problem, a problem that has been thoroughly investigated by the research community. \cite{Almeida2004} have investigated a variety of different approaches for this problem and conclude that the best approach on most classes of map topologies is a TSP\footnote{Traveling Salesman Problem}-based Single Cycle Approach. A cyclical path based on TSP-algorithms is computed for all cells of the map and Scout Agents patrol on this path in the same direction with more or less equal distances between them on the path. In order to achieve and uphold this equidistance, e.g. after collisions, we combine this approach with GPGP.
+
+A near optimal TSP path through the map will be calculated based on some common heuristic-based algorithm (calculating optimal solutions is unfeasible since the TSP problem belongs to the class of NP-complete problems).  
+
+
+The SAs keep their local viewpoints updated with their current goals and actions - this will always be to follow their given path and to find garbage. If a situation arises in which a SA has to change its path to avoid a collision, (this coordination is described in Vehicle Coordination Mechanism), then this change of path will be updated to the SA’s local viewpoint and then passed to the scout coordinator (SC) who will keep a partial plan of all SA local plans. The SC will calculate how best to keep the SAs equidistant following this change of path, e.g. by keeping all SAs stationary until the collision-avoiding SA is back to its original given path, and then it will pass these instructions back to the individual SAs. The SAs will now have updated local plans and will follow these new actions. In this way the SAs will continue, ensuring they are at equidistant points on their path to maintain our optimal map search. The same mechanism will be used to 
+  
+
+
+\subsection{Harvesting Coordination}
+
 
 auction vs. contractnet:
-harvesters don't have any incentive to get a task assigned with more resources (e.g. steps) than needed -> auction does not yield advantages but needs more computational effort and implementation complexity.
+harvesters don't have any incentive to get a task assigned with more resources (e.g. steps) than needed. auction does not yield advantages but needs more computational effort and implementation complexity.
+
+\subsection{Vehicle Coordination}
