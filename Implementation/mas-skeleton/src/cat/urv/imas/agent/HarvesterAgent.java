@@ -7,6 +7,7 @@ package cat.urv.imas.agent;
 
 import cat.urv.imas.map.Cell;
 import cat.urv.imas.onthology.GarbageType;
+import cat.urv.imas.onthology.HarvesterInfoAgent;
 import java.util.Arrays;
 
 /**
@@ -16,6 +17,7 @@ import java.util.Arrays;
 public class HarvesterAgent extends ImasAgent {
     
     private Cell location;
+    private HarvesterInfoAgent infoAgent;
     private GarbageType[] garbageTypes;
     
     private static int capacity;
@@ -28,8 +30,10 @@ public class HarvesterAgent extends ImasAgent {
     @Override
     protected void setup() {
         this.location = (Cell) this.getArguments()[0];
-        this.garbageTypes = (GarbageType[]) this.getArguments()[1];
-        log("["+location.getCol()+"|"+location.getRow()+"]\t"+Arrays.toString(garbageTypes));
+        infoAgent = (HarvesterInfoAgent) this.getArguments()[1];
+        infoAgent.setAID(this.getAID());
+        this.garbageTypes = (GarbageType[]) this.getArguments()[2];
+        log("["+location.getRow()+"|"+location.getCol()+"]\t"+Arrays.toString(garbageTypes));
     }
     
     public static void setCapacity(int c) {

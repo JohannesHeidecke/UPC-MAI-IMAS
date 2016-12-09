@@ -6,6 +6,7 @@
 package cat.urv.imas.agent;
 
 import cat.urv.imas.map.Cell;
+import cat.urv.imas.onthology.InfoAgent;
 
 /**
  *
@@ -14,6 +15,8 @@ import cat.urv.imas.map.Cell;
 public class ScoutAgent extends ImasAgent {
     
     private Cell location;
+    private InfoAgent infoAgent;
+    
     
     public ScoutAgent() {
         super(AgentType.SCOUT);
@@ -22,7 +25,9 @@ public class ScoutAgent extends ImasAgent {
     @Override
     protected void setup() {
         this.location = (Cell) this.getArguments()[0];
-        log("["+location.getCol()+"|"+location.getRow()+"]");
+        log("["+location.getRow()+"|"+location.getCol()+"]");
+        infoAgent = (InfoAgent) this.getArguments()[1];
+        infoAgent.setAID(this.getAID());
     }
     
 }

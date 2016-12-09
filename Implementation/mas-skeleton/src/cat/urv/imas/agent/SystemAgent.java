@@ -22,8 +22,11 @@ import cat.urv.imas.onthology.GameSettings;
 import cat.urv.imas.gui.GraphicInterface;
 import cat.urv.imas.behaviour.system.RequestResponseBehaviour;
 import cat.urv.imas.map.Cell;
+import cat.urv.imas.map.StreetCell;
 import cat.urv.imas.onthology.GarbageType;
+import cat.urv.imas.onthology.InfoAgent;
 import jade.core.*;
+import jade.core.behaviours.CyclicBehaviour;
 import jade.domain.*;
 import jade.domain.FIPAAgentManagement.*;
 import jade.domain.FIPANames.InteractionProtocol;
@@ -177,9 +180,9 @@ public class SystemAgent extends ImasAgent {
                 List<Cell> agentTypeCells = agents.get(agentType);
                 int counter = 0;
                 for (Cell cell : agentTypeCells) {
-                    Object[] args = new Object[]{cell, null};
+                    Object[] args = new Object[]{cell, ((StreetCell) cell).getAgent(), null};
                     if (agentType.equals(AgentType.HARVESTER)) {
-                        args[1] = garbageTypes[counter];
+                        args[2] = garbageTypes[counter];
                     }
                     agentController = cc.createNewAgent(agentType.getShortString() + "-" + counter, className, args);
                     agentController.start();
@@ -205,6 +208,47 @@ public class SystemAgent extends ImasAgent {
 
         // Setup finished. When the last inform is received, the agent itself will add
         // a behaviour to send/receive actions
+       
+        // NOTE: test behavior, to be deleted later!
+        // switches the ScoutAgent on Cell [1|4] to [1|5] and back
+        this.addBehaviour(new CyclicBehaviour(this) {
+            
+            @Override
+            public void action() {
+               // Test action: switch scout agent between 4-1 and 5-1
+               GameSettings game = ((SystemAgent) this.myAgent).getGame();
+               StreetCell c41 = (StreetCell) game.getMap()[1][4];
+               StreetCell c51 = (StreetCell) game.getMap()[1][5];
+               StreetCell empty, full;
+               if (c41.isThereAnAgent()) {
+                   full = c41;
+                   empty = c51;
+               } else {
+                   full = c51;
+                   empty = c41;
+               }
+               InfoAgent scoutInfoAgent = full.getAgent();
+                try {
+                    full.removeAgent(scoutInfoAgent);
+                    empty.addAgent(scoutInfoAgent);
+                    
+                } catch (Exception ex) {
+                    Logger.getLogger(SystemAgent.class.getName()).log(Level.SEVERE, null, ex);
+                    this.done();
+                }
+                ((SystemAgent) this.myAgent).gui.updateGame();
+                ((SystemAgent) this.myAgent).gui.log("Moved ScoutAgent\n");
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(SystemAgent.class.getName()).log(Level.SEVERE, null, ex);
+                }
+               
+            }
+        });
+        
+        
+        
     }
 
     public void updateGUI() {
