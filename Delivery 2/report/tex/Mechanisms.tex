@@ -1,5 +1,7 @@
 \section{Analysis of Cooperation Mechanisms}
-\label{sec:allCoop}
+\label{sec:allCoop}
+
+
 
 
 \subsection{PGP}
@@ -35,7 +37,7 @@ Efficiency - no two agents will work on same subproblem e.g. collecting same gar
 
 \subsubsection{General Description}
 
-GPGP is a domain-independent extension of PGP. Furthermore, GPGP mechanisms communicate scheduling for ``particular tasks'' [Decker \& Lesser, 1995] rather than a complete schedule as in PGP. In this way agents can detect and coordinate task interactions. 
+GPGP is a domain-independent extension of PGP. Furthermore, GPGP mechanisms communicate scheduling for ``particular tasks'' \cite{Decker1995} rather than a complete schedule as in PGP. In this way agents can detect and coordinate task interactions. 
 
 (i) Agents update non-local viewpoints by sending information about a particular task to all other agents that can also solve it.
 
@@ -51,6 +53,8 @@ If two HarvesterAgents commit to collect the same garbage, this information will
 
 
 
+
+
 \subsection{Coalitions}
 
 \subsubsection{General Description}
@@ -59,7 +63,13 @@ Coalition formation involves several agents creating a possibly temporary group 
 
 \subsubsection{Application to Practical Work}
 
-Coalitions are definitely applicable to our garbage collection problem as the MAS has agents that are cooperative, communicate, and deliberative. The different agents in our garbage collection problem have different and complementary abilities to achieve the common goal of collecting garbage as efficiently as possible. We have five different agents, as well as clones of scouts and harvesters. A coalition would bring together different agents (not clones) to help achieve the common goal more efficiently. Joint action is possible regardless of whether the agents are cooperative or selfish, as long as a coalition is beneficial for the agents involved (Coalition structure generation: A survey).  For instance, the scouting coordination and harvesting coordination are selfish in the sense that the agents involved act selfishly with regard to their tasks; acting in their own best interest towards their own goal. In our case, because of how the agents are structured, they contribute to the overall goal of the system (to collect and recycle garbage as efficiently as possible), despite their own 'selfish' goals. ``When the task is completed, the payoff is distributed, the coalition is disbanded and agents continue to pursue their own agendas''
+Coalitions are definitely applicable to our garbage collection problem as the MAS has agents that are cooperative, communicate, and deliberative.
+ 
+The different agents in our garbage collection problem have different and complementary abilities to achieve the common goal of collecting garbage as efficiently as possible. We have five different agents, as well as clones of scouts and harvesters. A coalition would bring together different agents (not clones) to help achieve the common goal more efficiently.
+ 
+Joint action is possible regardless of whether the agents are cooperative or selfish, as long as a coalition is beneficial for the agents involved (Coalition structure generation: A survey).  For instance, the scouting coordination and harvesting coordination are selfish in the sense that the agents involved act selfishly with regard to their tasks; acting in their own best interest towards their own goal. In our case, because of how the agents are structured, they contribute to the overall goal of the system (to collect and recycle garbage as efficiently as possible), despite their own 'selfish' goals.
+ 
+``When the task is completed, the payoff is distributed, the coalition is disbanded and agents continue to pursue their own agendas''
 
 \textbf{Scouting Coordination:} The ScoutAgents are told where to go by the ScoutCoordinator. They are purely reactive, as all they do is respond to find garbage and communicate this information. A coalition between the ScoutAgents only would not be useful as they do not have a common goal other than walking around as efficiently as possible. This efficiency has to be determined by the ScoutCoordinator.  
 
@@ -69,7 +79,9 @@ Coalitions are definitely applicable to our garbage collection problem as the MA
 
 \subsubsection{Advantages and Disadvantages}
 
-The evident advantage of coalitions is that they allow agents to work together to increase efficiency; theoretically they are only formed if a better outcome can be achieved by working together. A core issue of working with coalitions is to identify which coalitions should be formed in order to achieve a goal (Algorithms paper). ''This usually requires calculating a value for every possible coalition, known as the coalition value, which indicates how beneficial that coalition would be if it was formed.'' It always requires a lot of communication between the agents who have to decide which coalitions to form, and they have to decide which mechanisms to use for the formation. 
+The evident advantage of coalitions is that they allow agents to work together to increase efficiency; theoretically they are only formed if a better outcome can be achieved by working together. 
+
+A core issue of working with coalitions is to identify which coalitions should be formed in order to achieve a goal (Algorithms paper). ''This usually requires calculating a value for every possible coalition, known as the coalition value, which indicates how beneficial that coalition would be if it was formed.'' It always requires a lot of communication between the agents who have to decide which coalitions to form, and they have to decide which mechanisms to use for the formation. 
 
 
 
@@ -114,13 +126,20 @@ The disadvantages are the computational effort due to the exchange of messages, 
 
 \subsubsection{General Description}
 
-A class of negotiation protocols, which provide us with methods for allocating goods/resources, based upon competition among self-interested parties.There are different basic types of auctions: English, Dutch, FPSB-First price sealed bid and Vickrey. Auctions can furthermore be multi-unit, multi-attribute or combinatorial.
+A class of negotiation protocols, which provide us with methods for allocating goods/resources, based upon competition among self-interested parties.
+There are different basic types of auctions: English, Dutch, FPSB-First price sealed bid and Vickrey. Auctions can furthermore be multi-unit, multi-attribute or combinatorial.
+
 
 \subsubsection{Application to Practical Work}
 
 \textbf{Scouting Coordination:} ScoutAgents could compete to get different or specialised routes. They would bid for their different routes and the ScoutCoordinator would choose who to assign which specific routes. In this way we would choose a FPSB auction in which all of the ScoutAgents bid for their route and the one with the least cost/best performance will be the winner for that route. The ScoutAgents bid without knowing the others' bids.
-\textbf{Harvesting Coordination:} The HarvesterCoordinator could hold an auction for each garbage unit found to determine which HarvesterAgent(s) would harvest them. The HarvesterAgents' bids could depend on their current position, the position of the garbage and current state i.e. idle, moving to garbage for harvesting, moving to a recycling centre etc. Similarly, this could be a FPSB auction, where each HarvesterAgent would bid with the cost they would incur to reach the garbage without knowing others' bids and the HarvesterCoordinator would choose the best bid. 
-The auction could be a multi-unit auction, if several garbage units are located close to one another and they are auctioned together.\\There could be a combinatorial auction of all garbage at a certain point in time.
+
+
+\textbf{Harvesting Coordination:} The HarvesterCoordinator could hold an auction for each garbage unit found to determine which HarvesterAgent(s) would harvest them. The HarvesterAgents' bids could depend on their current position, the position of the garbage and current state i.e. idle, moving to garbage for harvesting, moving to a recycling centre etc. Similarly, this could be a FPSB auction, where each HarvesterAgent would bid with the cost they would incur to reach the garbage without knowing others' bids and the HarvesterCoordinator would choose the best bid. 
+
+The auction could be a multi-unit auction, if several garbage units are located close to one another and they are auctioned together.
+\\There could be a combinatorial auction of all garbage at a certain point in time.
+
 
 \subsubsection{Advantages and Disadvantages}
 
@@ -130,7 +149,8 @@ Flexibility, as protocols can be tailor-made.
 
 Advantages of multi-attribute auctions: They allow more degrees of freedom for bidders: price may not be the only attribute of interest and more efficient information exchange among the market participants.
 
-Disadvantages:The disadvantages of auctions are mostly related to bidding problems such as lying, shills etc. These do not apply to our problem. 
+Disadvantages:
+The disadvantages of auctions are mostly related to bidding problems such as lying, shills etc. These do not apply to our problem. 
 
 
 \subsection{Voting}
@@ -142,6 +162,7 @@ Voting is a distributed deliberation process. Decisions are taken collectively. 
 Simple voting is a group term for voting protocols, where each voter either chooses only their preferred option (Plurality), their least favourite option (Anti-plurality), both (Best-worst) or only the options they would accept (Approval).
 
 In total order voting, each voter returns complete list of options sorted by their preference. There are different ways to count results and determine a winning option (Binary, Borda, Condorcet).
+
 
 \subsubsection{Application to Practical Work}
 
