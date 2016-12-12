@@ -8,22 +8,18 @@ In total order voting, each voter returns complete list of options sorted by the
 
 
 
+# Advantages & Disadvantages
+
+In voting the decision process is decentralized. Applied to our problem, this means the coordinating agents (HarvesterCoordinator, ScoutCoordinator) merely act as administrative entities. If they have a vote at all, it only counts as much as any other agent’s vote. 
+
+This would work well in a scenario, where agents have individual objectives and therefore need more freedom. The problem of Harvesting and Scouting Coordination, though, require a centralized, hierarchic organisational structure. The use of a voting mechanism for both of these tasks, misses the actual purpose of that technique. Voting is used to collectively make a decision that affects all of the involved parties. As we want to split up tasks, though, there is no point in deciding on a plan for everyone together. There are more appropriate methods we can use.
+
+Voting techniques, however, could well be applicable to the Vehicle Coordination task. Here the premise of individual objectives is given: each vehicle has its own destination. And the decision about which route to take potentially affects other agents.
+
+
+
 
 # Applicability
-
-
-
-### Harvesting Coordination
-
-The HarvesterCoordinator presents as ballot a list of garbages that have to be picked up. Each HarvesterAgent either casts a simple plurality vote or returns a totally ordered list of preferences. Each gargabe location that is a preference of at least one HarvesterAgent can be erased from the ballot and be assigned to the respective agent(s). A HarvesterAgent may not cast a vote, for example when it is in the process of pickup up garbage (moving to the location, wait one turn). It shall instead return an abstention message. The voting has to be done whenever a new garbage is detected or a HarvesterAgent reports as idle.
-
-
-
-### Scouting Coordination
-
-The ScoutCoordinator presents as ballot a list of cells ordered by the amount of turns it has not been seen by a ScoutAgent (descending). 
-
-
 
 ### Vehicle Coordination
 
@@ -39,13 +35,24 @@ Problems:
 
 
 
-## Advantages & Disadvantages
 
-In voting the decision process is decentralized. Applied to our problem, this means the coordinating agents (HarvesterCoordinator, ScoutCoordinator) merely act as administrative entities. If they have a vote at all, it only counts as much as any other agent’s vote. 
 
-This would work well in a scenario, where agents have individual objectives and therefore needed more freedom. The problem of Harvesting and Scouting Coordination, though, require a centralized, hierarchic organisational structure. The use of a voting mechanism for both of these tasks, misses the actual purpose of that technique. Voting is used to collectively make a decision that affects all of the involved parties. As we want to split up tasks, though, there is no point in deciding on a plan for everyone together. There are more appropriate methods we can use.
 
-Voting techniques, however, could well be applicable to the Vehicle Coordination task. Here the premise of individual objectives is given: each vehicle has its own destination. And the decision about which route to take potentially affects other agents.
+
+
+
+
+## Other Applications (that don’t make as much sense)
+
+### Harvesting Coordination
+
+The HarvesterCoordinator presents as ballot a list of garbages that have to be picked up. Each HarvesterAgent either casts a simple plurality vote or returns a totally ordered list of preferences. Each gargabe location that is a preference of at least one HarvesterAgent can be erased from the ballot and be assigned to the respective agent(s). A HarvesterAgent may not cast a vote, for example when it is in the process of pickup up garbage (moving to the location, wait one turn). It shall instead return an abstention message. The voting has to be done whenever a new garbage is detected or a HarvesterAgent reports as idle.
+
+### Scouting Coordination
+
+The ScoutCoordinator presents as ballot a list of cells ordered by the amount of turns it has not been seen by a ScoutAgent (descending). 
+
+
 
 
 
