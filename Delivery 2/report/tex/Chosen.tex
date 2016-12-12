@@ -10,7 +10,9 @@ We have chosen to employ a combination of cooperation mechanisms in order to bes
 
 A near optimal TSP path through the map will be calculated based on some common heuristic-based algorithm (calculating optimal solutions is unfeasible since the TSP problem belongs to the class of NP-complete problems).
 
-In order to uphold this equidistance, e.g. after collisions, we combine this approach with GPGP. The ScoutAgents keep their local viewpoints updated with their current goals and actions - this will always be to follow their given path and to find garbage. If a situation arises in which a ScoutAgent has to change its path to avoid a collision, (this coordination is described in Vehicle Coordination Mechanism), then this change of path will be updated to the ScoutAgent’s local viewpoint and then passed to the ScoutCoordinator who will keep a partial plan of all ScoutAgent local plans. The ScoutCoordinator will calculate how best to keep the ScoutAgents equidistant following this change of path, e.g. by keeping all ScoutAgents stationary until the collision-avoiding ScoutAgent is back to its original given path, and then it will pass these instructions back to the individual ScoutAgents. The ScoutAgents will now have updated local plans and will follow these new actions. In this way the ScoutAgents will continue, ensuring they are at equidistant points on their path to maintain our optimal map search. 
+In order to uphold this equidistance, e.g. after collisions, we combine this approach with GPGP. The ScoutAgents keep their local viewpoints updated with their current goals and actions - this will always be to follow their given path and to find garbage. If a situation arises in which a ScoutAgent has to change its path to avoid a collision, (this coordination is described in Vehicle Coordination Mechanism), then this change of path will be updated to the ScoutAgent's local viewpoint and then passed to the ScoutCoordinator who will keep a partial plan of all ScoutAgent local plans. The ScoutCoordinator will calculate how best to keep the ScoutAgents equidistant following this change of path, e.g. by keeping all ScoutAgents stationary until the collision-avoiding ScoutAgent is back to its original given path, and then it will pass these instructions back to the individual ScoutAgents. The ScoutAgents will now have updated local plans and will follow these new actions. In this way the ScoutAgents will continue, ensuring they are at equidistant points on their path to maintain our optimal map search. 
+
+The Scouting Coordination task needs a hierarchically organized solution as we chose the ScoutAgents to have no deliberation capacity. We choose these mechanisms since the TSP-based approach has been empirically superior to other cooperation mechanisms (\cite{Almeida2004}) and GPGP is a good way to restore the necessary equidistance after collisions.
 
 
 \subsection{Harvesting Coordination}
@@ -22,6 +24,10 @@ For the ordering of pending garbage (not yet picked up and unassigned), a voting
 In order to assign a HarvesterAgent to a specific garbage collection task, we have chosen to use contract nets. In the order determined by the voting, the HarvesterAgents bid if they are willing and able to pick-up the garbage in question. This bidding is independent from the previous voting for the garbage ordering. The HarvesterCoordinator then chooses the best fitting agent for this task and assigns it to the garbage. `Best fitting' would be determined by the efficiency of the garbage collection, including distance to travel and type of garbage. 
 
 In order for the idle HarvesterAgents to be more purposeful, they will form a coalition with a ScoutAgent. As the idle HarvesterAgent has no task to complete in the current state, it will follow a ScoutAgent around in order that it is closer to potential newly-discovered garbage. 
+
+Using voting to decide on a good ordering of pending garbage efficiently combines the local knowledge of all agents to build a global solution without much computational effort needed. 
+Contract net is superior to auctions in this case, since there is already an existing JADE implementation and the bidding of the auctions would lead to the same distributions in most cases. 
+Coalition are an effective way of distributing idle HarvesterAgents and thus make the entire system more efficient.
 
 \subsection{Vehicle Coordination}
 
@@ -44,7 +50,11 @@ We will use GPGP for vehicle coordination. Each ScoutAgent and HarvesterAgent in
 
 \texttt{not Max P (Vehicle 1, Vehicle 2) =>} Go back on previous path taken until no longer in current path of prioritised vehicle. Remain stationary until prioritised vehicle is out of path. Move again on original path. (Note: whilst moving back on path and waiting stationary to avoid collision, this vehicle has higher priority than any other vehicle).
 
-Using the above solution the CoordinatorAgent sends these updated paths for the vehicles involved to the ScoutCoordinator and HarvestCoordinator, who in turn pass these to each vehicle. Their paths are updated in their local plans to avoid the collision.  
+Using the above solution the CoordinatorAgent sends these updated paths for the vehicles involved to the ScoutCoordinator and HarvestCoordinator, who in turn pass these to each vehicle. Their paths are updated in their local plans to avoid the collision.
+
+GPGP fits very well for the problem of finding a global solution for conflicts of many local plans.
+
+
 
 
 
