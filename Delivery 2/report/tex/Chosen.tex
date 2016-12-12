@@ -1,4 +1,5 @@
 \section{Chosen Cooperation Mechanisms}
+\label{sec:chosCoop}
 
 
 \subsection{Scouting Coordination}
@@ -16,8 +17,6 @@ The SAs keep their local viewpoints updated with their current goals and actions
 
 \subsection{Harvesting Coordination}
 
-
-auction vs. contractnet:
-harvesters don't have any incentive to get a task assigned with more resources (e.g. steps) than needed. auction does not yield advantages but needs more computational effort and implementation complexity.
+For the harvesting coordination we have chosen to implement three different cooperation mechanisms: voting for the garbage ordering, contract nets to assign the harvester to the garbage, and coalition for idle harvesters. For the ordering of pending garbage, not yet picked up and unassigned, a voting mechanism will be implemented. The harvest coordinator will announce which garbage is pending, and each harvester agent will respond with an ordered list of the pending garbage that they could pick up most efficiently. Only the available harvesters will vote for the garbage. In order to assign a harvester to a specific garbage collection task, we have chosen to use contract nets. In the order determined by the voting, the harvester agents bid if they are willing and able to pick-up the garbage in question. The coordinator then chooses the best fitting agent for this task and assigns it to the garbage. In order for the idle harvesters to be more purposeful, they will form a coalition with the scouts. As the idle scout has no task to complete in the current state, it will follow a scout around in order to be closer to potential garbage to be discovered. 
 
 \subsection{Vehicle Coordination}

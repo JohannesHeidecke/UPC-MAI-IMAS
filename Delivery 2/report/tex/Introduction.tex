@@ -1,26 +1,31 @@
 \section{Introduction}
 
-In this report we analyze the cooperation mechanisms of the multi agent system (MAS) described in the previous report with the task of recycling the garbage in a virtual city.
+In this report we analyze the cooperation mechanisms of the multi agent system (MAS) described in the previous report with the task of recycling the garbage in a virtual city. Section \ref{sub:goal} defines the common goal and performance measure of the MAS on which the choice of different possible actions of the agents will be based. Section \ref{sub:coop} gives an overview of the different coordination tasks in this specific problem.
+
+Section \ref{sec:allCoop} analyzes the different possible cooperation mechanisms that could be chosen to solve the problem: Contract Net, Auctions, Coalitions, GPGP, and Voting. For all mechanisms a general description is given, followed by possible applications to the specific problem of garbage collection, and advantages and disadvantages.
+
+In section \ref{sec:chosCoop}, the chosen mechanisms are presented together with a justification of why they were chosen.
 
 \subsection{Goal Definition}
 \label{sub:goal}
 
-All the agents in our MAS are contributing to the goal of recycling the garbage in the city in an efficient manner (except for the SystemAgent, which is solely taking care of the state of the virtual city and not further interacting with it). In order for several agents to contribute towards solving a distributed problem, they need to be coherent (working towards the same goal) and competent (knowledge how to work together). While we define the competence of the agents in the following sections, we start with defining the common goal of the MAS, that ensures coherent behavior.
+All the agents in our MAS are contributing to the goal of recycling the garbage in the city in an efficient manner (except for the SystemAgent, which is solely taking care of the state of the virtual city and not further interacting with it). In order for several agents to contribute towards solving a distributed problem, they need to be coherent (working towards the same goal) and competent (knowledge how to work together). While we define the competence of the agents in the following sections by specifying their coordination mechanisms, we start with defining the common goal of the MAS, that ensures coherent behavior. 
 
-According to the project description, the MAS ought to maximize the benefits (points received by recycling centers) while minimizing the time to recycle garbage. The agents' decisions will be based on evaluating different possible plans with with this goal and often there will be a trade off between achieving maximum points or minimal waiting time. 
+All agents should aim to maximize a common global performance measure. According to the project description, the MAS ought to maximize the benefits (points received by recycling centers) while minimizing the time to recycle garbage. The agents' decisions will be based on evaluating different possible plans for the next $t$ time steps using these goal measures and often there will be a trade off between achieving maximum points or minimal waiting time. 
 
-For all possible plans of actions $ p \in \mathbb{P} $: \[ \max_{p \in \mathbb{P}} b(p)\] with $ b(p) $ being the sum of benefit points achieved with the plan $p$, and \[ \min_{p \in \mathbb{P}} t(p)\] with $t(p)$ being an evaluation of the waiting time corresponding to $p$. Looking at the specific domain of garbage recycling, it makes sense to punish exceptionally long waiting times over-proportionately. Hence $ t(p) $ will be the sum of squared waiting times of all garbages between showing up and being picked up by a HarvesterAgent.
+For all possible plans of actions $ p \in \mathbb{P} $ we want to maximize the benefits of the plan: \[ \max_{p \in \mathbb{P}} b(p)\] with $ b(p) $ being the sum of benefit points achieved with the plan $p$, while, at the same time, we want to minimize some measure of waiting time: \[ \min_{p \in \mathbb{P}} t(p)\] with $t(p)$ being an evaluation of the waiting time corresponding to $p$. Looking at the specific domain of garbage recycling, it makes sense to punish long waiting times over-proportionately. Hence we choose $ t(p) $ to be the sum of squared waiting times of all garbages between being put on the map and being picked up by a HarvesterAgent.
 
-Combining our two subgoals, we get \[ \max_{p \in \mathbb{P}} \theta_1 \cdot b(p) - \theta_2 \cdot t(p)\] with $ \theta_1 $ and $ \theta_2 $ weighting the relative importance of benefits and weighting time.
+Combining our two subgoals, we get the combined performance measure: \[ \max_{p \in \mathbb{P}} \theta_1 \cdot b(p) - \theta_2 \cdot t(p)\] with $ \theta_1 $ and $ \theta_2 $ weighting the relative importance of benefits and weighting time. Since there are no further indications as to which of the subgoals should be considered more important, we set $\theta_1 = \theta_2$.
 
 \subsection{Analysis of necessary cooperation}
+\label{sub:coop}
 
-The MAS is cooperative-benevolent, i.e. all agents work towards the same goal.
+The MAS is cooperative-benevolent, i.e. all agents work towards the same goal, which we defined in the previous subsection. The following coordination tasks are necessary to achieve the common goal:
 
 % TODO: why not emergent / independent-self interested
 
 \begin{itemize}
-	\item \textbf{Harvesting Coordination}
-	\item \textbf{Scouting Coordination}
-	\item \textbf{Vehicle Coordination}
+	\item \textbf{Scouting Coordination}: The task of coordinating the Scout Agents (SA) in a way that maximizes the probability of detecting new garbage. SAs should obviously be well distributed over the map and primarily scout areas with high probabilities of detecting garbage (i.e. areas that haven't been scouted for a long time). 
+	\item \textbf{Harvesting Coordination}: The task of coordinating the Harvester Agents (HA) in a way to most efficiently recycle the detected garbage with respect to the performance measure defined in section \ref{sub:goal}.
+	\item \textbf{Vehicle Coordination}: The task of combining the plans of scouting and harvesting, detecting collisions of vehicles, and resolving these collisions in a way that leads to the smallest loss of performance measure.
 \end{itemize}
