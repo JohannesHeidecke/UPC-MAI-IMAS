@@ -4,7 +4,7 @@ Voting is a distributed deliberation process. Decisions are taken collectively. 
 
 Simple voting is a group term for voting protocols, where each voter either chooses only their prefered option (Plurality), their least favourite option (Anti-plurality), both (Best-worst) or only the options they would accept (Approval).
 
-In total order voting, each voter returns the list of options in its entirety sorted by their preference. There are different ways to count results and determine a winning option (Binary, Borda, Condorcet).
+In total order voting, each voter returns complete list of options sorted by their preference. There are different ways to count results and determine a winning option (Binary, Borda, Condorcet).
 
 
 
@@ -43,7 +43,7 @@ Problems:
 
 In voting the decision process is decentralized. Applied to our problem, this means the coordinating agents (HarvesterCoordinator, ScoutCoordinator) merely act as administrative entities. If they have a vote at all, it only counts as much as any other agent’s vote. 
 
-This would work well in a scenario, where agents had individual objectives and therefore needed more freedom. The problem of Harvesting and Scouting Coordination, though, require a centralized, hierarchic organisational structure. The use of a voting mechanism for both of these tasks, misses the actual purpose of that technique. Voting is used to collectively make a decision that affects all of the involved parties. As we want to split up tasks, though, there is no point in deciding on a plan for everyone together. There are more appropriate methods we can use.
+This would work well in a scenario, where agents have individual objectives and therefore needed more freedom. The problem of Harvesting and Scouting Coordination, though, require a centralized, hierarchic organisational structure. The use of a voting mechanism for both of these tasks, misses the actual purpose of that technique. Voting is used to collectively make a decision that affects all of the involved parties. As we want to split up tasks, though, there is no point in deciding on a plan for everyone together. There are more appropriate methods we can use.
 
 Voting techniques, however, could well be applicable to the Vehicle Coordination task. Here the premise of individual objectives is given: each vehicle has its own destination. And the decision about which route to take potentially affects other agents.
 
