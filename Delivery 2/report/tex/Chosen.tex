@@ -20,3 +20,31 @@ The SAs keep their local viewpoints updated with their current goals and actions
 For the harvesting coordination we have chosen to implement three different cooperation mechanisms: voting for the garbage ordering, contract nets to assign the harvester to the garbage, and coalition for idle harvesters. For the ordering of pending garbage, not yet picked up and unassigned, a voting mechanism will be implemented. The harvest coordinator will announce which garbage is pending, and each harvester agent will respond with an ordered list of the pending garbage that they could pick up most efficiently. Only the available harvesters will vote for the garbage. In order to assign a harvester to a specific garbage collection task, we have chosen to use contract nets. In the order determined by the voting, the harvester agents bid if they are willing and able to pick-up the garbage in question. The coordinator then chooses the best fitting agent for this task and assigns it to the garbage. In order for the idle harvesters to be more purposeful, they will form a coalition with the scouts. As the idle scout has no task to complete in the current state, it will follow a scout around in order to be closer to potential garbage to be discovered. 
 
 \subsection{Vehicle Coordination}
+
+We will use GPGP for vehicle coordination. Each SA and HA includes their current goals and actions in their local plan. These are passed to their respective coordinators and from there passed to the coordinator agent (CA) who has a partial plan of all SA and HA current paths/actions. If a situation arises in which the paths of 2 vehicles are going to collide in n steps, the CA detects this and sets out to resolve it using the following solution:
+
+\textbf{We define a hierarchy of vehicle priorities, P, as follows:}
+
+\begin{enumerate}
+	\item Vehicle already moving to avoid collision
+	\item Harvester Agent moving to recycling centre (to recycle garbage)
+	\item Harvester Agent moving to garbage location (to harvest garbage)
+	\item Scout Agent 
+	\item Harvester Agent idle 
+\end{enumerate}
+
+\textbf{Avoiding collision solution:}
+
+
+\texttt{Max P (Vehicle 1, Vehicle 2) =>} Continue moving on current path.
+
+\texttt{not Max P (Vehicle 1, Vehicle 2) =>} Go back on previous path taken until no longer in current path of prioritised vehicle. Remain stationary until prioritised vehicle is out of path. Move again on original path. (Note: whilst moving back on path and waiting stationary to avoid collision, this vehicle has higher priority than any other vehicle).
+
+Using the above solution the CA sends these updated paths for the vehicles involved to the SC and HC, who in turn pass these to each vehicle. Their paths are updated in their local plans to avoid the collision.  
+
+
+
+
+
+
+
