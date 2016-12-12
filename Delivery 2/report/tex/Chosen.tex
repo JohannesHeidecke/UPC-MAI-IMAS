@@ -4,38 +4,37 @@
 
 \subsection{Scouting Coordination}
 
-As part of the global goal definition of the MAS (see section \ref{sub:goal}), one important subtask is to efficiently detect new garbage on the map. New garbage should be quickly detected in order to allow its harvesting. As rational agents, ScoutAgents and the Scout Coordinator want to maximize the expected performance of this task.
+As part of the global goal definition of the MAS (see section \ref{sub:goal}), one important subtask is to efficiently detect new garbage on the map. New garbage should be quickly detected in order to allow its harvesting. As rational agents, ScoutAgents and the ScoutCoordinator want to maximize the expected performance of this task.
 
-We have chosen to employ a combination of cooperation mechanisms in order to best fit the scouting coordination task. This task is a special case of the multi agent patrolling problem, a problem that has been thoroughly investigated by the research community. \cite{Almeida2004} have investigated a variety of different approaches for this problem and conclude that the best approach on most classes of map topologies is a TSP\footnote{Traveling Salesman Problem}-based Single Cycle Approach. A cyclical path based on TSP-algorithms is computed for all cells of the map and ScoutAgents patrol on this path in the same direction with more or less equal distances between them on the path. In order to achieve and uphold this equidistance, e.g. after collisions, we combine this approach with GPGP.
+We have chosen to employ a combination of cooperation mechanisms in order to best fit the scouting coordination task. This task is a special case of the multi agent patrolling problem, a problem that has been thoroughly investigated by the research community. \cite{Almeida2004} have investigated a variety of different approaches for this problem and conclude that the best approach on most classes of map topologies is a TSP\footnote{Traveling Salesman Problem}-based Single Cycle Approach. A cyclical path based on TSP-algorithms is computed for all cells of the map and ScoutAgents patrol on this path in the same direction with more or less equal distances between them on the path. 
 
-A near optimal TSP path through the map will be calculated based on some common heuristic-based algorithm (calculating optimal solutions is unfeasible since the TSP problem belongs to the class of NP-complete problems).  
+A near optimal TSP path through the map will be calculated based on some common heuristic-based algorithm (calculating optimal solutions is unfeasible since the TSP problem belongs to the class of NP-complete problems).
 
-
-The ScoutAgentss keep their local viewpoints updated with their current goals and actions - this will always be to follow their given path and to find garbage. If a situation arises in which a ScoutAgent has to change its path to avoid a collision, (this coordination is described in Vehicle Coordination Mechanism), then this change of path will be updated to the ScoutAgent’s local viewpoint and then passed to the scout coordinator (SC) who will keep a partial plan of all ScoutAgent local plans. The ScoutCoordinator will calculate how best to keep the ScoutAgents equidistant following this change of path, e.g. by keeping all ScoutAgents stationary until the collision-avoiding ScoutAgent is back to its original given path, and then it will pass these instructions back to the individual ScuotAgents. The ScoutAgents will now have updated local plans and will follow these new actions. In this way the ScoutAgents will continue, ensuring they are at equidistant points on their path to maintain our optimal map search. 
+In order to uphold this equidistance, e.g. after collisions, we combine this approach with GPGP. The ScoutAgents keep their local viewpoints updated with their current goals and actions - this will always be to follow their given path and to find garbage. If a situation arises in which a ScoutAgent has to change its path to avoid a collision, (this coordination is described in Vehicle Coordination Mechanism), then this change of path will be updated to the ScoutAgent’s local viewpoint and then passed to the ScoutCoordinator who will keep a partial plan of all ScoutAgent local plans. The ScoutCoordinator will calculate how best to keep the ScoutAgents equidistant following this change of path, e.g. by keeping all ScoutAgents stationary until the collision-avoiding ScoutAgent is back to its original given path, and then it will pass these instructions back to the individual ScoutAgents. The ScoutAgents will now have updated local plans and will follow these new actions. In this way the ScoutAgents will continue, ensuring they are at equidistant points on their path to maintain our optimal map search. 
 
 
 \subsection{Harvesting Coordination}
 
 For the harvesting coordination we have chosen to implement three different cooperation mechanisms: voting for the garbage ordering, contract nets to assign the harvester to the garbage, and coalition for idle harvesters. 
 
-For the ordering of pending garbage, not yet picked up and unassigned, a voting mechanism will be implemented. The harvest coordinator will announce which garbage is pending, and each harvester agent will respond with an ordered list of the pending garbage that they could pick up most efficiently. The coordinator chooses the garbage with the garbage with the most votes as the first garbage to be assigned (using contract nets), and will then move on to the garbage with the second most votes, and so on. Every time new garbage is detected a new round of votes is cast, including all previously detected but still un-assigned garbage. 
+For the ordering of pending garbage (not yet picked up and unassigned), a voting mechanism will be implemented. The HarvestCoordinator will announce the pending garbage and each HarvesterAgent will respond with an ordered list of this garbage; ordered by garbage that they can pick up most efficiently. The HarvesterCoordinator chooses the garbage with the most top votes as the first garbage to be assigned (coordination described next) and once this is done, moves to the garbage with the second most votes, and so on. Every time new garbage is detected a new round of votes is cast.
 
-In order to assign a harvester to a specific garbage collection task, we have chosen to use contract nets. In the order determined by the voting, the harvester agents bid if they are willing and able to pick-up the garbage in question. This bidding is completely independent from the previous voting for the garbage ordering. The coordinator then chooses the best fitting agent for this task and assigns it to the garbage. `Best fitting' would be determined by the efficiency of the garbage collection, including the distances and types of garbage. 
+In order to assign a HarvesterAgent to a specific garbage collection task, we have chosen to use contract nets. In the order determined by the voting, the HarvesterAgents bid if they are willing and able to pick-up the garbage in question. This bidding is independent from the previous voting for the garbage ordering. The HarvesterCoordinator then chooses the best fitting agent for this task and assigns it to the garbage. `Best fitting' would be determined by the efficiency of the garbage collection, including distance to travel and type of garbage. 
 
-In order for the idle HarvesterAgents to be more purposeful, they will form a coalition with a ScoutAgent. As the idle HarvesterAgent has no task to complete in the current state, it will follow a ScoutAgent around in order to be closer to potential garbage to be discovered. 
+In order for the idle HarvesterAgents to be more purposeful, they will form a coalition with a ScoutAgent. As the idle HarvesterAgent has no task to complete in the current state, it will follow a ScoutAgent around in order that it is closer to potential newly-discovered garbage. 
 
 \subsection{Vehicle Coordination}
 
-We will use GPGP for vehicle coordination. Each ScoutAgent and HarvesterAgent includes their current goals and actions in their local plan. These are passed to their respective coordinators and from there passed to the coordinator agent who has a partial plan of all ScoutAgent and HarvesterAgent current paths/actions. If a situation arises in which the paths of 2 vehicles are going to collide in n steps, the CoordinatorAgent detects this and sets out to resolve it using the following solution:
+We will use GPGP for vehicle coordination. Each ScoutAgent and HarvesterAgent includes their current goals and actions in their local plan. These are passed to their respective coordinators and from there passed to the CoordinatorAgent who has a partial plan of all ScoutAgent and HarvesterAgent current paths/actions. If a situation arises in which the paths of 2 vehicles are going to collide in n steps, the CoordinatorAgent detects this and sets out to resolve it using the following solution:
 
 \textbf{We define a hierarchy of vehicle priorities, P, as follows:}
 
 \begin{enumerate}
 	\item Vehicle already moving to avoid collision
-	\item Harvester Agent moving to recycling centre (to recycle garbage)
-	\item Harvester Agent moving to garbage location (to harvest garbage)
-	\item Scout Agent 
-	\item Harvester Agent idle 
+	\item HarvesterAgent moving to recycling centre (to recycle garbage)
+	\item HarvesterAgent moving to garbage location (to harvest garbage)
+	\item ScoutAgent 
+	\item HarvesterAgent idle 
 \end{enumerate}
 
 \textbf{Avoiding collision solution:}
