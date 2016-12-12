@@ -12,7 +12,6 @@ A near optimal TSP path through the map will be calculated based on some common 
 
 
 The ScoutAgentss keep their local viewpoints updated with their current goals and actions - this will always be to follow their given path and to find garbage. If a situation arises in which a ScoutAgent has to change its path to avoid a collision, (this coordination is described in Vehicle Coordination Mechanism), then this change of path will be updated to the ScoutAgent’s local viewpoint and then passed to the scout coordinator (SC) who will keep a partial plan of all ScoutAgent local plans. The ScoutCoordinator will calculate how best to keep the ScoutAgents equidistant following this change of path, e.g. by keeping all ScoutAgents stationary until the collision-avoiding ScoutAgent is back to its original given path, and then it will pass these instructions back to the individual ScuotAgents. The ScoutAgents will now have updated local plans and will follow these new actions. In this way the ScoutAgents will continue, ensuring they are at equidistant points on their path to maintain our optimal map search. 
-  
 
 
 \subsection{Harvesting Coordination}
