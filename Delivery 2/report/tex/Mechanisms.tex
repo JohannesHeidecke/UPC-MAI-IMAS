@@ -67,9 +67,9 @@ Coalitions are definitely applicable to our garbage collection problem as the MA
  
 The different agents in our garbage collection problem have different and complementary abilities to achieve the common goal of collecting garbage as efficiently as possible. We have five different agents, as well as clones of scouts and harvesters. A coalition would bring together different agents (not clones) to help achieve the common goal more efficiently.
  
-Joint action is possible regardless of whether the agents are cooperative or selfish, as long as a coalition is beneficial for the agents involved (Coalition structure generation: A survey).  For instance, the scouting coordination and harvesting coordination are selfish in the sense that the agents involved act selfishly with regard to their tasks; acting in their own best interest towards their own goal. In our case, because of how the agents are structured, they contribute to the overall goal of the system (to collect and recycle garbage as efficiently as possible), despite their own 'selfish' goals.
+Joint action is possible regardless of whether the agents are cooperative or selfish, as long as a coalition is beneficial for the agents involved \cite{Rahwan:2015}.  For instance, the scouting coordination and harvesting coordination are selfish in the sense that the agents involved act selfishly with regard to their tasks; acting in their own best interest towards their own goal. In our case, because of how the agents are structured, they contribute to the overall goal of the system (to collect and recycle garbage as efficiently as possible), despite their own 'selfish' goals.
  
-``When the task is completed, the payoff is distributed, the coalition is disbanded and agents continue to pursue their own agendas''
+``When the task is completed, the payoff is distributed, the coalition is disbanded and agents continue to pursue their own agendas'' \cite{Shehory}
 
 \textbf{Scouting Coordination:} The ScoutAgents are told where to go by the ScoutCoordinator. They are purely reactive, as all they do is respond to find garbage and communicate this information. A coalition between the ScoutAgents only would not be useful as they do not have a common goal other than walking around as efficiently as possible. This efficiency has to be determined by the ScoutCoordinator.  
 
@@ -81,7 +81,7 @@ Joint action is possible regardless of whether the agents are cooperative or sel
 
 The evident advantage of coalitions is that they allow agents to work together to increase efficiency; theoretically they are only formed if a better outcome can be achieved by working together. 
 
-A core issue of working with coalitions is to identify which coalitions should be formed in order to achieve a goal (Algorithms paper). ''This usually requires calculating a value for every possible coalition, known as the coalition value, which indicates how beneficial that coalition would be if it was formed.'' It always requires a lot of communication between the agents who have to decide which coalitions to form, and they have to decide which mechanisms to use for the formation. 
+A core issue of working with coalitions is to identify which coalitions should be formed in order to achieve a goal (Algorithms paper). ''This usually requires calculating a value for every possible coalition, known as the coalition value, which indicates how beneficial that coalition would be if it was formed.'' \cite{Rahwan:2007} It always requires a lot of communication between the agents who have to decide which coalitions to form, and they have to decide which mechanisms to use for the formation. 
 
 
 
