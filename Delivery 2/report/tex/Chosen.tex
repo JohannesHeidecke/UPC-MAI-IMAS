@@ -23,7 +23,7 @@ For the ordering of pending garbage, not yet picked up and unassigned, a voting 
 
 In order to assign a harvester to a specific garbage collection task, we have chosen to use contract nets. In the order determined by the voting, the harvester agents bid if they are willing and able to pick-up the garbage in question. The coordinator then chooses the best fitting agent for this task and assigns it to the garbage. 
 
-In order for the idle harvesters to be more purposeful, they will form a coalition with the scouts. As the idle scout has no task to complete in the current state, it will follow a scout around in order to be closer to potential garbage to be discovered. 
+In order for the idle HarvesterAgents to be more purposeful, they will form a coalition with a ScoutAgent. As the idle HarvesterAgent has no task to complete in the current state, it will follow a ScoutAgent around in order to be closer to potential garbage to be discovered. 
 
 \subsection{Vehicle Coordination}
 
