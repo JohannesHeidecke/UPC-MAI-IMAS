@@ -15,11 +15,11 @@
 
 \subsubsection{Application to Practical Work}
 
-\textbf{Scouting Coordination:} The scout agents (SA) could be responsible for deciding their paths to discover garbage. They will put their proposed route information into their local plans and then send this onto the scout coordinator (SC). The SC then builds a PGP with the local plans from all agents. The SC detects if SAs plans are conflicting e.g. they plan to search the same area of map, they modify the PGP to avoid this and send this back to the scouts. 
+\textbf{Scouting Coordination:} The ScoutAgents could be responsible for deciding their paths to discover garbage. They will put their proposed route information into their local plans and then send this onto the ScoutCoordinator. The ScoutCoordinator then builds a PGP with the local plans from all agents. The ScoutCoordinator detects if ScoutAgents plans are conflicting e.g. they plan to search the same area of map, they modify the PGP to avoid this and send this back to the scouts. 
 
-\textbf{Harvesting Coordination:} Similarly, when harvester agents (HA) find out about garbage location they can generate their own plan (route) to harvest this located garbage. They add their suggested route to the garbage and onto appropriate recycling centre to their local plan, and send this onto the harvester coordinator (HC). The HC builds a PGP with the local plans from all HAs, and decides which HA route is the most beneficial for collecting which garbage. The HC modifies the PGP with its decision for each garbage collection and sends this back to the HAs so they have their updated individual plans. 
+\textbf{Harvesting Coordination:} Similarly, when HarvesterAgents find out about garbage location they can generate their own plan (route) to harvest this located garbage. They add their suggested route to the garbage and onto appropriate recycling centre to their local plan, and send this onto the HarvesterCoordinator. The HarvesterCoordinator builds a PGP with the local plans from all HarvesterAgents, and decides which HarvesterAgent route is the most beneficial for collecting which garbage. The HarvesterCoordinator modifies the PGP with its decision for each garbage collection and sends this back to the HAs so they have their updated individual plans. 
 
-\textbf{Vehicle Coordination:} The SC decides the routes that the SAs will take and this information goes into its local plan (it knows the current location and planned future location of all agents). Similarly, the HC is aware at all times of the location of all HAs, which are idle and which are en route to harvest garbage. This information is put into their local plan. The SC and HC send their local plans to the coordinator agent (CA). The CA builds a PGP and is able to see the locations and planned routes of all SAs and HAs. Using this information it can resolve conflicts e.g.two agents on one cell at one time, by deciding (based on a predetermined hierarchy) which agent must allow for another to pass by before continuing on its path. It will update the PGP with these decisions and send back to the SC and HC to update the SAs and HAs of any path modifications.
+\textbf{Vehicle Coordination:} The ScoutCoordinator decides the routes that the ScoutAgents will take and this information goes into its local plan (it knows the current location and planned future location of all agents). Similarly, the HarvesterCoordinator is aware at all times of the location of all HarvesterAgents, which are idle and which are en route to harvest garbage. This information is put into their local plan. The ScoutCoordinator and HarvesterCoordinator send their local plans to the CoordinatorAgent. The CoordinatorAgent builds a PGP and is able to see the locations and planned routes of all SAs and HarvesterAgents. Using this information it can resolve conflicts e.g.two agents on one cell at one time, by deciding (based on a predetermined hierarchy) which agent must allow for another to pass by before continuing on its path. It will update the PGP with these decisions and send back to the ScoutCoordinator and HarvesterCoordinator to update the ScoutAgents and HarvesterAgents of any path modifications.
 
 \subsubsection{Advantages and Disadvantages}
 
@@ -47,7 +47,7 @@ GPGP is a domain-independent extension of PGP. Furthermore, GPGP mechanisms comm
 
 \subsubsection{Application to Practical Work}
 
-If two harvesters commit to collect the same garbage, this information will be shared in their non-local viewpoints. The harvester coordinator would detect the redundancy in this task and will choose the agent that offers the best solution e.g. closest to garbage.  This agent will be notified to collect the garbage and the other will be updated with instructions that another agent is completing the task. 
+If two HarvesterAgents commit to collect the same garbage, this information will be shared in their non-local viewpoints. The HarvesterCoordinator would detect the redundancy in this task and will choose the agent that offers the best solution e.g. closest to garbage.  This agent will be notified to collect the garbage and the other will be updated with instructions that another agent is completing the task. 
 
 
 
@@ -114,22 +114,23 @@ The disadvantages are the computational effort due to the exchange of messages, 
 
 \subsubsection{General Description}
 
-A class of negotiation protocols, which provide us with methods for allocating goods/resources, based upon competition among self-interested parties.There are different types of auctions like the simple ones: English, Dutch, FPSB-First price sealed bid, Vickrey and then Multi-unit, Multi-attribute, Combinatorial and Others …
+A class of negotiation protocols, which provide us with methods for allocating goods/resources, based upon competition among self-interested parties.There are different types of auctions; the simple ones: English, Dutch, FPSB-First price sealed bid, Vickrey and multi-unit: Multi-attribute and  Combinatorial. 
 
 \subsubsection{Application to Practical Work}
 
-In case the Scouts would compete to get different or specialized routes they could bid to get different routes and then the ScoutCoordinator will choose to whom assign the specific route.If this was the case we would choose a FPSB- First price sealed bid in which all of the scouts will bid of a specific route/position and then the one with the less cost/max performance will be the winner for that specific position/route, all of the scouts bids without knowing the others bids.The harvester coordinator could make an auction for each group of garbage units to determine which harvester(s) should go there. The bids of the harvesters could depend on their current position, the position of the garbage, its current state (idle, on its way to another garbage collection, going to the recycling centre, pending garbages, …)This could be for example a FPSB where each of the Harvesters will bid (communicate its positions in regards to the garbage they want to  collect and how much it will cost them to get there) without knowing each of the other harvesters.There could be multi-unit auctions, if several garbage points are located close to one another and they are auctioned together.There could be a combinatoric auction of all the garbage at a certain point in time.Collected garbage could also be auctioned between recycling centers, if they were autonomous agents in this case the recycling centers will bid on which are closer to a specific harvester and its type of garbage.
+\textbf{Scouting Coordination:} ScoutAgents could compete to get different or specialised routes. They would bid for their different routes and the ScoutCoordinator would choose who to assign which specific routes. In this way we would choose a FPSB auction in which all of the ScoutAgents bid for their route and the one with the least cost/best performance will be the winner for that route. The ScoutAgents bid without knowing the others' bids.
+\textbf{Harvesting Coordination:} The HarvesterCoordinator could hold an auction for each garbage unit found to determine which HarvesterAgent(s) would harvest them. The HarvesterAgents' bids could depend on their current position, the position of the garbage and current state i.e. idle, moving to garbage for harvesting, moving to a recycling centre etc. Similarly, this could be a FPSB auction, where each HarvesterAgent would bid with the cost they would incur to reach the garbage without knowing others' bids and the HarvesterCoordinator would choose the best bid. 
+\\The auction could be a multi-unit auction, if several garbage units are located close to one another and they are auctioned together.\\There could be a combinatorial auction of all garbage at a certain point in time.
 
 \subsubsection{Advantages and Disadvantages}
 
-The advantage of an auction is that it creates competition; it enhances the seller’s bargaining power, this means that the harvester will really compete for getting a job as collecting a garbage and the coordinator (seller) will get to choose which is the best bid.
+The main advantage of an auction is that it creates competition; it enhances the seller's bargaining power, which means that the harvester competes for getting to collect garbage and the coordinator (seller) is able to choose the best bid.
 
-Flexibility, as protocols can be tailor-made
+Flexibility, as protocols can be tailor-made.
 
-Advantages of multi-attribute auctions: They allow more degrees of freedom for bidders: price may not be the only attribute of interest and more efficient information exchange among the market participants
+Advantages of multi-attribute auctions: They allow more degrees of freedom for bidders: price may not be the only attribute of interest and more efficient information exchange among the market participants.
 
-Disadvantages:The direally doesn't apply to our problem.. most are related to real bidding problems, like lying, shills, that doesn't apply to these agents
-
+Disadvantages:The disadvantages of auctions are mostly related to bidding problems such as lying, shills etc. These do not apply to our problem. 
 
 
 \subsection{Voting}
