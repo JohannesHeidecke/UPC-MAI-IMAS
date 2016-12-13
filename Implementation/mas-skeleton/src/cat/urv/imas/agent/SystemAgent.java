@@ -1,32 +1,33 @@
 /**
- *  IMAS base code for the practical work.
- *  Copyright (C) 2014 DEIM - URV
+ * IMAS base code for the practical work. Copyright (C) 2014 DEIM - URV
  *
- *  This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
  *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
  *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License along with
+ * this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package cat.urv.imas.agent;
 
+import cat.urv.imas.behaviour.system.PerformVehicleActionsBehaviour;
+import cat.urv.imas.behaviour.system.ProvideGameBehaviour;
 import cat.urv.imas.onthology.InitialGameSettings;
 import cat.urv.imas.onthology.GameSettings;
 import cat.urv.imas.gui.GraphicInterface;
-import cat.urv.imas.behaviour.system.RequestResponseBehaviour;
 import cat.urv.imas.map.Cell;
 import cat.urv.imas.map.StreetCell;
 import cat.urv.imas.onthology.GarbageType;
 import cat.urv.imas.onthology.InfoAgent;
 import jade.core.*;
 import jade.core.behaviours.CyclicBehaviour;
+import jade.core.behaviours.TickerBehaviour;
 import jade.domain.*;
 import jade.domain.FIPAAgentManagement.*;
 import jade.domain.FIPANames.InteractionProtocol;
@@ -200,55 +201,9 @@ public class SystemAgent extends ImasAgent {
         this.coordinatorAgent = UtilsAgents.searchAgent(this, searchCriterion);
         // searchAgent is a blocking method, so we will obtain always a correct AID
 
-        // add behaviours
-        // we wait for the initialization of the game
-        MessageTemplate mt = MessageTemplate.and(MessageTemplate.MatchProtocol(InteractionProtocol.FIPA_REQUEST), MessageTemplate.MatchPerformative(ACLMessage.REQUEST));
+        this.addBehaviour(new ProvideGameBehaviour(coordinatorAgent, game));
+        this.addBehaviour(new PerformVehicleActionsBehaviour());
 
-        this.addBehaviour(new RequestResponseBehaviour(this, mt));
-
-        // Setup finished. When the last inform is received, the agent itself will add
-        // a behaviour to send/receive actions
-       
-        // NOTE: test behavior, to be deleted later!
-        // switches the ScoutAgent on Cell [1|4] to [1|5] and back
-        this.addBehaviour(new CyclicBehaviour(this) {
-            
-            @Override
-            public void action() {
-               // Test action: switch scout agent between 4-1 and 5-1
-               GameSettings game = ((SystemAgent) this.myAgent).getGame();
-               StreetCell c41 = (StreetCell) game.getMap()[1][4];
-               StreetCell c51 = (StreetCell) game.getMap()[1][5];
-               StreetCell empty, full;
-               if (c41.isThereAnAgent()) {
-                   full = c41;
-                   empty = c51;
-               } else {
-                   full = c51;
-                   empty = c41;
-               }
-               InfoAgent scoutInfoAgent = full.getAgent();
-                try {
-                    full.removeAgent(scoutInfoAgent);
-                    empty.addAgent(scoutInfoAgent);
-                    
-                } catch (Exception ex) {
-                    Logger.getLogger(SystemAgent.class.getName()).log(Level.SEVERE, null, ex);
-                    this.done();
-                }
-                ((SystemAgent) this.myAgent).gui.updateGame();
-                ((SystemAgent) this.myAgent).gui.log("Moved ScoutAgent\n");
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException ex) {
-                    Logger.getLogger(SystemAgent.class.getName()).log(Level.SEVERE, null, ex);
-                }
-               
-            }
-        });
-        
-        
-        
     }
 
     public void updateGUI() {

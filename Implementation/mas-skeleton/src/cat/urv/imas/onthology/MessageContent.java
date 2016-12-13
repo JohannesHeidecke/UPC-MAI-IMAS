@@ -26,6 +26,18 @@ public class MessageContent {
      * Message sent from Coordinator agent to System agent to get the whole
      * city information.
      */
-    public static final String GET_MAP = "Get map";
+    public static final String REQUEST_GAME = "Get map";
+    public static final String REPLY_GAME = "Reply game";
+    
+    public static final String REQUEST_PLAN_SCOUTS = "Get scouting plan";
+    public static final String REPLY_PLAN_SCOUTS = "Reply scouting plan";
+    
+    public static final String REQUEST_PLAN_HARVESTERS = "Get harvesting plan";
+    public static final String REPLY_PLAN_HARVESTERS = "Reply harvesting plan";
+    
+    public static final String REQUEST_VEHICLE_ACTIONS = "Request vehicle actions";
+    
+    
+    
     
 }

@@ -57,9 +57,9 @@ public class StreetCell extends Cell {
      * @throws Exception
      */
     public void addAgent(InfoAgent newAgent) throws Exception {
-        System.out.println("Add an agent to " + this + "<--" + newAgent);
+//        System.out.println("Add an agent to " + this + "<--" + newAgent);
         if (this.isThereAnAgent()) {
-            throw new Exception("Full STREET cell");
+            throw new Exception("Full STREET cell: ("+this.getRow()+"|"+this.getCol()+")");
         }
         if (newAgent == null) {
             throw new Exception("No valid agent to be set (null)");
