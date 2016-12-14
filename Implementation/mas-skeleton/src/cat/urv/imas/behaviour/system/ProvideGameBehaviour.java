@@ -40,12 +40,7 @@ public class ProvideGameBehaviour extends CyclicBehaviour {
         if (msg != null) {
             if (msg.getSender().equals(coordinator)) {
                 try {
-                    //TODO: remove sleep
-                    try {
-                        Thread.sleep(200);
-                    } catch (InterruptedException ex) {
-                        Logger.getLogger(ProvideGameBehaviour.class.getName()).log(Level.SEVERE, null, ex);
-                    }
+                    
 //                    ((SystemAgent) myAgent).log("Send game settings to Coordinator");
                     ACLMessage reply = new ACLMessage(Performatives.REPLY_GAME);
                     reply.setSender(myAgent.getAID());

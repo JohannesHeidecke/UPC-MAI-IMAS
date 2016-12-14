@@ -8,9 +8,12 @@ package cat.urv.imas.behaviour.system;
 import cat.urv.imas.agent.CoordinatorAgent;
 import cat.urv.imas.agent.SystemAgent;
 import cat.urv.imas.gui.CellVisualizer;
+import cat.urv.imas.map.BuildingCell;
 import cat.urv.imas.map.Cell;
 import cat.urv.imas.map.CellType;
+import cat.urv.imas.map.SettableBuildingCell;
 import cat.urv.imas.map.StreetCell;
+import cat.urv.imas.onthology.GarbageType;
 import cat.urv.imas.onthology.InfoAgent;
 import cat.urv.imas.onthology.Performatives;
 import cat.urv.imas.plan.Coordinate;
@@ -40,6 +43,7 @@ public class PerformVehicleActionsBehaviour extends CyclicBehaviour {
         ACLMessage msg = myAgent.receive(mt);
         if (msg != null) {
             handleRequestedActions(msg);
+            myAgent.addBehaviour(new AddGarbageBehavior());
         } else {
             block();
         }
@@ -69,6 +73,7 @@ public class PerformVehicleActionsBehaviour extends CyclicBehaviour {
                     // check if toCell is a collision:
                     for (Coordinate collision : collisionCells) {
                         if (to.equals(collision)) {
+                            // Vehicles that would collide are not allowed to move:
                             Movement movement = (Movement) plan.getActions().get(0);
                             int rowFrom = movement.getRowFrom();
                             int colFrom = movement.getColFrom();
@@ -78,6 +83,7 @@ public class PerformVehicleActionsBehaviour extends CyclicBehaviour {
                         }
                     }
 
+                    // If there was no collision: add Movement to validMovements
                     int rowFrom = ((Movement) plan.getActions().get(0)).getRowFrom();
                     int colFrom = ((Movement) plan.getActions().get(0)).getColFrom();
                     Coordinate from = new Coordinate(rowFrom, colFrom);
@@ -85,6 +91,7 @@ public class PerformVehicleActionsBehaviour extends CyclicBehaviour {
                     validMovements.add(new ValidMovement(from, to, infoAgent));
 
                 }
+                // repeat until all agents are doing valid movements
             } while (validMovements.size() < plans.size());
 
             executeValidMovements(validMovements, map);

@@ -32,7 +32,7 @@ public class SettableBuildingCell extends BuildingCell {
     
     public void setGarbage(GarbageType type, int amount) {
         if (!garbage.isEmpty()) {
-            throw new IllegalStateException("This building (" + this.getRow() + "," + this.getCol() + ") has garbage yet: " + this.getMapMessage());
+            throw new IllegalStateException("This building (" + this.getRow() + "," + this.getCol() + ") has garbage already: " + this.getMapMessage());
         }
         garbage.put(type, amount);
     }

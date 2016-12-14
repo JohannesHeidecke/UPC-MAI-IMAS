@@ -70,7 +70,7 @@ public class BuildingCell extends Cell {
      * @return the garbage on it.
      */
     public Map<GarbageType, Integer> getGarbage() {
-        return (found) ? garbage : empty;
+        return (!garbage.isEmpty()) ? garbage : empty;
     }
     
     /**
