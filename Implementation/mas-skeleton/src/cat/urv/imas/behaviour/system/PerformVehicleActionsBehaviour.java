@@ -5,6 +5,7 @@
  */
 package cat.urv.imas.behaviour.system;
 
+import cat.urv.imas.agent.AgentType;
 import cat.urv.imas.agent.CoordinatorAgent;
 import cat.urv.imas.agent.SystemAgent;
 import cat.urv.imas.gui.CellVisualizer;
@@ -158,8 +159,10 @@ public class PerformVehicleActionsBehaviour extends CyclicBehaviour {
             int rowTo = validMovement.getTo().getRow();
             int colTo = validMovement.getTo().getCol();
             try {
-
                 ((StreetCell) map[rowTo][colTo]).addAgent(validMovement.getInfoAgent());
+                if (validMovement.getInfoAgent().getType().equals(AgentType.SCOUT)) {
+                  ((SystemAgent) myAgent).getGame().detectBuildingsWithGarbage(rowTo, colTo);
+                }
             } catch (Exception ex) {
                 Logger.getLogger(PerformVehicleActionsBehaviour.class.getName()).log(Level.SEVERE, null, ex);
             }

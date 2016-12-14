@@ -70,7 +70,7 @@ public class BuildingCell extends Cell {
      * @return the garbage on it.
      */
     public Map<GarbageType, Integer> getGarbage() {
-        return (!garbage.isEmpty()) ? garbage : empty;
+        return found ? garbage : empty;
     }
     
     /**
@@ -89,6 +89,10 @@ public class BuildingCell extends Cell {
                 }
             }
         }
+    }
+    
+    public boolean hasGarbage() {
+        return !this.garbage.isEmpty();
     }
     
     /* ***************** Map visualization API ********************************/
@@ -113,7 +117,7 @@ public class BuildingCell extends Cell {
             return "";
         }
         for (Map.Entry<GarbageType, Integer> entry: garbage.entrySet()) {
-            return entry.getKey().getShortString() + ":" + entry.getValue() + 
+            return "      "+entry.getKey().getShortString() + ":" + entry.getValue() + 
                     ((found) ? "*" : "");
         }
         return "";

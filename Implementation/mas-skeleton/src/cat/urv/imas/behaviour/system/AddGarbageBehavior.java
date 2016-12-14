@@ -50,7 +50,7 @@ public class AddGarbageBehavior extends SimpleBehaviour {
             int randomCol = ThreadLocalRandom.current().nextInt(minCol, maxCol);
             Cell randomCell = map[randomRow][randomCol];
             if (randomCell instanceof SettableBuildingCell) {
-                if (((BuildingCell) randomCell).getGarbage().isEmpty()) {
+                if (!((BuildingCell) randomCell).hasGarbage()) {
                     int garbageAmount = ThreadLocalRandom.current().nextInt(1, maxAmountOfNewGarbage + 1);
                     int randomType = ThreadLocalRandom.current().nextInt(0, 3);
                     GarbageType garbageType = null;
@@ -82,7 +82,7 @@ public class AddGarbageBehavior extends SimpleBehaviour {
         for (int i = 0; i < map.length; i++) {
             for (int j = 0; j< map[i].length; j++) {
                 if (map[i][j] instanceof SettableBuildingCell) {
-                    if (!((BuildingCell) map[i][j]).getGarbage().isEmpty()) {
+                    if (((BuildingCell) map[i][j]).hasGarbage()) {
                         result++;
                     }
                 }

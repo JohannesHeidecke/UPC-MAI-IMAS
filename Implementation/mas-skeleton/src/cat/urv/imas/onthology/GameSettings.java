@@ -1,6 +1,5 @@
 /**
- * IMAS base code for the practical work. 
- * Copyright (C) 2014 DEIM - URV
+ * IMAS base code for the practical work. Copyright (C) 2014 DEIM - URV
  *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -18,6 +17,7 @@
 package cat.urv.imas.onthology;
 
 import cat.urv.imas.agent.AgentType;
+import cat.urv.imas.map.BuildingCell;
 import cat.urv.imas.map.Cell;
 import java.util.List;
 import java.util.Map;
@@ -28,12 +28,12 @@ import javax.xml.bind.annotation.XmlRootElement;
 /**
  * Current game settings. Cell coordinates are zero based: row and column values
  * goes from [0..n-1], both included.
- * 
+ *
  * Use the GenerateGameSettings to build the game.settings configuration file.
- * 
+ *
  */
 @XmlRootElement(name = "GameSettings")
-public class GameSettings implements java.io.Serializable {    
+public class GameSettings implements java.io.Serializable {
 
     /* Default values set to all attributes, just in case. */
     /**
@@ -41,17 +41,16 @@ public class GameSettings implements java.io.Serializable {
      */
     private float seed = 0.0f;
     /**
-     * Price for recycling on recycling centers, for plastic, glass and paper. 
+     * Price for recycling on recycling centers, for plastic, glass and paper.
      * Therefore, a value "{{1, 2, 3}}" means there will be a single recycling
-     * center and it will pay 1 coin for plastic, 2 coins for glass and
-     * 3 coins for paper. If there is a 0 coin at some point, it means
-     * there is no recycling process for that kind of garbage.
+     * center and it will pay 1 coin for plastic, 2 coins for glass and 3 coins
+     * for paper. If there is a 0 coin at some point, it means there is no
+     * recycling process for that kind of garbage.
      */
     private int[][] recyclingCenterPrices = {
         {9, 10, 0},
         {10, 0, 9},
-        {0, 9, 10},
-    };
+        {0, 9, 10},};
     /**
      * Total number of simulation steps.
      */
@@ -61,8 +60,8 @@ public class GameSettings implements java.io.Serializable {
      */
     protected Cell[][] map;
     /**
-     * From 0 to 100 (meaning percentage) of probability of having new
-     * garbage in the city at every step.
+     * From 0 to 100 (meaning percentage) of probability of having new garbage
+     * in the city at every step.
      */
     protected int newGarbageProbability = 10;
     /**
@@ -93,7 +92,6 @@ public class GameSettings implements java.io.Serializable {
      * Title to set to the GUI.
      */
     protected String title = "Demo title";
-    
 
     public float getSeed() {
         return seed;
@@ -112,8 +110,8 @@ public class GameSettings implements java.io.Serializable {
     public void setRecyclingCenterPrices(int[][] prices) {
         this.recyclingCenterPrices = prices;
         int check = 0; // if 7, all garbage types are treated.
-        for (int i=0; i < prices.length; i++) {
-            for (int j=0; j < 3; j++) {
+        for (int i = 0; i < prices.length; i++) {
+            for (int j = 0; j < 3; j++) {
                 if (prices[i][j] != 0) {
                     check |= 1 << j;
                 }
@@ -137,16 +135,16 @@ public class GameSettings implements java.io.Serializable {
         return title;
     }
 
-    @XmlElement(required=true)
+    @XmlElement(required = true)
     public void setTitle(String title) {
         this.title = title;
     }
-    
+
     public int getNewGarbageProbability() {
         return newGarbageProbability;
     }
 
-    @XmlElement(required=true)
+    @XmlElement(required = true)
     public void setNewGarbageProbability(int newGarbageProbability) {
         this.newGarbageProbability = newGarbageProbability;
     }
@@ -155,7 +153,7 @@ public class GameSettings implements java.io.Serializable {
         return maxNumberBuildingWithNewGargabe;
     }
 
-    @XmlElement(required=true)
+    @XmlElement(required = true)
     public void setMaxNumberBuildingWithNewGargabe(int maxNumberBuildingWithNewGargabe) {
         this.maxNumberBuildingWithNewGargabe = maxNumberBuildingWithNewGargabe;
     }
@@ -164,7 +162,7 @@ public class GameSettings implements java.io.Serializable {
         return maxAmountOfNewGargabe;
     }
 
-    @XmlElement(required=true)
+    @XmlElement(required = true)
     public void setMaxAmountOfNewGargabe(int maxAmountOfNewGargabe) {
         this.maxAmountOfNewGargabe = maxAmountOfNewGargabe;
     }
@@ -178,29 +176,42 @@ public class GameSettings implements java.io.Serializable {
         return harvestersCapacity;
     }
 
-    @XmlElement(required=true)
+    @XmlElement(required = true)
     public void setHarvestersCapacity(int harvestersCapacity) {
         this.harvestersCapacity = harvestersCapacity;
     }
-    
+
     /**
      * Gets the full current city map.
+     *
      * @return the current city map.
      */
     @XmlTransient
     public Cell[][] getMap() {
         return map;
     }
-    
+
     public Cell[] detectBuildingsWithGarbage(int row, int col) {
         //TODO: find all surrounding cells to (row,col) that are
         //      buildings and have garbage on it.
         //      Use: BuildingCell.detectGarbage() to do so.
+        int minRow = Math.max(0, row - 1);
+        int maxRow = Math.min(row + 1, map.length - 1);
+        int minCol = Math.max(0, col - 1);
+        int maxCol = Math.min(col + 1, map[0].length - 1);
+        for (int i = minRow; i <= maxRow; i++) {
+            for (int j = minCol; j <= maxCol; j++) {
+                if (map[i][j] instanceof BuildingCell) {
+                    ((BuildingCell) map[i][j]).detectGarbage();
+                }
+            }
+        }
         return null;
     }
-    
+
     /**
      * Gets the cell given its coordinate.
+     *
      * @param row row number (zero based)
      * @param col column number (zero based).
      * @return a city's Cell.
@@ -217,15 +228,15 @@ public class GameSettings implements java.io.Serializable {
     public void setAgentList(Map<AgentType, List<Cell>> agentList) {
         this.agentList = agentList;
     }
-    
+
     public String toString() {
         //TODO: show a human readable summary of the game settings.
         return "Game settings";
     }
-    
+
     public String getShortString() {
         //TODO: list of agents
         return "Game settings: agent related string";
     }
-    
+
 }
