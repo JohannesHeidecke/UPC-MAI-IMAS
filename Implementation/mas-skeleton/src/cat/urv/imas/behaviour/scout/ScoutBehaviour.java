@@ -78,8 +78,9 @@ public class ScoutBehaviour extends CyclicBehaviour {
             int max = 1;
             int rowStep = ThreadLocalRandom.current().nextInt(min, max + 1);
             int colStep = ThreadLocalRandom.current().nextInt(min, max + 1);
-            int newRow = Math.max(0, myLocation.getRow() + rowStep);
-            int newCol = Math.max(0, myLocation.getCol() + colStep);
+            int rowOrCol = ThreadLocalRandom.current().nextInt(0, 2);
+            int newRow = Math.max(0, myLocation.getRow() + rowStep * rowOrCol);
+            int newCol = Math.max(0, myLocation.getCol() + colStep * (1-rowOrCol));
             randomPlan.addAction(new Movement(myLocation.getRow(), myLocation.getCol(), newRow, newCol));
 
             try {
