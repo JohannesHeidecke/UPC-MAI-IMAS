@@ -6,15 +6,9 @@
 package cat.urv.imas.behaviour.system;
 
 import cat.urv.imas.agent.AgentType;
-import cat.urv.imas.agent.CoordinatorAgent;
 import cat.urv.imas.agent.SystemAgent;
-import cat.urv.imas.gui.CellVisualizer;
-import cat.urv.imas.map.BuildingCell;
 import cat.urv.imas.map.Cell;
-import cat.urv.imas.map.CellType;
-import cat.urv.imas.map.SettableBuildingCell;
 import cat.urv.imas.map.StreetCell;
-import cat.urv.imas.onthology.GarbageType;
 import cat.urv.imas.onthology.InfoAgent;
 import cat.urv.imas.onthology.Performatives;
 import cat.urv.imas.plan.Coordinate;
@@ -27,7 +21,9 @@ import jade.lang.acl.MessageTemplate;
 import jade.lang.acl.UnreadableException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -52,7 +48,7 @@ public class PerformVehicleActionsBehaviour extends CyclicBehaviour {
     }
 
     private void handleRequestedActions(ACLMessage msg) {
-
+        
         ((SystemAgent) myAgent).log("Performing vehicle Actions");
 
         try {
@@ -63,7 +59,7 @@ public class PerformVehicleActionsBehaviour extends CyclicBehaviour {
 
             List<ValidMovement> validMovements;
             do {
-                List<Coordinate> collisionCells = getCollisionCells(plans);
+                Set<Coordinate> collisionCells = getCollisionCells(plans);
                 validMovements = new ArrayList<>();
                 outerLoop:
                 for (AID agent : plans.keySet()) {
@@ -103,13 +99,18 @@ public class PerformVehicleActionsBehaviour extends CyclicBehaviour {
 
     }
 
-    private List<Coordinate> getCollisionCells(HashMap<AID, Plan> plans) {
-        List<Coordinate> collisions = new ArrayList<>();
+    private Set<Coordinate> getCollisionCells(HashMap<AID, Plan> plans) {
+        Set<Coordinate> collisions = new HashSet<>();
         List<Coordinate> tos = new ArrayList<>();
 
-        for (Plan plan : plans.values()) {
+        for (AID vehicle : plans.keySet()) {
+            Plan plan = plans.get(vehicle);
             Movement movement = (Movement) plan.getActions().get(0);
+
             Coordinate to = new Coordinate(movement.getRowTo(), movement.getColTo());
+            Coordinate from = new Coordinate(movement.getRowFrom(), movement.getColFrom());
+
+            // Check if two vehicles are trying to move on the same cell:
             // check if to is already in tos (collision):
             for (Coordinate coord : tos) {
                 if (to.equals(coord)) {
@@ -117,8 +118,20 @@ public class PerformVehicleActionsBehaviour extends CyclicBehaviour {
                     break;
                 }
             }
-
             tos.add(to);
+
+            // Check if two vehicles are trying to swap positions:
+            for (AID otherVehicle : plans.keySet()) {
+                Plan otherPlan = plans.get(otherVehicle);
+                Movement otherMovement = (Movement) otherPlan.getActions().get(0);
+                Coordinate otherTo = new Coordinate(otherMovement.getRowTo(), otherMovement.getColTo());
+                Coordinate otherFrom = new Coordinate(otherMovement.getRowFrom(), otherMovement.getColFrom());
+                if ((!to.equals(from)) && to.equals(otherFrom) && from.equals(otherTo)) {
+                    collisions.add(to);
+                    collisions.add(from);
+                }
+            }
+
         }
 
         return collisions;
@@ -161,7 +174,7 @@ public class PerformVehicleActionsBehaviour extends CyclicBehaviour {
             try {
                 ((StreetCell) map[rowTo][colTo]).addAgent(validMovement.getInfoAgent());
                 if (validMovement.getInfoAgent().getType().equals(AgentType.SCOUT)) {
-                  ((SystemAgent) myAgent).getGame().detectBuildingsWithGarbage(rowTo, colTo);
+                    ((SystemAgent) myAgent).getGame().detectBuildingsWithGarbage(rowTo, colTo);
                 }
             } catch (Exception ex) {
                 Logger.getLogger(PerformVehicleActionsBehaviour.class.getName()).log(Level.SEVERE, null, ex);
