@@ -7,6 +7,7 @@ package cat.urv.imas.behaviour.system;
 
 import cat.urv.imas.agent.AgentType;
 import cat.urv.imas.agent.SystemAgent;
+import cat.urv.imas.behaviour.coordinator.harvester.CoordinateHarvestersBehaviour;
 import cat.urv.imas.map.Cell;
 import cat.urv.imas.map.StreetCell;
 import cat.urv.imas.onthology.InfoAgent;
@@ -48,6 +49,12 @@ public class PerformVehicleActionsBehaviour extends CyclicBehaviour {
     }
 
     private void handleRequestedActions(ACLMessage msg) {
+        
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(PerformVehicleActionsBehaviour.class.getName()).log(Level.SEVERE, null, ex);
+        }
         
         ((SystemAgent) myAgent).log("Performing vehicle Actions");
 
@@ -181,7 +188,7 @@ public class PerformVehicleActionsBehaviour extends CyclicBehaviour {
             }
         }
 
-        ((SystemAgent) myAgent).updateGUI();
+        myAgent.addBehaviour(new UpdateGuiBehaviour());
     }
 
 }

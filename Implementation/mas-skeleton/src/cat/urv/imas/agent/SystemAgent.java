@@ -205,6 +205,10 @@ public class SystemAgent extends ImasAgent {
         this.addBehaviour(new PerformVehicleActionsBehaviour());
 
     }
+    
+    public void writeStatisticMessage(String msg) {
+        this.gui.showStatistics(msg);
+    }
 
     public void updateGUI() {
         this.gui.updateGame();
