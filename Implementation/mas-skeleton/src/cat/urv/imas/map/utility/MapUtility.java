@@ -171,12 +171,23 @@ public class MapUtility {
         Assignment solution = routing.solveWithParameters(searchParameters);
 
         int routeNumber = 0;
-        List<Coordinate> result = new ArrayList<>();
+        List<Coordinate> tspRoute = new ArrayList<>();
         for (long node = routing.start(routeNumber);
                 !routing.isEnd(node);
                 node = solution.value(routing.nextVar(node))) {
-            result.add(coordinates[(int)node]);
+            tspRoute.add(coordinates[(int)node]);
         }
+        
+        // if necessary (distance > 1): add paths between coordinates in result:
+        Coordinate coord, nextCoord;
+        List<Coordinate> result = new ArrayList<>();
+        for (int i = 0; i < tspRoute.size(); i++) {
+            coord = tspRoute.get(i);
+            nextCoord = tspRoute.get((i+1) % tspRoute.size());
+            List<Coordinate> path = getShortestPath(coord, nextCoord);
+            result.addAll(path.subList(1, path.size()));
+        }
+        
         return result;
 
     }
@@ -187,8 +198,9 @@ public class MapUtility {
         for (int i = 0; i < coordinates.length; i++) {
             result[i][i] = 0;
             for (int j = i+1; j < coordinates.length; j++) {
-                result[i][j] = getShortestDistance(coordinates[i], coordinates[j]);
-                result[j][i] = getShortestDistance(coordinates[i], coordinates[j]);
+                int distance = getShortestDistance(coordinates[i], coordinates[j]);
+                result[i][j] = distance;
+                result[j][i] = distance;
             }
         }
 
