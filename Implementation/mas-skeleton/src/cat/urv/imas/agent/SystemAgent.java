@@ -16,6 +16,7 @@
  */
 package cat.urv.imas.agent;
 
+import cat.urv.imas.SystemConstants;
 import cat.urv.imas.behaviour.system.PerformVehicleActionsBehaviour;
 import cat.urv.imas.behaviour.system.ProvideGameBehaviour;
 import cat.urv.imas.onthology.InitialGameSettings;
@@ -135,7 +136,7 @@ public class SystemAgent extends ImasAgent {
         }
 
         // 2. Load game settings.
-        this.game = InitialGameSettings.load("game.settings");
+        this.game = InitialGameSettings.load(SystemConstants.GAME_SETTINGS_NAME);
         log("Initial configuration settings loaded");
         MapUtility.initialize(game.getMap());
         log("Initialized MapUtility structures");

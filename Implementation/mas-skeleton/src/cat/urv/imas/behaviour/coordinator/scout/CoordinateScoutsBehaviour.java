@@ -161,6 +161,8 @@ public class CoordinateScoutsBehaviour extends CyclicBehaviour {
             tspRoutePositions = new HashMap<>(((ScoutCoordinatorAgent) myAgent).getCoordinatedScouts().size());
             initRoutePositions();
         }
+        
+        enhanceEquidistance();
 
         // move tspRoutePositions one forward:
         for (AID scout : tspRoutePositions.keySet()) {
@@ -191,6 +193,10 @@ public class CoordinateScoutsBehaviour extends CyclicBehaviour {
             }
         }
 
+    }
+    
+    private void enhanceEquidistance() {
+        //TODO
     }
 
 }
