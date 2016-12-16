@@ -5,6 +5,7 @@
  */
 package cat.urv.imas.behaviour.system;
 
+import cat.urv.imas.SystemConstants;
 import cat.urv.imas.agent.AgentType;
 import cat.urv.imas.agent.SystemAgent;
 import cat.urv.imas.behaviour.coordinator.harvester.CoordinateHarvestersBehaviour;
@@ -51,13 +52,11 @@ public class PerformVehicleActionsBehaviour extends CyclicBehaviour {
     private void handleRequestedActions(ACLMessage msg) {
         
         try {
-            Thread.sleep(500);
+            Thread.sleep(SystemConstants.DELAY_SIMULATION_STEP);
         } catch (InterruptedException ex) {
             Logger.getLogger(PerformVehicleActionsBehaviour.class.getName()).log(Level.SEVERE, null, ex);
         }
         
-        ((SystemAgent) myAgent).log("Performing vehicle Actions");
-
         try {
             HashMap<AID, Plan> plans = (HashMap<AID, Plan>) msg.getContentObject();
             Cell[][] map = ((SystemAgent) myAgent).getGame().getMap();
