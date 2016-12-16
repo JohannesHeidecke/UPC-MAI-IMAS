@@ -24,15 +24,15 @@ import java.util.logging.Logger;
  * @author johannesheidecke
  */
 public class ScoutCoordinatorAgent extends ImasAgent {
-    
+
     private List<AID> coordinatedScouts = new ArrayList<>();
-    
+
     public ScoutCoordinatorAgent() {
         super(AgentType.SCOUT_COORDINATOR);
     }
-    
+
     public void setup() {
-        
+
         /* ** Very Important Line (VIL) ***************************************/
         this.setEnabledO2ACommunication(true, 1);
         /* ********************************************************************/
@@ -53,7 +53,7 @@ public class ScoutCoordinatorAgent extends ImasAgent {
             System.err.println(getLocalName() + " registration with DF unsucceeded. Reason: " + e.getMessage());
             doDelete();
         }
-        
+
         // Add subscription to keep List of coordinated Scouts up to date:
         DFAgentDescription dfAgentDescr = new DFAgentDescription();
         ServiceDescription sdScout = new ServiceDescription();
@@ -64,28 +64,26 @@ public class ScoutCoordinatorAgent extends ImasAgent {
                     protected void handleInform(ACLMessage inform) {
                         try {
                             DFAgentDescription[] dfad = DFService.decodeNotification(inform.getContent());
-                            for(int i = 0; i < dfad.length; i++) {
+                            for (int i = 0; i < dfad.length; i++) {
                                 ((ScoutCoordinatorAgent) myAgent).addCoordinatedScout(dfad[i].getName());
                             }
-                            
+
                         } catch (FIPAException ex) {
                             Logger.getLogger(ScoutCoordinatorAgent.class.getName()).log(Level.SEVERE, null, ex);
                         }
                     }
                 });
-        
-        
 
         this.addBehaviour(new CoordinateScoutsBehaviour(this));
-        
+
     }
-    
+
     public List<AID> getCoordinatedScouts() {
         return this.coordinatedScouts;
     }
-    
+
     public void addCoordinatedScout(AID scout) {
         this.coordinatedScouts.add(scout);
     }
-    
+
 }

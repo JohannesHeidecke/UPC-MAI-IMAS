@@ -11,6 +11,6 @@ package cat.urv.imas;
  */
 public class SystemConstants {
     
-    public static final int DELAY_SIMULATION_STEP = 100;
+    public static final int DELAY_SIMULATION_STEP = 0;
     
 }

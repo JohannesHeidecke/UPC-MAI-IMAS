@@ -23,6 +23,7 @@ import cat.urv.imas.onthology.GameSettings;
 import cat.urv.imas.gui.GraphicInterface;
 import cat.urv.imas.map.Cell;
 import cat.urv.imas.map.StreetCell;
+import cat.urv.imas.map.utility.MapUtility;
 import cat.urv.imas.onthology.GarbageType;
 import cat.urv.imas.onthology.InfoAgent;
 import jade.core.*;
@@ -136,6 +137,8 @@ public class SystemAgent extends ImasAgent {
         // 2. Load game settings.
         this.game = InitialGameSettings.load("game.settings");
         log("Initial configuration settings loaded");
+        MapUtility.initialize(game.getMap());
+        log("Initialized MapUtility structures");
 
         // 3. Load GUI
         try {

@@ -18,8 +18,8 @@ public class Performatives extends ACLMessage {
     
     public static final int REQUEST_PLAN_SCOUTS = 200;
     public static final int REPLY_PLAN_SCOUTS = 201;
-    public static final int REQUEST_PLAN_SCOUT = 202;
-    public static final int REPLY_PLAN_SCOUT = 203;
+    public static final int REQUEST_LOCATION_SCOUT = 202;
+    public static final int REPLY_LOCATION_SCOUT = 203;
     
     public static final int REQUEST_PLAN_HARVESTERS = 300;
     public static final int REPLY_PLAN_HARVESTERS = 301;

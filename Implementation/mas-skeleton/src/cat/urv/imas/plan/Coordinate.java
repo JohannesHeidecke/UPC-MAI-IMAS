@@ -5,11 +5,13 @@
  */
 package cat.urv.imas.plan;
 
+import java.io.Serializable;
+
 /**
  *
  * @author Ihcrul
  */
-public class Coordinate {
+public class Coordinate implements Serializable {
     
     private int row;
     private int col;

@@ -37,6 +37,11 @@ public class CoordinateHarvestersBehaviour extends CyclicBehaviour {
     public CoordinateHarvestersBehaviour(HarvesterCoordinatorAgent harvCoordinator) {
         this.harvCoordinator = harvCoordinator;
     }
+    
+    @Override
+    public void onStart() {
+        ((HarvesterCoordinatorAgent) myAgent).log("Started Behaviour: "+this.getClass().toString());
+    }
 
     @Override
     public void action() {

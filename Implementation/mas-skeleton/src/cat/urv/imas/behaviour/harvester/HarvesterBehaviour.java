@@ -6,6 +6,7 @@
 package cat.urv.imas.behaviour.harvester;
 
 import cat.urv.imas.agent.HarvesterAgent;
+import cat.urv.imas.agent.SystemAgent;
 import cat.urv.imas.map.Cell;
 import cat.urv.imas.map.StreetCell;
 import cat.urv.imas.onthology.HarvesterInfoAgent;
@@ -25,7 +26,7 @@ import java.util.logging.Logger;
  * @author Ihcrul
  */
 public class HarvesterBehaviour extends CyclicBehaviour {
-
+    
     @Override
     public void action() {
 

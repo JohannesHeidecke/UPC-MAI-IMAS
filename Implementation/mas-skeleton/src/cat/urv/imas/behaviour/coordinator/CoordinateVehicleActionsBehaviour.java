@@ -48,12 +48,13 @@ public class CoordinateVehicleActionsBehaviour extends CyclicBehaviour {
 
     @Override
     public void onStart() {
+        ((CoordinatorAgent) myAgent).log("Started Behaviour: "+this.getClass().toString());
         // Send initial Request to SystemAgent
         ACLMessage msg = new ACLMessage(Performatives.REQUEST_GAME);
         msg.setSender(myAgent.getAID());
         msg.addReceiver(system);
         myAgent.send(msg);
-//        ((CoordinatorAgent) myAgent).log("Requested Initial Game Settings");
+        ((CoordinatorAgent) myAgent).log("Requested Initial Game Settings");
     }
 
     @Override
@@ -105,7 +106,7 @@ public class CoordinateVehicleActionsBehaviour extends CyclicBehaviour {
 
         try {
 
-//            ((CoordinatorAgent) myAgent).log("Request new plans from HC and SC");
+            ((CoordinatorAgent) myAgent).log("Request new plans from HC and SC");
 
             Cell[][] map = ((GameSettings) msg.getContentObject()).getMap();
             // Send requests for new plans to HCoord and SCoord,
@@ -130,7 +131,7 @@ public class CoordinateVehicleActionsBehaviour extends CyclicBehaviour {
 
     private void handleNewPlanHarvesting(ACLMessage msg) {
         try {
-//            ((CoordinatorAgent) myAgent).log("Harvester Plans received");
+            ((CoordinatorAgent) myAgent).log("Harvester Plans received");
             this.currentHarvestingPlan = (HashMap<AID, Plan>) msg.getContentObject();
             planHarvestersReceived = true;
         } catch (UnreadableException ex) {
@@ -140,7 +141,7 @@ public class CoordinateVehicleActionsBehaviour extends CyclicBehaviour {
 
     private void handleNewPlanScouting(ACLMessage msg) {
         try {
-//            ((CoordinatorAgent) myAgent).log("Scout Plans received");
+            ((CoordinatorAgent) myAgent).log("Scout Plans received");
             this.currentScoutingPlan = (HashMap<AID, Plan>) msg.getContentObject();
             planScoutsReceived = true;
         } catch (UnreadableException ex) {

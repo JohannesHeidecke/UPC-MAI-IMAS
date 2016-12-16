@@ -31,6 +31,11 @@ public class ProvideGameBehaviour extends CyclicBehaviour {
         this.coordinator = authorizedCoordinator;
         this.game = game;
     }
+    
+    @Override
+    public void onStart() {
+        ((SystemAgent) myAgent).log("Started Behaviour: "+this.getClass().toString());
+    }
 
     @Override
     public void action() {
