@@ -16,6 +16,7 @@
  */
 package cat.urv.imas.agent;
 
+import cat.urv.imas.SystemConstants;
 import cat.urv.imas.behaviour.system.PerformVehicleActionsBehaviour;
 import cat.urv.imas.behaviour.system.ProvideGameBehaviour;
 import cat.urv.imas.onthology.InitialGameSettings;
@@ -23,6 +24,7 @@ import cat.urv.imas.onthology.GameSettings;
 import cat.urv.imas.gui.GraphicInterface;
 import cat.urv.imas.map.Cell;
 import cat.urv.imas.map.StreetCell;
+import cat.urv.imas.map.utility.MapUtility;
 import cat.urv.imas.onthology.GarbageType;
 import cat.urv.imas.onthology.InfoAgent;
 import jade.core.*;
@@ -134,8 +136,10 @@ public class SystemAgent extends ImasAgent {
         }
 
         // 2. Load game settings.
-        this.game = InitialGameSettings.load("game.settings");
+        this.game = InitialGameSettings.load(SystemConstants.GAME_SETTINGS_NAME);
         log("Initial configuration settings loaded");
+        MapUtility.initialize(game.getMap());
+        log("Initialized MapUtility structures");
 
         // 3. Load GUI
         try {

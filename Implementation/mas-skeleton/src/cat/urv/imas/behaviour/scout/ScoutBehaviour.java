@@ -6,10 +6,12 @@
 package cat.urv.imas.behaviour.scout;
 
 import cat.urv.imas.agent.ScoutAgent;
+import cat.urv.imas.agent.SystemAgent;
 import cat.urv.imas.map.Cell;
 import cat.urv.imas.map.StreetCell;
 import cat.urv.imas.onthology.InfoAgent;
 import cat.urv.imas.onthology.Performatives;
+import cat.urv.imas.plan.Coordinate;
 import cat.urv.imas.plan.Movement;
 import cat.urv.imas.plan.Plan;
 import jade.core.behaviours.CyclicBehaviour;
@@ -23,15 +25,15 @@ import java.util.concurrent.ThreadLocalRandom;
  * @author Ihcrul
  */
 public class ScoutBehaviour extends CyclicBehaviour {
-    
+       
     @Override
     public void action() {
 
         ACLMessage msg = myAgent.receive();
         if (msg != null) {
             switch (msg.getPerformative()) {
-                case Performatives.REQUEST_PLAN_SCOUT:
-                    provideCurrentPlan(msg);
+                case Performatives.REQUEST_LOCATION_SCOUT:
+                    provideCurrentLocation(msg);
                     break;
                 default:
                     //TODO:
@@ -43,15 +45,16 @@ public class ScoutBehaviour extends CyclicBehaviour {
 
     }
     
-    private void provideCurrentPlan(ACLMessage msg) {
+    private void provideCurrentLocation(ACLMessage msg) {
+        
+        ((ScoutAgent) myAgent).log("Received location request");
 
         try {
 
             Cell[][] map = (Cell[][]) msg.getContentObject();
-
-            // TODO: more intelligent behavior here:
+            
             // Find current location on map:
-            Cell myLocation = null;
+            Coordinate myLocation = null;
             InfoAgent myInfoAgent = ((ScoutAgent) myAgent).getInfoAgent();
             outerloop:
             for (int i = 0; i < map.length; i++) {
@@ -59,7 +62,7 @@ public class ScoutBehaviour extends CyclicBehaviour {
                     if (map[i][j] instanceof StreetCell) {
                         if (((StreetCell) map[i][j]).isThereAnAgent()) {
                             if (((StreetCell) map[i][j]).getAgent().getAID().equals(myInfoAgent.getAID())) {
-                                myLocation = map[i][j];
+                                myLocation = new Coordinate(i, j);
                                 break outerloop;
                             }
                         }
@@ -72,22 +75,11 @@ public class ScoutBehaviour extends CyclicBehaviour {
                 throw new RuntimeException("Scout did not find itself on the map");
             }
 
-            // TODO: remove random plan
-            Plan randomPlan = new Plan();
-            int min = -1;
-            int max = 1;
-            int rowStep = ThreadLocalRandom.current().nextInt(min, max + 1);
-            int colStep = ThreadLocalRandom.current().nextInt(min, max + 1);
-            int rowOrCol = ThreadLocalRandom.current().nextInt(0, 2);
-            int newRow = Math.max(0, myLocation.getRow() + rowStep * rowOrCol);
-            int newCol = Math.max(0, myLocation.getCol() + colStep * (1-rowOrCol));
-            randomPlan.addAction(new Movement(myLocation.getRow(), myLocation.getCol(), newRow, newCol));
-
             try {
-                ACLMessage reply = new ACLMessage(Performatives.REPLY_PLAN_SCOUT);
+                ACLMessage reply = new ACLMessage(Performatives.REPLY_LOCATION_SCOUT);
                 reply.setSender(myAgent.getAID());
                 reply.addReceiver(msg.getSender());
-                reply.setContentObject(randomPlan);
+                reply.setContentObject(myLocation);
                 myAgent.send(reply);
             } catch (IOException ex) {
                 ex.printStackTrace();

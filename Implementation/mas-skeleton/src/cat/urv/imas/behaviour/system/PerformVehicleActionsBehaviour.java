@@ -34,6 +34,11 @@ import java.util.logging.Logger;
  * @author Ihcrul
  */
 public class PerformVehicleActionsBehaviour extends CyclicBehaviour {
+    
+    @Override
+    public void onStart() {
+        ((SystemAgent) myAgent).log("Started Behaviour: "+this.getClass().toString());
+    }
 
     @Override
     public void action() {
