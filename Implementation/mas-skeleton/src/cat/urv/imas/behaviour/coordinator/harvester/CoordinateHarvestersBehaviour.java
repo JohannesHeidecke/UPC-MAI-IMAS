@@ -7,6 +7,7 @@ package cat.urv.imas.behaviour.coordinator.harvester;
 
 import cat.urv.imas.agent.HarvesterCoordinatorAgent;
 import cat.urv.imas.map.Cell;
+import cat.urv.imas.onthology.Garbage;
 import cat.urv.imas.onthology.Performatives;
 import cat.urv.imas.plan.Plan;
 import jade.core.AID;
@@ -30,9 +31,14 @@ public class CoordinateHarvestersBehaviour extends CyclicBehaviour {
 
     private HarvesterCoordinatorAgent harvCoordinator;
     private AID coordinator;
+    
+    private Cell[][] map;
 
     private List<AID> harvestersWithoutPlanReply;
-    HashMap<AID, Plan> currentPlans;
+    private HashMap<AID, Plan> currentPlans;
+    
+    private List<Garbage> unassignedGarbage;
+    private List<Garbage> announcedGarbage;
 
     public CoordinateHarvestersBehaviour(HarvesterCoordinatorAgent harvCoordinator) {
         this.harvCoordinator = harvCoordinator;
@@ -45,8 +51,6 @@ public class CoordinateHarvestersBehaviour extends CyclicBehaviour {
 
     @Override
     public void action() {
-        
-        
         
         MessageTemplate mt = MessageTemplate.or(MessageTemplate.MatchPerformative(Performatives.REQUEST_PLAN_HARVESTERS), 
                 MessageTemplate.MatchPerformative(Performatives.REPLY_PLAN_HARVESTER));
@@ -77,9 +81,12 @@ public class CoordinateHarvestersBehaviour extends CyclicBehaviour {
 //        ((HarvesterCoordinatorAgent) myAgent).log("Received plans request");
 
         try {
-            Cell[][] map = (Cell[][]) msg.getContentObject();
+            map = (Cell[][]) msg.getContentObject();
+            
+            detectNewUnassignedGarbage();
+            announceUnassignedGarbage();
+            
             List<AID> harvesters = this.harvCoordinator.getCoordinatedHarvesters();
-
             harvestersWithoutPlanReply = new ArrayList<>();
             harvestersWithoutPlanReply.addAll(harvesters);
             currentPlans = new HashMap<>();
@@ -127,6 +134,14 @@ public class CoordinateHarvestersBehaviour extends CyclicBehaviour {
             ex.printStackTrace();
         }
 
+    }
+
+    private void detectNewUnassignedGarbage() {
+//        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    private void announceUnassignedGarbage() {
+//        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
 }

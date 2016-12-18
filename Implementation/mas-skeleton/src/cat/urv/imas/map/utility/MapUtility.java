@@ -5,17 +5,17 @@
  */
 package cat.urv.imas.map.utility;
 
+import cat.urv.imas.map.BuildingCell;
 import cat.urv.imas.map.Cell;
 import cat.urv.imas.map.StreetCell;
 import cat.urv.imas.plan.Coordinate;
-import com.google.ortools.constraintsolver.Assignment;
-import com.google.ortools.constraintsolver.FirstSolutionStrategy;
-import com.google.ortools.constraintsolver.NodeEvaluator2;
-import com.google.ortools.constraintsolver.RoutingModel;
-import com.google.ortools.constraintsolver.RoutingSearchParameters;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import org.jgrapht.alg.FloydWarshallShortestPaths;
 import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.graph.SimpleWeightedGraph;
@@ -26,9 +26,6 @@ import org.jgrapht.graph.SimpleWeightedGraph;
  */
 public class MapUtility {
 
-    static {
-        System.loadLibrary("jniortools");
-    }
 
     private static Cell[][] map;
 
@@ -37,14 +34,14 @@ public class MapUtility {
 
     private static FloydWarshallShortestPaths shortestPaths;
 
-    private static Coordinate[] coordinates;
+    private static Coordinate[] coordinatesBuildingNeighbors;
 
     private static long[][] distances;
 
     public static void initialize(Cell[][] m) {
         map = m;
         constructCityGraph();
-        coordinates = cityGraph.vertexSet().toArray(new Coordinate[cityGraph.vertexSet().size()]);
+        coordinatesBuildingNeighbors = constructBuildingNeighborsArray();
         shortestPaths = new FloydWarshallShortestPaths(cityGraph);
         distances = distancesToArray();
 
@@ -54,6 +51,10 @@ public class MapUtility {
         // Returns list of all coordinates on the path between 'from' and 'to'
         // Path can only contain Coordinates corresponding to StreetCells on the map
         // 'from' and 'to' correspond to StreetCells on the map
+
+        if (from.equals(to)) {
+            return null;
+        }
 
         // Find vertices in graph:
         Coordinate startVertex = null, endVertex = null;
@@ -65,6 +66,7 @@ public class MapUtility {
                 endVertex = coord;
             }
         }
+
         return shortestPaths.getShortestPath(startVertex, endVertex).getVertexList();
     }
 
@@ -150,61 +152,113 @@ public class MapUtility {
 
     public static List<Coordinate> getTravelingSalesmanPath() {
 
-        final int size = cityGraph.vertexSet().size();
+        HashMap<Coordinate, HashMap<Coordinate, Long>> distancesMap;
+        distancesMap = new HashMap<>(coordinatesBuildingNeighbors.length);
 
-        RoutingModel routing = new RoutingModel(size, 1, 0);
+        for (int i = 0; i < coordinatesBuildingNeighbors.length; i++) {
 
-        NodeEvaluator2 distanceEvaluator = new NodeEvaluator2() {
-            @Override
-            public long run(int firstIndex, int secondIndex) {
-                return distances[firstIndex][secondIndex];
+            Coordinate coord = coordinatesBuildingNeighbors[i];
+            HashMap<Coordinate, Long> coordDistances = new HashMap<>(coordinatesBuildingNeighbors.length);
+
+            for (int j = 0; j < coordinatesBuildingNeighbors.length; j++) {
+                coordDistances.put(coordinatesBuildingNeighbors[j], distances[i][j]);
             }
-        };
 
-        routing.setCost(distanceEvaluator);
+            distancesMap.put(coord, coordDistances);
 
-        RoutingSearchParameters searchParameters = RoutingSearchParameters.newBuilder()
-                .mergeFrom(RoutingModel.defaultSearchParameters())
-                .setFirstSolutionStrategy(FirstSolutionStrategy.Value.PATH_CHEAPEST_ARC)
-                .build();
-
-        Assignment solution = routing.solveWithParameters(searchParameters);
-
-        int routeNumber = 0;
-        List<Coordinate> tspRoute = new ArrayList<>();
-        for (long node = routing.start(routeNumber);
-                !routing.isEnd(node);
-                node = solution.value(routing.nextVar(node))) {
-            tspRoute.add(coordinates[(int)node]);
         }
-        
-        // if necessary (distance > 1): add paths between coordinates in result:
+
+        List<Coordinate> vertices = new LinkedList<>(Arrays.asList(coordinatesBuildingNeighbors));
+        List<Coordinate> tour = new LinkedList<>();
+
+        while (tour.size() != coordinatesBuildingNeighbors.length) {
+            boolean firstEdge = true;
+            double minEdgeValue = 0;
+            int minVertexFound = 0;
+            int vertexConnectedTo = 0;
+
+            for (int i = 0; i < tour.size(); i++) {
+                Coordinate v = tour.get(i);
+                for (int j = 0; j < vertices.size(); j++) {
+                    double weight = distancesMap.get(v).get(vertices.get(j));
+                    if (firstEdge || (weight < minEdgeValue)) {
+                        firstEdge = false;
+                        minEdgeValue = weight;
+                        minVertexFound = j;
+                        vertexConnectedTo = i;
+                    }
+                }
+            }
+            tour.add(vertexConnectedTo, vertices.get(minVertexFound));
+            if ((tour.size() % 10) == 0) {
+                System.out.println("TSP progress: "+tour.size()+"/"+coordinatesBuildingNeighbors.length);
+            }
+            vertices.remove(minVertexFound);
+        }
+
         Coordinate coord, nextCoord;
         List<Coordinate> result = new ArrayList<>();
-        for (int i = 0; i < tspRoute.size(); i++) {
-            coord = tspRoute.get(i);
-            nextCoord = tspRoute.get((i+1) % tspRoute.size());
+        result.add(tour.get(0));
+        for(int i = 0; i < tour.size(); i++) {
+            coord = tour.get(i);
+            nextCoord = tour.get((i+1) % tour.size());
             List<Coordinate> path = getShortestPath(coord, nextCoord);
-            result.addAll(path.subList(1, path.size()));
+            if (path != null) {
+                result.addAll(path.subList(1, path.size()));
+            }
+            
         }
-        
+
         return result;
 
     }
 
     private static long[][] distancesToArray() {
-        long[][] result = new long[coordinates.length][coordinates.length];
+        long[][] result = new long[coordinatesBuildingNeighbors.length][coordinatesBuildingNeighbors.length];
 
-        for (int i = 0; i < coordinates.length; i++) {
+        for (int i = 0; i < coordinatesBuildingNeighbors.length; i++) {
             result[i][i] = 0;
-            for (int j = i+1; j < coordinates.length; j++) {
-                int distance = getShortestDistance(coordinates[i], coordinates[j]);
+            for (int j = i + 1; j < coordinatesBuildingNeighbors.length; j++) {
+                int distance = getShortestDistance(coordinatesBuildingNeighbors[i], coordinatesBuildingNeighbors[j]);
                 result[i][j] = distance;
                 result[j][i] = distance;
             }
         }
 
         return result;
+    }
+
+    private static Coordinate[] constructBuildingNeighborsArray() {
+
+        Set<Coordinate> streetCells = cityGraph.vertexSet();
+        Set<Coordinate> streetsNextToBuildings = new HashSet<>();
+
+        for (Coordinate streetCell : streetCells) {
+            // check if one of the neighbors is a building cell:
+            int minRow = Math.max(0, streetCell.getRow() - 1);
+            int minCol = Math.max(0, streetCell.getCol() - 1);
+            int maxRow = Math.min(map.length - 1, streetCell.getRow() + 1);
+            int maxCol = Math.min(map.length - 1, streetCell.getCol() + 1);
+            boolean buildingFound = false;
+            outerLoop:
+            for (int i = minRow; i <= maxRow; i++) {
+                for (int j = minCol; j <= maxCol; j++) {
+                    if (i == streetCell.getRow() && j == streetCell.getCol()) {
+                        continue;
+                    }
+                    if (map[i][j] instanceof BuildingCell) {
+                        buildingFound = true;
+                        break outerLoop;
+                    }
+                }
+            }
+            streetsNextToBuildings.add(streetCell);
+
+        }
+
+        Coordinate[] result = streetsNextToBuildings.toArray(new Coordinate[streetsNextToBuildings.size()]);
+        return result;
+
     }
 
 }
