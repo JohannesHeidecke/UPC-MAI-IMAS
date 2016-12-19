@@ -11,12 +11,12 @@ import java.io.Serializable;
  *
  * @author Ihcrul
  */
-public class Coordinate implements Serializable {
+public class Location implements Serializable {
     
     private int row;
     private int col;
 
-    public Coordinate(int row, int col) {
+    public Location(int row, int col) {
         this.row = row;
         this.col = col;
     }
@@ -51,7 +51,7 @@ public class Coordinate implements Serializable {
         if (getClass() != obj.getClass()) {
             return false;
         }
-        final Coordinate other = (Coordinate) obj;
+        final Location other = (Location) obj;
         if (this.row != other.row) {
             return false;
         }
@@ -60,10 +60,14 @@ public class Coordinate implements Serializable {
         }
         return true;
     }
+    
+    public int getManhattanDistanceTo(Location otherCoord) {
+        return Math.abs(this.row - otherCoord.row) + Math.abs(this.col - otherCoord.col);
+    }
 
     @Override
     public String toString() {
-        return "Coordinate{" + "row=" + row + ", col=" + col + '}';
+        return "[" + row + "," + col + ']';
     }
     
     

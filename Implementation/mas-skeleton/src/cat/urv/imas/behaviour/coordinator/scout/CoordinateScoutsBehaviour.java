@@ -5,31 +5,24 @@
  */
 package cat.urv.imas.behaviour.coordinator.scout;
 
-import cat.urv.imas.agent.AgentType;
 import cat.urv.imas.agent.ScoutCoordinatorAgent;
-import cat.urv.imas.agent.SystemAgent;
 import cat.urv.imas.map.Cell;
 import cat.urv.imas.map.utility.MapUtility;
 import cat.urv.imas.onthology.Performatives;
-import cat.urv.imas.plan.Coordinate;
+import cat.urv.imas.plan.Location;
 import cat.urv.imas.plan.Movement;
 import cat.urv.imas.plan.Plan;
 import jade.core.AID;
 import jade.core.behaviours.CyclicBehaviour;
-import jade.domain.DFService;
-import jade.domain.FIPAAgentManagement.DFAgentDescription;
-import jade.domain.FIPAAgentManagement.ServiceDescription;
-import jade.domain.FIPAException;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import jade.lang.acl.UnreadableException;
-import jade.proto.SubscriptionInitiator;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  *
@@ -43,9 +36,11 @@ public class CoordinateScoutsBehaviour extends CyclicBehaviour {
     private List<AID> scoutsWithoutLocationReply;
     private HashMap<AID, Plan> currentPlans;
 
-    private List<Coordinate> tspRoute = null;
+    private List<Location> tspRoute = null;
     private HashMap<AID, Integer> tspRoutePositions = null;
-    private HashMap<AID, Coordinate> currentLocations;
+    private HashMap<AID, Location> currentLocations;
+
+    private Cell[][] map;
 
     public CoordinateScoutsBehaviour(ScoutCoordinatorAgent scoutCoordinator) {
         this.scoutCoordinator = scoutCoordinator;
@@ -86,10 +81,9 @@ public class CoordinateScoutsBehaviour extends CyclicBehaviour {
 
     private void handlePlansRequest(ACLMessage msg) {
 
-        ((ScoutCoordinatorAgent) myAgent).log("Received plans request");
-
+//        ((ScoutCoordinatorAgent) myAgent).log("Received plans request");
         try {
-            Cell[][] map = (Cell[][]) msg.getContentObject();
+            this.map = (Cell[][]) msg.getContentObject();
             List<AID> scouts = this.scoutCoordinator.getCoordinatedScouts();
 
             scoutsWithoutLocationReply = new ArrayList<>();
@@ -114,18 +108,18 @@ public class CoordinateScoutsBehaviour extends CyclicBehaviour {
         if (tspRoute == null) {
             currentLocations = new HashMap<>(((ScoutCoordinatorAgent) myAgent).getCoordinatedScouts().size());
             tspRoute = MapUtility.getTravelingSalesmanPath();
-            ((ScoutCoordinatorAgent) myAgent).log("Created a TSP route ("+tspRoute.size()+" steps) for ScoutAgents");
+            ((ScoutCoordinatorAgent) myAgent).log("Created a TSP route (" + tspRoute.size() + " steps) for ScoutAgents");
         }
 
         try {
 
-            Coordinate location = (Coordinate) msg.getContentObject();
+            Location location = (Location) msg.getContentObject();
 
             currentLocations.put(msg.getSender(), location);
             scoutsWithoutLocationReply.remove(msg.getSender());
 
             if (scoutsWithoutLocationReply.isEmpty()) {
-                ((ScoutCoordinatorAgent) myAgent).log("Received locations from all Scouts.");
+//                ((ScoutCoordinatorAgent) myAgent).log("Received locations from all Scouts.");
                 createPlans();
                 resolveCollisions();
                 sendPlans();
@@ -137,7 +131,44 @@ public class CoordinateScoutsBehaviour extends CyclicBehaviour {
     }
 
     private void resolveCollisions() {
-        // TODO
+        // Scouts that collide with other scouts do a random movement in another direction:
+        List<AID> plannedScouts = new ArrayList<>(currentPlans.keySet());
+
+        boolean collisionDetected = true;
+        while (collisionDetected) {
+            collisionDetected = false;
+
+            outerFor:
+            for (int i = 0; i < plannedScouts.size(); i++) {
+                for (int j = i + 1; j < plannedScouts.size(); j++) {
+
+                    Movement iMove = (Movement) currentPlans.get(plannedScouts.get(i)).getActions().get(0);
+                    Movement jMove = (Movement) currentPlans.get(plannedScouts.get(j)).getActions().get(0);
+
+                    // check for collisions
+                    if (iMove.getTo().equals(jMove.getTo())) {
+                        collisionDetected = true;
+                    }
+                    if (iMove.getFrom().equals(jMove.getTo()) && iMove.getTo().equals(jMove.getFrom())) {
+                        collisionDetected = true;
+                    }
+
+                    // resolve found collision
+                    if (collisionDetected) {
+                        int rowStep = ThreadLocalRandom.current().nextInt(-1, 1 + 1);
+                        int colStep = ThreadLocalRandom.current().nextInt(-1, 1 + 1);
+                        int rowOrCol = ThreadLocalRandom.current().nextInt(0, 2);
+                        int newRow = Math.max(0, jMove.getFrom().getRow() + rowStep * rowOrCol);
+                        int newCol = Math.max(0, jMove.getFrom().getCol() + colStep * (1 - rowOrCol));
+                        jMove.setRowTo(newRow);
+                        jMove.setColTo(newCol);
+                        break outerFor;
+                    }
+
+                }
+            }
+        }
+
     }
 
     private void sendPlans() {
@@ -159,44 +190,112 @@ public class CoordinateScoutsBehaviour extends CyclicBehaviour {
 
         if (tspRoutePositions == null) {
             tspRoutePositions = new HashMap<>(((ScoutCoordinatorAgent) myAgent).getCoordinatedScouts().size());
-            initRoutePositions();
         }
-        
+
+        setScoutRoutePositions();
+
         enhanceEquidistance();
 
         // move tspRoutePositions one forward:
         for (AID scout : tspRoutePositions.keySet()) {
             Integer position = tspRoutePositions.get(scout);
-            Integer newPosition = (position.intValue() + 1) % tspRoute.size();
-            tspRoutePositions.put(scout, newPosition);
-            Coordinate from = currentLocations.get(scout);
-            Coordinate to = tspRoute.get(newPosition);
+            Integer newPosition = (position + 1) % tspRoute.size();
+            Location from = currentLocations.get(scout);
+            Location to = tspRoute.get(newPosition);
             Plan plan = new Plan();
             plan.addAction(new Movement(from.getRow(), from.getCol(), to.getRow(), to.getCol()));
             this.currentPlans.put(scout, plan);
 
+            // increase tspRoutePos for next simulation step:
+            tspRoutePositions.put(scout, newPosition);
+
         }
 
     }
 
-    private void initRoutePositions() {
+    private void setScoutRoutePositions() {
 
-        for (AID scout : currentLocations.keySet()) {
-            Coordinate location = currentLocations.get(scout);
-            int counter = 0;
-            for (Coordinate step : tspRoute) {
-                if (step.equals(location)) {
-                    tspRoutePositions.put(scout, counter);
-                    break;
+        // remove scouts from tspRoutePositions who are not on their supposed positions:
+        Iterator<AID> iterator = tspRoutePositions.keySet().iterator();
+        while (iterator.hasNext()) {
+            AID scout = iterator.next();
+            Location scoutLocation = currentLocations.get(scout);
+            Location supposedScoutLocation = tspRoute.get(tspRoutePositions.get(scout));
+            if (!scoutLocation.equals(supposedScoutLocation)) {
+                iterator.remove();
+            }
+        }
+
+        List<AID> scouts = this.scoutCoordinator.getCoordinatedScouts();
+        for (AID scout : scouts) {
+            if (!tspRoutePositions.keySet().contains(scout)) {
+                // scout does not have a current tsp position
+                int closestDistance = Integer.MAX_VALUE;
+                int closestPosition = 0;
+                Location scoutPos = currentLocations.get(scout);
+                for (int i = 0; i < tspRoute.size(); i++) {
+                    Location routePos = tspRoute.get(i);
+                    int distance = MapUtility.getShortestDistance(scoutPos, routePos);
+                    if (distance < closestDistance) {
+                        closestDistance = distance;
+                        closestPosition = i;
+                    }
                 }
-                counter++;
+
+                if (closestDistance == 0) {
+                    tspRoutePositions.put(scout, closestPosition);
+                } else {
+                    // if Scout is not on tspRoute: move 1 field towards nearest tspRoute cell
+                    Location to = tspRoute.get(closestPosition);
+                    Plan plan = new Plan();
+                    List<Location> path = MapUtility.getShortestPath(scoutPos, to);
+                    Location nextStep = path.get(0);
+                    plan.addAction(new Movement(scoutPos.getRow(), scoutPos.getCol(), nextStep.getRow(), nextStep.getCol()));
+                    this.currentPlans.put(scout, plan);
+                }
+
             }
         }
 
     }
-    
+
     private void enhanceEquidistance() {
-        //TODO
+        int preferredDistance = tspRoute.size() / currentLocations.size();
+
+        for (AID scout : tspRoutePositions.keySet()) {
+            AID scoutBefore, scoutAfter;
+            int scoutPos = tspRoutePositions.get(scout);
+            int smallestLeftDiff = Integer.MAX_VALUE;
+            int smallestRightDiff = Integer.MAX_VALUE;
+            for (AID otherScout : tspRoutePositions.keySet()) {
+                if (scout.equals(otherScout)) {
+                    continue;
+                }
+                int otherScoutPos = tspRoutePositions.get(otherScout);
+
+                int leftDiff = scoutPos - otherScoutPos;
+                if (leftDiff < 0) {
+                    leftDiff += tspRoute.size();
+                }
+
+                int rightDiff = otherScoutPos - scoutPos;
+                if (rightDiff < 0) {
+                    rightDiff += tspRoute.size();
+                }
+
+                if (leftDiff < smallestLeftDiff) {
+                    smallestLeftDiff = leftDiff;
+                }
+                if (rightDiff < smallestRightDiff) {
+                    smallestRightDiff = rightDiff;
+                }
+            }
+            
+            if (smallestLeftDiff > preferredDistance && smallestRightDiff < preferredDistance) {
+                int currentPos = tspRoutePositions.get(scout);
+                tspRoutePositions.put(scout, currentPos-1);
+            }
+        }
     }
 
 }

@@ -6,7 +6,7 @@
 package cat.urv.imas.behaviour.system;
 
 import cat.urv.imas.onthology.InfoAgent;
-import cat.urv.imas.plan.Coordinate;
+import cat.urv.imas.plan.Location;
 
 /**
  *
@@ -14,21 +14,21 @@ import cat.urv.imas.plan.Coordinate;
  */
 public class ValidMovement {
     
-    private Coordinate from;
-    private Coordinate to;
+    private Location from;
+    private Location to;
     private InfoAgent infoAgent;
 
-    public ValidMovement(Coordinate from, Coordinate to, InfoAgent infoAgent) {
+    public ValidMovement(Location from, Location to, InfoAgent infoAgent) {
         this.from = from;
         this.to = to;
         this.infoAgent = infoAgent;
     }
 
-    public Coordinate getFrom() {
+    public Location getFrom() {
         return from;
     }
 
-    public Coordinate getTo() {
+    public Location getTo() {
         return to;
     }
 

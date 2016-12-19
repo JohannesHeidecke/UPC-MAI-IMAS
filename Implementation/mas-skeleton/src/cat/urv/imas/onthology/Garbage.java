@@ -5,7 +5,7 @@
  */
 package cat.urv.imas.onthology;
 
-import cat.urv.imas.plan.Coordinate;
+import cat.urv.imas.plan.Location;
 
 /**
  *
@@ -14,11 +14,11 @@ import cat.urv.imas.plan.Coordinate;
 public class Garbage {
     
     private GarbageType type;
-    private Coordinate location;
+    private Location location;
     private long detectedAt;
     private int amount;
 
-    public Garbage(GarbageType type, Coordinate location, long detectedAt, int amount) {
+    public Garbage(GarbageType type, Location location, long detectedAt, int amount) {
         this.type = type;
         this.location = location;
         this.detectedAt = detectedAt;
@@ -29,7 +29,7 @@ public class Garbage {
         return type;
     }
 
-    public Coordinate getLocation() {
+    public Location getLocation() {
         return location;
     }
 
