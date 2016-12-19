@@ -6,12 +6,14 @@
 package cat.urv.imas.onthology;
 
 import cat.urv.imas.plan.Location;
+import java.io.Serializable;
+import java.util.Objects;
 
 /**
  *
  * @author Ihcrul
  */
-public class Garbage {
+public class Garbage implements Serializable {
     
     private GarbageType type;
     private Location location;
@@ -40,6 +42,36 @@ public class Garbage {
     public int getAmount() {
         return amount;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Garbage other = (Garbage) obj;
+        if (this.type != other.type) {
+            return false;
+        }
+        if (!Objects.equals(this.location, other.location)) {
+            return false;
+        }
+        if (this.amount != other.amount) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public String toString() {
+        return "Garbage{" + "type=" + type + ", location=" + location + ", detectedAt=" + detectedAt + ", amount=" + amount + '}';
+    }
+    
+    
+    
+    
     
     
     

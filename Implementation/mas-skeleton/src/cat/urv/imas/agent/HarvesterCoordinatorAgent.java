@@ -67,6 +67,7 @@ public class HarvesterCoordinatorAgent extends ImasAgent {
                             DFAgentDescription[] dfad = DFService.decodeNotification(inform.getContent());
                             for(int i = 0; i < dfad.length; i++) {
                                 ((HarvesterCoordinatorAgent) myAgent).addCoordinatedHarvester(dfad[i].getName());
+                                ((HarvesterCoordinatorAgent) myAgent).log("now managing "+dfad[i].getName());
                             }
                             
                         } catch (FIPAException ex) {

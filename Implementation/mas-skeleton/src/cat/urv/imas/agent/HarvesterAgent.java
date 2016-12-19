@@ -54,7 +54,7 @@ public class HarvesterAgent extends ImasAgent {
         dfd.setName(getAID());
         try {
             DFService.register(this, dfd);
-            log("Registered to the DF");
+//            log("Registered to the DF");
         } catch (FIPAException e) {
             System.err.println(getLocalName() + " registration with DF unsucceeded. Reason: " + e.getMessage());
             doDelete();

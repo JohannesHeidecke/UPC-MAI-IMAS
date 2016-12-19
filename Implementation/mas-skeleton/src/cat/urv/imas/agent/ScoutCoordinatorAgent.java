@@ -66,6 +66,7 @@ public class ScoutCoordinatorAgent extends ImasAgent {
                             DFAgentDescription[] dfad = DFService.decodeNotification(inform.getContent());
                             for (int i = 0; i < dfad.length; i++) {
                                 ((ScoutCoordinatorAgent) myAgent).addCoordinatedScout(dfad[i].getName());
+                                ((ScoutCoordinatorAgent) myAgent).log("now managing "+dfad[i].getName());
                             }
 
                         } catch (FIPAException ex) {
