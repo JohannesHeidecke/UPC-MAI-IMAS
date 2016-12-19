@@ -243,6 +243,7 @@ public class CoordinateScoutsBehaviour extends CyclicBehaviour {
                 }
 
                 if (closestDistance == 0) {
+//                    ((ScoutCoordinatorAgent) myAgent).log(scout.getName() + " now on pos "+closestPosition);
                     tspRoutePositions.put(scout, closestPosition);
                 } else {
                     // if Scout is not on tspRoute: move 1 field towards nearest tspRoute cell
@@ -261,7 +262,7 @@ public class CoordinateScoutsBehaviour extends CyclicBehaviour {
 
     private void enhanceEquidistance() {
         int preferredDistance = tspRoute.size() / currentLocations.size();
-
+        int leftDistanceErrorSum = 0;
         for (AID scout : tspRoutePositions.keySet()) {
             AID scoutBefore, scoutAfter;
             int scoutPos = tspRoutePositions.get(scout);
@@ -290,12 +291,27 @@ public class CoordinateScoutsBehaviour extends CyclicBehaviour {
                     smallestRightDiff = rightDiff;
                 }
             }
-            
-            if (smallestLeftDiff > preferredDistance && smallestRightDiff < preferredDistance) {
+
+            // positive if distance is too large:
+            int leftDev = smallestLeftDiff - preferredDistance;
+            int rightDev = smallestRightDiff - preferredDistance;
+
+            // if (the distance to the left is too large
+            // and (the distance to the right is too small
+            // or the distance to the left is much bigger than to the right))
+            // let scout wait at current location for one step
+            if ((leftDev > 0
+                    && rightDev < 0) || smallestLeftDiff > 2 * smallestRightDiff) {
+                // let scout wait on current position on the path for one step:
                 int currentPos = tspRoutePositions.get(scout);
-                tspRoutePositions.put(scout, currentPos-1);
+                tspRoutePositions.put(scout, currentPos - 1);
             }
+
+            leftDistanceErrorSum += Math.abs(smallestLeftDiff - preferredDistance);
         }
+
+//        ((ScoutCoordinatorAgent) myAgent).log("Average equidistance deviation: " + (double) leftDistanceErrorSum / currentLocations.size());
+
     }
 
 }

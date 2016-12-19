@@ -231,8 +231,6 @@ public class MapUtility {
             }
         }
 
-        System.err.println(streetsNextToBuildings);
-
         Location[] result = streetsNextToBuildings.toArray(new Location[streetsNextToBuildings.size()]);
         return result;
 
