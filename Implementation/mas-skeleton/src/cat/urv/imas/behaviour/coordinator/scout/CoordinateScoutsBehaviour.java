@@ -38,6 +38,7 @@ public class CoordinateScoutsBehaviour extends CyclicBehaviour {
 
     private List<Location> tspRoute = null;
     private HashMap<AID, Integer> tspRoutePositions = null;
+    private HashMap<AID, Integer> lastKnownTspRoutePositions = null;
     private HashMap<AID, Location> currentLocations;
 
     private Cell[][] map;
@@ -190,6 +191,7 @@ public class CoordinateScoutsBehaviour extends CyclicBehaviour {
 
         if (tspRoutePositions == null) {
             tspRoutePositions = new HashMap<>(((ScoutCoordinatorAgent) myAgent).getCoordinatedScouts().size());
+            lastKnownTspRoutePositions = new HashMap<>(((ScoutCoordinatorAgent) myAgent).getCoordinatedScouts().size());
         }
 
         setScoutRoutePositions();
@@ -206,6 +208,8 @@ public class CoordinateScoutsBehaviour extends CyclicBehaviour {
             plan.addAction(new Movement(from.getRow(), from.getCol(), to.getRow(), to.getCol()));
             this.currentPlans.put(scout, plan);
 
+            // save current pos for when scouts get lost (through collisions)
+            lastKnownTspRoutePositions.put(scout, tspRoutePositions.get(scout));
             // increase tspRoutePos for next simulation step:
             tspRoutePositions.put(scout, newPosition);
 
@@ -229,16 +233,25 @@ public class CoordinateScoutsBehaviour extends CyclicBehaviour {
         List<AID> scouts = this.scoutCoordinator.getCoordinatedScouts();
         for (AID scout : scouts) {
             if (!tspRoutePositions.keySet().contains(scout)) {
-                // scout does not have a current tsp position
-                int closestDistance = Integer.MAX_VALUE;
                 int closestPosition = 0;
+                int closestDistance;
                 Location scoutPos = currentLocations.get(scout);
-                for (int i = 0; i < tspRoute.size(); i++) {
-                    Location routePos = tspRoute.get(i);
-                    int distance = MapUtility.getShortestDistance(scoutPos, routePos);
-                    if (distance < closestDistance) {
-                        closestDistance = distance;
-                        closestPosition = i;
+                
+                // if there is a former tspPosition known: try to return there
+                if (lastKnownTspRoutePositions.keySet().contains(scout)) {
+                    closestPosition = lastKnownTspRoutePositions.get(scout);
+                    closestDistance = MapUtility.getShortestDistance(scoutPos, tspRoute.get(closestPosition));
+                } else {
+                    // scout does not have a current or former tsp position
+                    closestDistance = Integer.MAX_VALUE;
+                    // find the nearest position of the tspRoute and go there
+                    for (int i = 0; i < tspRoute.size(); i++) {
+                        Location routePos = tspRoute.get(i);
+                        int distance = MapUtility.getShortestDistance(scoutPos, routePos);
+                        if (distance < closestDistance) {
+                            closestDistance = distance;
+                            closestPosition = i;
+                        }
                     }
                 }
 
@@ -311,7 +324,6 @@ public class CoordinateScoutsBehaviour extends CyclicBehaviour {
         }
 
 //        ((ScoutCoordinatorAgent) myAgent).log("Average equidistance deviation: " + (double) leftDistanceErrorSum / currentLocations.size());
-
     }
 
 }
