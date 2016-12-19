@@ -136,7 +136,7 @@ public class SystemAgent extends ImasAgent {
         }
 
         // 2. Load game settings.
-        this.game = InitialGameSettings.load(SystemConstants.GAME_SETTINGS_NAME);
+        this.game = InitialGameSettings.load("game.group7.test3.settings");
         log("Initial configuration settings loaded");
         MapUtility.initialize(game.getMap());
         log("Initialized MapUtility structures");

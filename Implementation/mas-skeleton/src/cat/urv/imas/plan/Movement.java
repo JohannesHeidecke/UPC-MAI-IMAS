@@ -21,6 +21,14 @@ public class Movement extends Action implements Serializable {
         this.rowTo = rowTo;
         this.colTo = colTo;
     }
+    
+    public Location getFrom() {
+        return new Location(rowFrom, colFrom);
+    }
+    
+    public Location getTo() { 
+        return new Location(rowTo, colTo);
+    }
 
     public int getRowFrom() {
         return rowFrom;

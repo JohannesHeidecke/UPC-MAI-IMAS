@@ -11,7 +11,7 @@ import cat.urv.imas.map.Cell;
 import cat.urv.imas.map.StreetCell;
 import cat.urv.imas.onthology.InfoAgent;
 import cat.urv.imas.onthology.Performatives;
-import cat.urv.imas.plan.Coordinate;
+import cat.urv.imas.plan.Location;
 import cat.urv.imas.plan.Movement;
 import cat.urv.imas.plan.Plan;
 import jade.core.behaviours.CyclicBehaviour;
@@ -47,14 +47,12 @@ public class ScoutBehaviour extends CyclicBehaviour {
     
     private void provideCurrentLocation(ACLMessage msg) {
         
-        ((ScoutAgent) myAgent).log("Received location request");
-
         try {
 
             Cell[][] map = (Cell[][]) msg.getContentObject();
             
             // Find current location on map:
-            Coordinate myLocation = null;
+            Location myLocation = null;
             InfoAgent myInfoAgent = ((ScoutAgent) myAgent).getInfoAgent();
             outerloop:
             for (int i = 0; i < map.length; i++) {
@@ -62,7 +60,7 @@ public class ScoutBehaviour extends CyclicBehaviour {
                     if (map[i][j] instanceof StreetCell) {
                         if (((StreetCell) map[i][j]).isThereAnAgent()) {
                             if (((StreetCell) map[i][j]).getAgent().getAID().equals(myInfoAgent.getAID())) {
-                                myLocation = new Coordinate(i, j);
+                                myLocation = new Location(i, j);
                                 break outerloop;
                             }
                         }

@@ -59,7 +59,11 @@ public class BuildingCell extends Cell {
      * @return the garbage on it.
      */
     public Map<GarbageType, Integer> detectGarbage() {
-        found = (!garbage.isEmpty());
+        if (!found && !garbage.isEmpty()) {
+            found = true;
+            
+        }
+        
         return garbage;
     }
 

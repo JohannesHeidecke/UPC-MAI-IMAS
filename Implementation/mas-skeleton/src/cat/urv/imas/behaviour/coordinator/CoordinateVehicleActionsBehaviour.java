@@ -106,7 +106,7 @@ public class CoordinateVehicleActionsBehaviour extends CyclicBehaviour {
 
         try {
 
-            ((CoordinatorAgent) myAgent).log("Request new plans from HC and SC");
+//            ((CoordinatorAgent) myAgent).log("Request new plans from HC and SC");
 
             Cell[][] map = ((GameSettings) msg.getContentObject()).getMap();
             // Send requests for new plans to HCoord and SCoord,
@@ -131,7 +131,7 @@ public class CoordinateVehicleActionsBehaviour extends CyclicBehaviour {
 
     private void handleNewPlanHarvesting(ACLMessage msg) {
         try {
-            ((CoordinatorAgent) myAgent).log("Harvester Plans received");
+//            ((CoordinatorAgent) myAgent).log("Harvester Plans received");
             this.currentHarvestingPlan = (HashMap<AID, Plan>) msg.getContentObject();
             planHarvestersReceived = true;
         } catch (UnreadableException ex) {
@@ -141,7 +141,7 @@ public class CoordinateVehicleActionsBehaviour extends CyclicBehaviour {
 
     private void handleNewPlanScouting(ACLMessage msg) {
         try {
-            ((CoordinatorAgent) myAgent).log("Scout Plans received");
+//            ((CoordinatorAgent) myAgent).log("Scout Plans received");
             this.currentScoutingPlan = (HashMap<AID, Plan>) msg.getContentObject();
             planScoutsReceived = true;
         } catch (UnreadableException ex) {
