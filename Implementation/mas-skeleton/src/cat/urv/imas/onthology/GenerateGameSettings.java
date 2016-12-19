@@ -23,7 +23,7 @@ import javax.xml.namespace.QName;
 public class GenerateGameSettings {
 
     private static final int STEPS = 600;
-    private static final String FILENAME = "game.settings";
+    private static final String FILENAME = "game.group7.test5.settings";
 
     /*
      * ********************* JUST SET YOUR SETTINGS ****************************
@@ -35,53 +35,28 @@ public class GenerateGameSettings {
      */
     public static void defineSettings(InitialGameSettings settings) {
         settings.setSeed(1234567.8f);
-        settings.setRecyclingCenterPrices(new int[][]{
-            {0, 10, 9},
-            {9, 0, 10},
-            {10, 9, 0},
-            {9, 9, 0},
-        });
         settings.setSimulationSteps(STEPS);
-        settings.setTitle("Practical IMAS");
+        settings.setTitle("Group 7 Test 5");
         //add here whatever settings.set* to define your new settings.
         // settings for first date
         int[][] map
             = {
-                {10, 10, R, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10},
-                {10,  S,  S,  S,  SC,  S,  S,  S,  S,  S,  S,  S,  S,  S,  S,  S,  S,  S,  H,  SC,  S,  S,  S,  S, 10},
-                {10,  S,  H,  S,  S,  S,  S,  S,  S,  S,  S,  S,  S,  S,  S,  S,  S,  S,  S,  S,  S,  S,  S,  S, 10},
-                {10,  S,  S, 10, 10,  S,  S, 10, 10,  S,  S, 10, 10,  S,  S, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10},
-                {10,  S,  S, 10, 10,  S,  S, 10, 10,  S,  S, 10, 10,  S,  S, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10},
-                {10,  S,  S, 10, 10,  S,  S,  S,  S,  S,  S, 10, 10,  S,  S,  S,  S,  S,  S,  S,  S,  S,  S,  S, 10},
-                {10,  S,  S, 10, 10,  S,  S,  S,  S,  S,  S, 10, 10,  S,  S,  S,  S,  S,  S,  S,  S,  S,  S,  S, 10},
-                {10,  S,  S, 10, 10,  S,  S, 10, 10,  S,  S, 10, 10,  S,  S, 10, 10,  S,  S, 10, 10, 10,  S,  S, 10},
-                {10,  S,  S, 10,  R,  S,  H, 10, 10,  S,  S, 10, 10,  H,  S, 10, 10,  S,  S, 10, 10,  S,  S,  S, 10},
-                {10,  S,  S, 10, 10,  S,  S, 10, 10,  S,  S,  R, 10,  S,  S, 10, 10,  S,  H, 10, 10,  S,  S,  S, 10},
-                {10,  S,  S, 10, 10,  S,  S, 10, 10,  S,  S, 10, 10,  S,  S, 10, 10,  S,  S, 10, 10,  S,  S,  S, 10},
-                {10,  S,  S, 10, 10,  S,  S, 10, 10,  S,  S, 10, 10,  S,  S, 10, 10,  S,  S, 10, 10,  SC,  S,  S, 10},
-                {10,  S,  S, 10, 10,  H,  S, 10, 10,  S,  S, 10, 10,  S,  S, 10, 10,  S,  S, 10, 10,  S,  S,  S, 10},
-                {10,  S,  S, 10, 10,  S,  S, 10, 10,  S,  S, 10, 10,  S,  S, 10, 10,  S,  S, 10, 10,  S,  S, 10, 10},
-                {10,  S,  S, 10, 10,  S,  S, 10, 10,  S,  S, 10, 10,  S,  S, 10, 10,  SC,  S, 10, 10,  S,  S,  S, 10},
-                {10,  S,  S, 10, 10,  S,  S, 10, 10,  S,  S, 10, 10,  S,  S, 10, 10,  S,  S, 10, 10,  S,  S,  S, 10},
-                {10,  S,  S, 10, 10,  S,  S, 10, 10,  SC,  S, 10, 10,  S,  S, 10, 10,  S,  S, R, 10,  S,  S,  S, 10},
-                {10,  S,  H,  S,  S,  S,  S, 10, 10,  S,  S,  S,  S,  S,  S, 10, 10,  S,  S, 10, 10,  S,  S,  S, 10},
-                {10,  S,  S,  S,  S,  S,  S, 10, 10,  S,  S,  S,  S,  S,  S, 10, 10,  S,  S, 10, 10,  S,  S,  S, 10},
-                {10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10},};
+                {10, 10,  R, 10, 10, 10, 10, 10},
+                {10,  S,  S,  S, SC,  S,  S, 10},
+                {10,  S,  H,  S,  S,  S,  S, 10},
+                {10,  S,  S, 10, 10,  S,  S, 10},
+                {10,  S,  S, 10, 10,  S,  S, 10},
+                {10,  S,  S,  S,  S, SC,  S, 10},
+                {10,  S,  H,  S,  S,  S,  S, 10},
+                {10, 10, 10, 10,  R, 10, 10, 10}};
         settings.setHarvestersCapacity(6);
         settings.setSupportedGarbageByHarvesters(new String[][]{
-            {L},
             {G, P, L},
-            {G},
-            {G, P},
-            {L, P},
-            {G, L},
-            {G, P},
+            {G, P, L},
         });
         settings.setRecyclingCenterPrices(new int[][]{
-            {9, 10, 0},
-            {10, 0, 9},
-            {0, 9, 10},
-            {2, 8, 6},
+            { 5, 7, 10},
+            {10, 7,  5},
         });
         settings.setInitialMap(map);
     }
