@@ -65,4 +65,11 @@ public class GarbageCNResponder extends ContractNetResponder {
 
         return null;
     }
+
+    @Override
+    protected void handleRejectProposal(ACLMessage cfp, ACLMessage propose, ACLMessage reject) {
+        ((HarvesterAgent) myAgent).log("I got rejected :(");
+    }
+
+    
 }

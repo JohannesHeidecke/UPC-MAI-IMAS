@@ -14,7 +14,7 @@ import java.util.List;
 public class PerformanceMeasure {
     
     private static final double bWeight = 100;
-    private static final double wWeight = 100;
+    private static final double wWeight = 2;
     
     
     
@@ -24,6 +24,10 @@ public class PerformanceMeasure {
             result += Math.pow(waitingTime, 2);
         }
         return result;
+    }
+    
+    public static double getPerformanceMeasure(double benefitsPerStep, double waitingValue) {
+        return bWeight * benefitsPerStep - wWeight * waitingValue;
     }
 
 }

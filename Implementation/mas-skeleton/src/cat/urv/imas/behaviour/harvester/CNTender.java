@@ -26,9 +26,9 @@ public class CNTender implements Serializable {
     // when picking up at least one unit of this garbage:
     private double globalWaitingTimeIncrease;
 
-    public CNTender(int maxAmount, int simStepsNeededTotal, int benefitsEarnedPerUnit, double globalWaitingTimeIncrease) {
+    public CNTender(int maxAmount, int simStepsIncrease, int benefitsEarnedPerUnit, double globalWaitingTimeIncrease) {
         this.maxAmount = maxAmount;
-        this.simStepsIncrease = simStepsNeededTotal;
+        this.simStepsIncrease = simStepsIncrease;
         this.benefitsEarnedPerUnit = benefitsEarnedPerUnit;
         this.globalWaitingTimeIncrease = globalWaitingTimeIncrease;
     }
@@ -37,7 +37,7 @@ public class CNTender implements Serializable {
         return maxAmount;
     }
 
-    public int getSimStepsNeededTotal() {
+    public int getSimStepsIncrease() {
         return simStepsIncrease;
     }
 
@@ -48,6 +48,13 @@ public class CNTender implements Serializable {
     public double getGlobalWaitingTimeIncrease() {
         return globalWaitingTimeIncrease;
     }
+
+    @Override
+    public String toString() {
+        return "CNTender{" + "maxAmount=" + maxAmount + ", simStepsIncrease=" + simStepsIncrease + ", benefitsEarnedPerUnit=" + benefitsEarnedPerUnit + ", globalWaitingTimeIncrease=" + globalWaitingTimeIncrease + '}';
+    }
+    
+    
     
     
 
