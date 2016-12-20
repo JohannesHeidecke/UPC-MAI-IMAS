@@ -21,7 +21,6 @@ import jade.domain.FIPAException;
  */
 public class ScoutAgent extends ImasAgent {
     
-    private Cell location;
     private InfoAgent infoAgent;
     
     
@@ -53,8 +52,6 @@ public class ScoutAgent extends ImasAgent {
             doDelete();
         }
         
-        this.location = (Cell) this.getArguments()[0];
-//        log("["+location.getRow()+"|"+location.getCol()+"]");
         infoAgent = (InfoAgent) this.getArguments()[1];
         infoAgent.setAID(this.getAID());
         

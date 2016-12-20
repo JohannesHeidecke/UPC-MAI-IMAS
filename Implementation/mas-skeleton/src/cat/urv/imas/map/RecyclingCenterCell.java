@@ -1,6 +1,5 @@
 /**
- * IMAS base code for the practical work. 
- * Copyright (C) 2014 DEIM - URV
+ * IMAS base code for the practical work. Copyright (C) 2014 DEIM - URV
  *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -18,6 +17,7 @@
 package cat.urv.imas.map;
 
 import cat.urv.imas.gui.CellVisualizer;
+import cat.urv.imas.onthology.GarbageType;
 
 /**
  * Cell that represents a recycling center.
@@ -46,10 +46,27 @@ public class RecyclingCenterCell extends Cell {
     public void draw(CellVisualizer visual) {
         visual.drawRecyclingCenter(this);
     }
-    
+
     @Override
     public String getMapMessage() {
         return prices[0] + "/" + prices[1] + "/" + prices[2];
     }
-    
+
+    public int[] getPrices() {
+        return this.prices;
+    }
+
+    public int getPriceFor(GarbageType gType) {
+        switch (gType) {
+            case GLASS:
+                return prices[0];
+
+            case PAPER:
+                return prices[1];
+            case PLASTIC:
+                return prices[2];
+        }
+        return -1;
+    }
+
 }

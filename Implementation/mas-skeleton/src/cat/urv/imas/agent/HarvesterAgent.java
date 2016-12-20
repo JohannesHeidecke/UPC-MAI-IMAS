@@ -5,17 +5,29 @@
  */
 package cat.urv.imas.agent;
 
+import cat.urv.imas.PerformanceMeasure;
+import cat.urv.imas.behaviour.harvester.GarbageEvaluation;
 import static cat.urv.imas.agent.ImasAgent.OWNER;
 import cat.urv.imas.behaviour.harvester.HarvesterBehaviour;
+import cat.urv.imas.map.BuildingCell;
 import cat.urv.imas.map.Cell;
+import cat.urv.imas.map.RecyclingCenterCell;
+import cat.urv.imas.map.utility.MapUtility;
+import cat.urv.imas.map.utility.Permute;
+import cat.urv.imas.onthology.Garbage;
 import cat.urv.imas.onthology.GarbageType;
 import cat.urv.imas.onthology.HarvesterInfoAgent;
+import cat.urv.imas.plan.Location;
 import cat.urv.imas.plan.Plan;
 import jade.domain.DFService;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.domain.FIPAException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -23,13 +35,19 @@ import java.util.Arrays;
  */
 public class HarvesterAgent extends ImasAgent {
 
-    private Cell location;
+    private Location location;
     private HarvesterInfoAgent infoAgent;
     private GarbageType[] garbageTypes;
 
-    private Plan myPlan;
-
     private static int capacity;
+
+    private int currentLoad = 0;
+    private GarbageType currentLoadType;
+    private List<Location> pickUpOrder = new ArrayList<>();
+    private Map<Location, Integer> pickUpPlan = new HashMap<>();
+    private Location targetedRecyclingCenter;
+
+    private Cell[][] map;
 
     public HarvesterAgent() {
         super(AgentType.HARVESTER);
@@ -54,27 +72,208 @@ public class HarvesterAgent extends ImasAgent {
         dfd.setName(getAID());
         try {
             DFService.register(this, dfd);
-//            log("Registered to the DF");
         } catch (FIPAException e) {
             System.err.println(getLocalName() + " registration with DF unsucceeded. Reason: " + e.getMessage());
             doDelete();
         }
 
-        this.location = (Cell) this.getArguments()[0];
+        Cell initialCell = (Cell) this.getArguments()[0];
+        Location myLoc = new Location(initialCell.getRow(), initialCell.getCol());
+        this.location = myLoc;
         infoAgent = (HarvesterInfoAgent) this.getArguments()[1];
         infoAgent.setAID(this.getAID());
         this.garbageTypes = (GarbageType[]) this.getArguments()[2];
-//        log("["+location.getRow()+"|"+location.getCol()+"]\t"+Arrays.toString(garbageTypes));
-        
+
         this.addBehaviour(new HarvesterBehaviour());
     }
 
     public static void setCapacity(int c) {
         capacity = c;
     }
-    
+
+    public void setMap(Cell[][] map) {
+        this.map = map;
+    }
+
     public HarvesterInfoAgent getInfoAgent() {
         return this.infoAgent;
+    }
+
+    public boolean isIdle() {
+        return (currentLoad == 0 && pickUpPlan.isEmpty());
+    }
+
+    public int getFreeCapacity() {
+        return capacity - currentLoad;
+    }
+
+    public void setCurrentLocation(Location location) {
+        this.location = location;
+    }
+
+    public Location getCurrentLocation() {
+        return this.location;
+    }
+
+    public GarbageEvaluation getGarbageEvalFor(Garbage garbage) {
+        List<Location> pickUpOrderAndCenter = getPickUpOrderAndCenterWith(garbage);
+        double currentWaitingTime = evalWaitingTime(pickUpOrder);
+        double newWaitingTime = evalWaitingTime(pickUpOrderAndCenter.subList(0, pickUpOrderAndCenter.size() - 1));
+        double waitingTimeIncr = newWaitingTime - currentWaitingTime;
+        int currentSteps = evalBusyTime(pickUpOrder, targetedRecyclingCenter);
+        int newSteps = evalBusyTime(pickUpOrderAndCenter.
+                subList(0, pickUpOrderAndCenter.size() - 1), 
+                pickUpOrderAndCenter.get(pickUpOrderAndCenter.size() - 1));
+        int stepsIncr = newSteps - currentSteps;
+        Location plannedCenter = pickUpOrderAndCenter.get(pickUpOrderAndCenter.size() - 1);
+        int price = ((RecyclingCenterCell) map[plannedCenter.getRow()][plannedCenter.getCol()]).getPriceFor(garbage.getType());
+        GarbageEvaluation garbEval = new GarbageEvaluation(stepsIncr, price, waitingTimeIncr);
+        log(garbEval.toString());
+        return null;
+    }
+
+    private List<Location> getPickUpOrderAndCenterWith(Garbage garbage) {
+        // the last element of the list contains the recycling center 
+
+        List<Location> result = new ArrayList<>(this.pickUpOrder.size() + 2);
+
+        // determine current garbage type
+        GarbageType gType;
+        if (pickUpOrder.isEmpty()) {
+            gType = garbage.getType();
+        } else {
+            gType = this.currentLoadType;
+        }
+
+        List<RecyclingCenterCell> recyclingCenters = new ArrayList<>();
+        for (int i = 0; i < map.length; i++) {
+            for (int j = 0; j < map[i].length; j++) {
+                if (map[i][j] instanceof RecyclingCenterCell) {
+                    RecyclingCenterCell center = (RecyclingCenterCell) map[i][j];
+                    int gTypePrice = center.getPriceFor(gType);
+                    if (gTypePrice > 0) {
+                        recyclingCenters.add(center);
+                    }
+                }
+            }
+        }
+
+        // for each Recycling Center with the right garbage type:
+        // get the shortest route containing all current pick ups and new garbage
+        // get all permutations of pick up orders:
+        List<Location> pickUpLocs = new ArrayList<>();
+        pickUpLocs.addAll(pickUpOrder);
+        pickUpLocs.add(garbage.getLocation());
+
+        List<Integer[]> pickUpPermutations = Permute.getIndexPermutations(pickUpLocs.size());
+        Map<RecyclingCenterCell, Integer[]> shortestPathByCenter = new HashMap<>();
+        Map<RecyclingCenterCell, Integer> shortestDistanceByCenter = new HashMap<>();
+
+        for (RecyclingCenterCell center : recyclingCenters) {
+            Location centerLoc = new Location(center.getRow(), center.getCol());
+            int bestDistance = Integer.MAX_VALUE;
+            Integer[] bestPermut = null;
+
+            List<Location> lastPath = null;
+            Location lastValidTo = location;
+            for (Integer[] permut : pickUpPermutations) {
+                int distance = 0;
+
+                for (int i = 0; i < pickUpLocs.size(); i++) {
+                    if (lastPath != null && lastPath.size() != 0) {
+                        lastValidTo = lastPath.get(lastPath.size() - 1);
+                    }
+                    lastPath = MapUtility.getShortestPath(lastValidTo, pickUpLocs.get(permut[i]));
+                    distance += lastPath != null ? lastPath.size() : 0;
+                }
+                if (lastPath != null && lastPath.size() != 0) {
+                    lastValidTo = lastPath.get(lastPath.size() - 1);
+                }
+                lastPath = MapUtility.getShortestPath(lastValidTo, centerLoc);
+                distance += lastPath != null ? lastPath.size() : 0;
+
+                if (distance < bestDistance) {
+                    bestDistance = distance;
+                    bestPermut = permut;
+                }
+            }
+
+            shortestPathByCenter.put(center, bestPermut);
+            shortestDistanceByCenter.put(center, bestDistance);
+
+        }
+
+        // evaluate all recycling centers with price / path length:
+        // pick the best
+        double bestPriceDistanceRatio = 0.0;
+        RecyclingCenterCell bestCenter = null;
+        for (RecyclingCenterCell center : recyclingCenters) {
+            double priceDistanceRatio = center.getPriceFor(gType);
+            priceDistanceRatio /= shortestDistanceByCenter.get(center);
+            if (priceDistanceRatio > bestPriceDistanceRatio) {
+                bestPriceDistanceRatio = priceDistanceRatio;
+                bestCenter = center;
+            }
+        }
+
+        // add all to result list
+        Integer[] bestCenterPermut = shortestPathByCenter.get(bestCenter);
+        for (int i = 0; i < pickUpLocs.size(); i++) {
+            result.add(pickUpLocs.get(bestCenterPermut[i]));
+        }
+        Location centerLoc = new Location(bestCenter.getRow(), bestCenter.getCol());
+        // the last element of the list contains the recycling center:
+        result.add(centerLoc);
+
+        return result;
+    }
+
+    private double evalWaitingTime(List<Location> pickUpLocations) {
+
+        List<Integer> waitingTimes = new ArrayList<>();
+        List<Location> lastPath = null;
+        Location lastValidTo = location;
+
+        int currentWaitingTime = 0;
+        for (int i = 0; i < pickUpLocations.size(); i++) {
+            if (lastPath != null && lastPath.size() != 0) {
+                lastValidTo = lastPath.get(lastPath.size() - 1);
+            }
+            lastPath = MapUtility.getShortestPath(lastValidTo, pickUpLocations.get(i));
+            currentWaitingTime += lastPath != null ? lastPath.size() : 0;
+            waitingTimes.add(currentWaitingTime);
+        }
+
+        return PerformanceMeasure.getWaitingValue(waitingTimes);
+    }
+
+    private int evalBusyTime(List<Location> pickUpLocations, Location center) {
+        
+        if (pickUpLocations == null || pickUpLocations.isEmpty()) {
+            return 0;
+        }
+
+        
+        List<Location> lastPath = null;
+        Location lastValidTo = location;
+        
+        
+        int currentWaitingTime = 0;
+        for (int i = 0; i < pickUpLocations.size(); i++) {
+            if (lastPath != null && lastPath.size() != 0) {
+                lastValidTo = lastPath.get(lastPath.size() - 1);
+            }
+            lastPath = MapUtility.getShortestPath(lastValidTo, pickUpLocations.get(i));
+            currentWaitingTime += lastPath != null ? lastPath.size() : 0;
+        }
+
+        if (lastPath != null && lastPath.size() != 0) {
+            lastValidTo = lastPath.get(lastPath.size() - 1);
+        }
+        lastPath = MapUtility.getShortestPath(lastValidTo, center);
+        currentWaitingTime += lastPath != null ? lastPath.size() : 0;
+        
+        return currentWaitingTime;
     }
 
 }

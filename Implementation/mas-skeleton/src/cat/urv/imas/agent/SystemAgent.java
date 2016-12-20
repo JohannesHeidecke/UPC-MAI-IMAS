@@ -63,6 +63,8 @@ public class SystemAgent extends ImasAgent {
      * round.
      */
     private AID coordinatorAgent;
+    
+    private static int simulationStep = 0;
 
     /**
      * Builds the System agent.
@@ -136,7 +138,7 @@ public class SystemAgent extends ImasAgent {
         }
 
         // 2. Load game settings.
-        this.game = InitialGameSettings.load("game.settings");
+        this.game = InitialGameSettings.load("game.group7.test4.settings");
         log("Initial configuration settings loaded");
         MapUtility.initialize(game.getMap());
         log("Initialized MapUtility structures");
@@ -226,6 +228,11 @@ public class SystemAgent extends ImasAgent {
 
     public void updateGUI() {
         this.gui.updateGame();
+        simulationStep++;
+    }
+    
+    public static int getCurrentSimulationStep() {
+        return simulationStep;
     }
 
 }

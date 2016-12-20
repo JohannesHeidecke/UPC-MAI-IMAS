@@ -11,10 +11,13 @@ import cat.urv.imas.map.Cell;
 import cat.urv.imas.map.StreetCell;
 import cat.urv.imas.onthology.HarvesterInfoAgent;
 import cat.urv.imas.onthology.Performatives;
+import cat.urv.imas.plan.Location;
 import cat.urv.imas.plan.Movement;
 import cat.urv.imas.plan.Plan;
 import jade.core.behaviours.CyclicBehaviour;
+import jade.domain.FIPANames;
 import jade.lang.acl.ACLMessage;
+import jade.lang.acl.MessageTemplate;
 import jade.lang.acl.UnreadableException;
 import java.io.IOException;
 import java.util.concurrent.ThreadLocalRandom;
@@ -26,11 +29,24 @@ import java.util.logging.Logger;
  * @author Ihcrul
  */
 public class HarvesterBehaviour extends CyclicBehaviour {
-    
+
+    @Override
+    public void onStart() {
+        MessageTemplate mt = MessageTemplate.and(
+				MessageTemplate.MatchProtocol(FIPANames.InteractionProtocol.FIPA_CONTRACT_NET),
+				MessageTemplate.MatchPerformative(ACLMessage.CFP) );
+
+        myAgent.addBehaviour(new GarbageCNResponder(myAgent, mt));
+
+    }
+
     @Override
     public void action() {
+        
+        MessageTemplate mt = MessageTemplate.MatchPerformative(Performatives.REQUEST_PLAN_HARVESTER);
 
-        ACLMessage msg = myAgent.receive();
+        ACLMessage msg = myAgent.receive(mt);
+        
         if (msg != null) {
             switch (msg.getPerformative()) {
                 case Performatives.REQUEST_PLAN_HARVESTER:
@@ -51,6 +67,7 @@ public class HarvesterBehaviour extends CyclicBehaviour {
         try {
 
             Cell[][] map = (Cell[][]) msg.getContentObject();
+            ((HarvesterAgent) myAgent).setMap(map);
 
             // TODO: more intelligent behavior here:
             // Find current location on map:
@@ -70,10 +87,13 @@ public class HarvesterBehaviour extends CyclicBehaviour {
                     }
                 }
             }
-            
+
             if (myLocation == null) {
                 throw new RuntimeException("Harvester did not find itself on the map");
             }
+            
+            Location loc = new Location(myLocation.getRow(), myLocation.getCol());
+            ((HarvesterAgent) myAgent).setCurrentLocation(loc);
 
             // TODO: remove random plan
             Plan randomPlan = new Plan();
@@ -83,7 +103,7 @@ public class HarvesterBehaviour extends CyclicBehaviour {
             int colStep = ThreadLocalRandom.current().nextInt(min, max + 1);
             int rowOrCol = ThreadLocalRandom.current().nextInt(0, 2);
             int newRow = Math.max(0, myLocation.getRow() + rowStep * rowOrCol);
-            int newCol = Math.max(0, myLocation.getCol() + colStep * (1-rowOrCol));
+            int newCol = Math.max(0, myLocation.getCol() + colStep * (1 - rowOrCol));
             randomPlan.addAction(new Movement(myLocation.getRow(), myLocation.getCol(), newRow, newCol));
 
             try {

@@ -6,6 +6,7 @@
 package cat.urv.imas.behaviour.coordinator.harvester;
 
 import cat.urv.imas.agent.HarvesterCoordinatorAgent;
+import cat.urv.imas.agent.SystemAgent;
 import cat.urv.imas.map.BuildingCell;
 import cat.urv.imas.map.Cell;
 import cat.urv.imas.onthology.Garbage;
@@ -23,6 +24,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -141,10 +143,9 @@ public class CoordinateHarvestersBehaviour extends CyclicBehaviour {
                         continue;
                     }
                     
-                    // TODO: exception if detectedGarbageMap.keySet().size > 1
                     GarbageType gType = (GarbageType) detectedGarbageMap.keySet().toArray(new GarbageType[1])[0];
-                    // TODO: get time step from system agent
-                    int detectedAt = 100;
+                    
+                    int detectedAt = SystemAgent.getCurrentSimulationStep();
                     Garbage detectedGarbage = new Garbage(gType, new Location(i, j), detectedAt, detectedGarbageMap.get(gType));
                     
                     // check if this garbage is new:
@@ -155,6 +156,11 @@ public class CoordinateHarvestersBehaviour extends CyclicBehaviour {
                             isNewGarbage = false;
                         }
                     }
+                    for(Garbage garbage : inNegotiationGarbage) {
+                        if (garbage.equals(detectedGarbage)) {
+                            isNewGarbage = false;
+                        }
+                    } 
                     for (Garbage garbage : assignedGarbage) {
                         if (garbage.equals(detectedGarbage)) {
                             isNewGarbage = false;
@@ -174,12 +180,15 @@ public class CoordinateHarvestersBehaviour extends CyclicBehaviour {
 
     private void announceUnassignedGarbage() {
 
-        for (Garbage garbage : unassignedGarbage) {
+        Iterator<Garbage> iterator = unassignedGarbage.iterator();
+        while(iterator.hasNext()) {
+            Garbage garbage = iterator.next();
             inNegotiationGarbage.add(garbage);
+            iterator.remove();
             try {
                 ACLMessage cnMessage = new ACLMessage(ACLMessage.CFP);
                 cnMessage.setProtocol(FIPANames.InteractionProtocol.FIPA_CONTRACT_NET);
-                cnMessage.setReplyByDate(new Date(System.currentTimeMillis() + 1000));
+                cnMessage.setReplyByDate(new Date(System.currentTimeMillis() + 100));
                 cnMessage.setContentObject(garbage);
                 cnMessage.setSender(myAgent.getAID());
                 for (AID harvester : this.harvCoordinator.getCoordinatedHarvesters()) {

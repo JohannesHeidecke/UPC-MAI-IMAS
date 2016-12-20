@@ -55,6 +55,10 @@ public class MapUtility {
         if (from.equals(to)) {
             return null;
         }
+        
+        if (!(map[to.getRow()][to.getCol()] instanceof StreetCell)) {
+            return getShortestPathToBuilding(from, to);
+        }
 
         // Find vertices in graph:
         Location startVertex = null;
@@ -78,9 +82,51 @@ public class MapUtility {
         if (from.equals(to)) {
             return 0;
         }
+        
+        List<Location> path = getShortestPath(from, to);
+        
+        if (path == null) {
+            return 0;
+        }
 
-        return getShortestPath(from, to).size();
+        return path.size();
 
+    }
+    
+    private static List<Location> getShortestPathToBuilding(Location from, Location building) {
+        List<Location> result = null;
+        
+        List<Location> adjacentStreets = new ArrayList<>();
+        int minRow = Math.max(0, building.getRow() - 1);
+        int minCol = Math.max(0, building.getCol() - 1);
+        int maxRow = Math.min(map.length - 1, building.getRow() + 1);
+        int maxCol = Math.min(map[0].length - 1, building.getCol() + 1);
+        for (int i = minRow; i <= maxRow; i++) {
+            for (int j = minCol; j <= maxCol; j++) {
+                if (map[i][j] instanceof StreetCell) {
+                    adjacentStreets.add(new Location(i, j));
+                }
+            }
+        }
+        
+        int bestDistance = Integer.MAX_VALUE;
+        Location bestTo = null;
+        
+        if (adjacentStreets.isEmpty()) {
+            throw new RuntimeException("Trying to reach a building without adjacent street cells: "+building);
+        }
+        
+        for (Location to : adjacentStreets) {
+            int distance = getShortestDistance(from, to);
+            if (distance < bestDistance) {
+                bestDistance = distance;
+                bestTo = to;
+            }
+        }
+        if (from.equals(bestTo)) {
+            return null;
+        }
+        return getShortestPath(from, bestTo);
     }
 
     private static void constructCityGraph() {
