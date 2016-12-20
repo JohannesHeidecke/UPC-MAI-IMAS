@@ -40,16 +40,17 @@ public class GarbageCNInitiator extends ContractNetInitiator {
     public void handleAllResponses(Vector responses,
             Vector acceptances) {
         System.err.println("Handle all responses for " + garbage);
+        // TODO: loop over responses, select one of the ones with performative PROPOSE
     }
 
     @Override
     protected void handlePropose(ACLMessage propose, Vector v) {
-        System.out.println("Agent " + propose.getSender().getName() + " proposed " + propose.getContent());
+//        System.out.println("Agent " + propose.getSender().getName() + " proposed " + propose.getContent());
     }
 
     @Override
     protected void handleRefuse(ACLMessage refuse) {
-        System.out.println("Agent " + refuse.getSender().getName() + " refused");
+//        System.out.println("Agent " + refuse.getSender().getName() + " refused");
     }
 
     @Override

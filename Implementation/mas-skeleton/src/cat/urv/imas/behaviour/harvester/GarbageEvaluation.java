@@ -35,7 +35,7 @@ public class GarbageEvaluation {
 
     @Override
     public String toString() {
-        return "GarbageEvaluation{" + "stepsIncr=" + stepsIncr + ", benefitsIncr=" + price + ", waitIncr=" + waitIncr + '}';
+        return "GarbageEvaluation{" + "stepsIncr=" + stepsIncr + ", price=" + price + ", waitIncr=" + waitIncr + '}';
     }
 
     

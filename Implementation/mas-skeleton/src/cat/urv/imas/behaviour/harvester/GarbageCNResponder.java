@@ -14,6 +14,7 @@ import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import jade.lang.acl.UnreadableException;
 import jade.proto.ContractNetResponder;
+import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -36,14 +37,31 @@ public class GarbageCNResponder extends ContractNetResponder {
         } catch (UnreadableException ex) {
             Logger.getLogger(GarbageCNResponder.class.getName()).log(Level.SEVERE, null, ex);
         }
-//        System.out.println("Agent " + ": CFP received from " + cfp.getSender().getName() + " for " + this.garbage);
 
         HarvesterAgent harvester = (HarvesterAgent) myAgent;
+
+        // refuse if capacity full or wrong garbage type:
+        if (harvester.getFreeCapacity() == 0 || !harvester.canCarry(garbage.getType())) {
+            // Refuse the CFP
+            ACLMessage reply = cfp.createReply();
+            reply.setPerformative(ACLMessage.REFUSE);
+            return reply;
+        }
+
         int maxAmount = harvester.getFreeCapacity();
         GarbageEvaluation garbEval = harvester.getGarbageEvalFor(garbage);
-//        CNTender tender = new CNTender(maxAmount, garbEval.getTotalSteps(), 
-//                garbEval.getBenefits(), garbEval.getWaitIncr());
+        ((HarvesterAgent) myAgent).log("Proposing: "+garbEval.toString());
+        CNTender tender = new CNTender(maxAmount, garbEval.getStepsIncr(),
+                garbEval.getPrice(), garbEval.getWaitIncr());
 
+        try {
+            ACLMessage reply = cfp.createReply();
+            reply.setPerformative(ACLMessage.PROPOSE);
+            reply.setContentObject(tender);
+            return reply;
+        } catch (IOException ex) {
+            Logger.getLogger(GarbageCNResponder.class.getName()).log(Level.SEVERE, null, ex);
+        }
 
         return null;
     }

@@ -128,8 +128,7 @@ public class HarvesterAgent extends ImasAgent {
         Location plannedCenter = pickUpOrderAndCenter.get(pickUpOrderAndCenter.size() - 1);
         int price = ((RecyclingCenterCell) map[plannedCenter.getRow()][plannedCenter.getCol()]).getPriceFor(garbage.getType());
         GarbageEvaluation garbEval = new GarbageEvaluation(stepsIncr, price, waitingTimeIncr);
-        log(garbEval.toString());
-        return null;
+        return garbEval;
     }
 
     private List<Location> getPickUpOrderAndCenterWith(Garbage garbage) {
@@ -274,6 +273,15 @@ public class HarvesterAgent extends ImasAgent {
         currentWaitingTime += lastPath != null ? lastPath.size() : 0;
         
         return currentWaitingTime;
+    }
+    
+    public boolean canCarry(GarbageType type) {
+        for (GarbageType myType : this.garbageTypes) {
+            if (myType.equals(type)) {
+                return true;
+            }
+        }
+        return false;
     }
 
 }

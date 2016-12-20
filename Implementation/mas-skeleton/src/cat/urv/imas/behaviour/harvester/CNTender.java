@@ -5,11 +5,13 @@
  */
 package cat.urv.imas.behaviour.harvester;
 
+import java.io.Serializable;
+
 /**
  *
  * @author Ihcrul
  */
-public class CNTender {
+public class CNTender implements Serializable {
     
     // How much of the Garbage can be taken at most:
     private int maxAmount;
