@@ -42,7 +42,7 @@ public class HarvesterAgent extends ImasAgent {
     private static int capacity;
 
     private int currentLoad = 0;
-    private GarbageType currentLoadType;
+    private GarbageType currentLoadType = null;
     private List<Location> pickUpOrder = new ArrayList<>();
     private Map<Location, Integer> pickUpPlan = new HashMap<>();
     private Location targetedRecyclingCenter;
@@ -122,7 +122,7 @@ public class HarvesterAgent extends ImasAgent {
         double waitingTimeIncr = newWaitingTime - currentWaitingTime;
         int currentSteps = evalBusyTime(pickUpOrder, targetedRecyclingCenter);
         int newSteps = evalBusyTime(pickUpOrderAndCenter.
-                subList(0, pickUpOrderAndCenter.size() - 1), 
+                subList(0, pickUpOrderAndCenter.size() - 1),
                 pickUpOrderAndCenter.get(pickUpOrderAndCenter.size() - 1));
         int stepsIncr = newSteps - currentSteps;
         Location plannedCenter = pickUpOrderAndCenter.get(pickUpOrderAndCenter.size() - 1);
@@ -247,16 +247,14 @@ public class HarvesterAgent extends ImasAgent {
     }
 
     private int evalBusyTime(List<Location> pickUpLocations, Location center) {
-        
+
         if (pickUpLocations == null || pickUpLocations.isEmpty()) {
             return 0;
         }
 
-        
         List<Location> lastPath = null;
         Location lastValidTo = location;
-        
-        
+
         int currentWaitingTime = 0;
         for (int i = 0; i < pickUpLocations.size(); i++) {
             if (lastPath != null && lastPath.size() != 0) {
@@ -271,10 +269,10 @@ public class HarvesterAgent extends ImasAgent {
         }
         lastPath = MapUtility.getShortestPath(lastValidTo, center);
         currentWaitingTime += lastPath != null ? lastPath.size() : 0;
-        
+
         return currentWaitingTime;
     }
-    
+
     public boolean canCarry(GarbageType type) {
         for (GarbageType myType : this.garbageTypes) {
             if (myType.equals(type)) {
@@ -282,6 +280,46 @@ public class HarvesterAgent extends ImasAgent {
             }
         }
         return false;
+    }
+
+    public void addGarbageToHarvest(Garbage garbage, int amount) {
+
+        if (!(currentLoadType == null) && !garbage.getType().equals(this.currentLoadType)) {
+            throw new RuntimeException("Harvester was assigned to pick up wrong type");
+        }
+        currentLoadType = garbage.getType();
+        Location loc = garbage.getLocation();
+
+        this.pickUpPlan.put(loc, amount);
+        List<Location> order = getPickUpOrderAndCenterWith(garbage);
+        
+        this.pickUpOrder.clear();
+        this.pickUpOrder.addAll(order.subList(0, (order.size()-1)));
+        
+        this.targetedRecyclingCenter = order.get(order.size()-1);
+
+    }
+
+    private void harvest(Location loc, int amount) {
+        // if now empty: set currentLoadType to null
+        // TODO
+        // TOOOODODOO
+    }
+    
+    public GarbageType getCurrentLoadType() {
+        return this.currentLoadType;
+    }
+    
+    public boolean hasPickupLocation() {
+        return !this.pickUpOrder.isEmpty();
+    }
+    
+    public Location getNextPickupLocation() {
+        return this.pickUpOrder.get(0);
+    }
+    
+    public Location getTargetedRecyclingCenter() {
+        return this.targetedRecyclingCenter;
     }
 
 }

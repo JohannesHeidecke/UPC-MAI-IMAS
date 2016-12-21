@@ -8,12 +8,15 @@ package cat.urv.imas.behaviour.coordinator.harvester;
 import cat.urv.imas.PerformanceMeasure;
 import cat.urv.imas.behaviour.harvester.CNTender;
 import cat.urv.imas.onthology.Garbage;
+import jade.core.AID;
 import jade.core.Agent;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.UnreadableException;
 import jade.proto.ContractNetInitiator;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -38,27 +41,66 @@ public class GarbageCNInitiator extends ContractNetInitiator {
     @Override
     public void handleAllResponses(Vector responses,
             Vector acceptances) {
-        // loop over responses, select one of the ones with performative PROPOSE
 
-        CNTender tender;
+        int garbageUnitsToDistribute = garbage.getAmount();
+
+        Map<AID, Integer> chosenHarvestersAmounts = new HashMap<>();
+                
+        while (garbageUnitsToDistribute > 0) {
+
+            CNTender tender;
+            double bestPerformanceMeasure = Double.NEGATIVE_INFINITY;
+            AID chosenHarvester = null;
+            int chosenAmount = 0;
+
+            boolean harvesterFound = false;
+            for (Object o : responses) {
+                ACLMessage msg = (ACLMessage) o;
+                if (chosenHarvestersAmounts.keySet().contains(msg.getSender())) {
+                    continue;
+                }
+                if (msg.getPerformative() == ACLMessage.PROPOSE) {
+                    try {
+                        tender = (CNTender) msg.getContentObject();
+                        double performanceMeasure = evaluateTender(tender, garbageUnitsToDistribute);
+
+                        if (performanceMeasure > bestPerformanceMeasure) {
+                            harvesterFound = true;
+                            bestPerformanceMeasure = performanceMeasure;
+                            chosenHarvester = msg.getSender();
+                            chosenAmount = Math.min(garbageUnitsToDistribute, tender.getMaxAmount());
+                        }
+
+                    } catch (UnreadableException ex) {
+                        Logger.getLogger(GarbageCNInitiator.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+            }
+
+            if (!harvesterFound) {
+                break;
+            }
+
+            garbageUnitsToDistribute -= chosenAmount;
+            chosenHarvestersAmounts.put(chosenHarvester, chosenAmount);
+
+        }
+        
+        // Send ACCEPT_PROPOSAL / REJECT_PROPOSAL
         for (Object o : responses) {
             ACLMessage msg = (ACLMessage) o;
             if (msg.getPerformative() == ACLMessage.PROPOSE) {
-                try {
-                    tender = (CNTender) msg.getContentObject();
-                    System.err.println(tender + " ::: "+evaluateTender(tender));
-                    
-                    ACLMessage reply = msg.createReply();
+                ACLMessage reply = msg.createReply();
+                if (chosenHarvestersAmounts.keySet().contains(msg.getSender())) {
+                    reply.setPerformative(ACLMessage.ACCEPT_PROPOSAL);
+                    reply.setContent(chosenHarvestersAmounts.get(msg.getSender()).toString());
+                } else {
                     reply.setPerformative(ACLMessage.REJECT_PROPOSAL);
-                    myAgent.send(reply);
-                    
-                } catch (UnreadableException ex) {
-                    Logger.getLogger(GarbageCNInitiator.class.getName()).log(Level.SEVERE, null, ex);
                 }
+                acceptances.addElement(reply);
             }
+
         }
-        
-        
 
     }
 
@@ -77,11 +119,11 @@ public class GarbageCNInitiator extends ContractNetInitiator {
         System.out.println("Agent " + inform.getSender().getName() + " successfully performed the requested action");
     }
 
-    private double evaluateTender(CNTender tender) {
-        double benefitsPerStep = Math.min(garbage.getAmount(), tender.getMaxAmount());
+    private double evaluateTender(CNTender tender, int amount) {
+        double benefitsPerStep = Math.min(amount, tender.getMaxAmount());
         benefitsPerStep *= tender.getBenefitsEarnedPerUnit();
         benefitsPerStep /= tender.getSimStepsIncrease();
         return PerformanceMeasure.getPerformanceMeasure(benefitsPerStep, tender.getGlobalWaitingTimeIncrease());
     }
-    
+
 }

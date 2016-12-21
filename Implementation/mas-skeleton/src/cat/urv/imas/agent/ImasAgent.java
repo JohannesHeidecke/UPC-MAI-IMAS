@@ -66,7 +66,7 @@ public class ImasAgent extends Agent {
      * @param str message to show
      */
     public void log(String str) {
-        System.out.println(getLocalName() + ": " + str);
+        System.out.println(SystemAgent.getCurrentSimulationStep()+": "+getLocalName() + ": " + str);
     }
     
     /**
