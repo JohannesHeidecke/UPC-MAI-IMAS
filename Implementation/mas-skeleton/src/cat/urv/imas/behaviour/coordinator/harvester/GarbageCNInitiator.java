@@ -6,6 +6,7 @@
 package cat.urv.imas.behaviour.coordinator.harvester;
 
 import cat.urv.imas.PerformanceMeasure;
+import cat.urv.imas.agent.HarvesterCoordinatorAgent;
 import cat.urv.imas.behaviour.harvester.CNTender;
 import cat.urv.imas.onthology.Garbage;
 import jade.core.AID;
@@ -45,7 +46,7 @@ public class GarbageCNInitiator extends ContractNetInitiator {
         int garbageUnitsToDistribute = garbage.getAmount();
 
         Map<AID, Integer> chosenHarvestersAmounts = new HashMap<>();
-                
+
         while (garbageUnitsToDistribute > 0) {
 
             CNTender tender;
@@ -85,7 +86,12 @@ public class GarbageCNInitiator extends ContractNetInitiator {
             chosenHarvestersAmounts.put(chosenHarvester, chosenAmount);
 
         }
-        
+
+        if (garbageUnitsToDistribute > 0) {
+            ((HarvesterCoordinatorAgent) myAgent).
+                    registerRemainingUnassignedGarbage(garbage, garbageUnitsToDistribute);
+        }
+
         // Send ACCEPT_PROPOSAL / REJECT_PROPOSAL
         for (Object o : responses) {
             ACLMessage msg = (ACLMessage) o;
@@ -94,6 +100,10 @@ public class GarbageCNInitiator extends ContractNetInitiator {
                 if (chosenHarvestersAmounts.keySet().contains(msg.getSender())) {
                     reply.setPerformative(ACLMessage.ACCEPT_PROPOSAL);
                     reply.setContent(chosenHarvestersAmounts.get(msg.getSender()).toString());
+
+                    ((HarvesterCoordinatorAgent) myAgent).registerGarbageAssignment(garbage, 
+                            chosenHarvestersAmounts.get(msg.getSender()));
+
                 } else {
                     reply.setPerformative(ACLMessage.REJECT_PROPOSAL);
                 }

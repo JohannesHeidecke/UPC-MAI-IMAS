@@ -68,6 +68,12 @@ public class Garbage implements Serializable {
     public String toString() {
         return "Garbage{" + "type=" + type + ", location=" + location + ", detectedAt=" + detectedAt + ", amount=" + amount + '}';
     }
+
+    public void setAmount(int amount) {
+        this.amount = amount;
+    }
+    
+    
     
     
     

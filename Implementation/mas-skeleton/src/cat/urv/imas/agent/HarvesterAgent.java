@@ -26,6 +26,7 @@ import jade.domain.FIPAException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -292,34 +293,67 @@ public class HarvesterAgent extends ImasAgent {
 
         this.pickUpPlan.put(loc, amount);
         List<Location> order = getPickUpOrderAndCenterWith(garbage);
-        
+
         this.pickUpOrder.clear();
-        this.pickUpOrder.addAll(order.subList(0, (order.size()-1)));
-        
-        this.targetedRecyclingCenter = order.get(order.size()-1);
+        this.pickUpOrder.addAll(order.subList(0, (order.size() - 1)));
+
+        this.targetedRecyclingCenter = order.get(order.size() - 1);
 
     }
 
-    private void harvest(Location loc, int amount) {
-        // if now empty: set currentLoadType to null
-        // TODO
-        // TOOOODODOO
-    }
-    
     public GarbageType getCurrentLoadType() {
         return this.currentLoadType;
     }
-    
+
     public boolean hasPickupLocation() {
         return !this.pickUpOrder.isEmpty();
     }
-    
+
     public Location getNextPickupLocation() {
         return this.pickUpOrder.get(0);
     }
-    
+
     public Location getTargetedRecyclingCenter() {
         return this.targetedRecyclingCenter;
     }
+
+    public void pickUpOneUnit(Location loc) {
+        for (Location pickUpLoc : this.pickUpPlan.keySet()) {
+            if (loc.equals(pickUpLoc)) {
+                int currentAmount = pickUpPlan.get(pickUpLoc);
+                pickUpPlan.replace(pickUpLoc, currentAmount - 1);
+                if (currentAmount == 1) {
+                    // all assigned garbage has been picked up
+                    // remove from pick up order and pick up plan:
+                    pickUpPlan.remove(pickUpLoc);
+                    Iterator<Location> itOrder = pickUpOrder.iterator();
+                    while (itOrder.hasNext()) {
+                        Location pLoc = itOrder.next();
+                        if (pLoc.equals(loc)) {
+                            itOrder.remove();
+                            log("Done picking up garbage at "+loc);
+                            break;
+                        }
+                    }
+
+                }
+            }
+        }
+    }
+
+    public int getCurrentLoadAmount() {
+        return this.currentLoad;
+    }
+
+    public void loadOneUnit() {
+        this.currentLoad++;
+    }
+
+    public void clearLoad() {
+        this.currentLoad = 0;
+        this.currentLoadType = null;
+    }
+    
+    
 
 }

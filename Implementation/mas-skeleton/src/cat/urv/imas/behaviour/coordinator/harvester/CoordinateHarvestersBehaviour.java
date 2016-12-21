@@ -43,10 +43,6 @@ public class CoordinateHarvestersBehaviour extends CyclicBehaviour {
 
     private List<AID> harvestersWithoutPlanReply;
     private HashMap<AID, Plan> currentPlans;
-
-    private List<Garbage> unassignedGarbage = new ArrayList<>();
-    private List<Garbage> inNegotiationGarbage = new ArrayList<>();
-    private List<Garbage> assignedGarbage = new ArrayList<>();
     
     private boolean cnDone = false;
 
@@ -151,25 +147,25 @@ public class CoordinateHarvestersBehaviour extends CyclicBehaviour {
                     // check if this garbage is new:
                     boolean isNewGarbage = true;
                     
-                    for(Garbage garbage : unassignedGarbage) {
-                        if (garbage.equals(detectedGarbage)) {
+                    for(Garbage garbage : harvCoordinator.getUnassignedGarbage()) {
+                        if (garbage.getLocation().equals(detectedGarbage.getLocation())) {
                             isNewGarbage = false;
                         }
                     }
-                    for(Garbage garbage : inNegotiationGarbage) {
-                        if (garbage.equals(detectedGarbage)) {
+                    for(Garbage garbage : harvCoordinator.getInNegotiationGarbage()) {
+                        if (garbage.getLocation().equals(detectedGarbage.getLocation())) {
                             isNewGarbage = false;
                         }
                     } 
-                    for (Garbage garbage : assignedGarbage) {
-                        if (garbage.equals(detectedGarbage)) {
+                    for (Garbage garbage : harvCoordinator.getAssignedGarbage()) {
+                        if (garbage.getLocation().equals(detectedGarbage.getLocation())) {
                             isNewGarbage = false;
                         }
                     }
                     
                     if (isNewGarbage) {
                         ((HarvesterCoordinatorAgent) myAgent).log("New garbage detected: "+detectedGarbage);
-                        unassignedGarbage.add(detectedGarbage);
+                        harvCoordinator.addUnassignedGarbage(detectedGarbage);
                     }
                     
                 }
@@ -180,10 +176,10 @@ public class CoordinateHarvestersBehaviour extends CyclicBehaviour {
 
     private void announceUnassignedGarbage() {
 
-        Iterator<Garbage> iterator = unassignedGarbage.iterator();
+        Iterator<Garbage> iterator = harvCoordinator.getUnassignedGarbage().iterator();
         while(iterator.hasNext()) {
             Garbage garbage = iterator.next();
-            inNegotiationGarbage.add(garbage);
+            harvCoordinator.addInNegotiationGarbage(garbage);
             iterator.remove();
             try {
                 ACLMessage cnMessage = new ACLMessage(ACLMessage.CFP);

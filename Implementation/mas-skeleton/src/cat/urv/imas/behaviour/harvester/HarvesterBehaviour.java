@@ -14,7 +14,9 @@ import cat.urv.imas.onthology.HarvesterInfoAgent;
 import cat.urv.imas.onthology.Performatives;
 import cat.urv.imas.plan.Location;
 import cat.urv.imas.plan.Movement;
+import cat.urv.imas.plan.PickUp;
 import cat.urv.imas.plan.Plan;
+import cat.urv.imas.plan.Recycle;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.domain.FIPANames;
 import jade.lang.acl.ACLMessage;
@@ -121,15 +123,24 @@ public class HarvesterBehaviour extends CyclicBehaviour {
                 }
 
                 List<Location> pathToTarget = MapUtility.getShortestPath(myLoc, target);
+
                 if (pathToTarget != null) {
                     Location nextStep = pathToTarget.get(0);
                     plan.addAction(new Movement(myLoc.getRow(), myLoc.getCol(),
                             nextStep.getRow(), nextStep.getCol()));
                 } else {
                     //check if garbage or recycling center, perform corresponding action
-                    // TODO: don't stand still, but do the actions.
-                    plan.addAction(new Movement(myLoc.getRow(), myLoc.getCol(),
-                            myLoc.getRow(), myLoc.getCol()));
+                    if (harvester.hasPickupLocation()) {
+                        Location pickUpLoc = harvester.getNextPickupLocation();
+                        harvester.pickUpOneUnit(pickUpLoc);
+                        harvester.loadOneUnit();
+                        plan.addAction(new PickUp(pickUpLoc, harvester.getCurrentLoadType()));
+                    } else {
+                        // recycle:
+                        plan.addAction(new Recycle(harvester.getCurrentLoadType(),
+                                harvester.getCurrentLoadAmount(), harvester.getTargetedRecyclingCenter()));
+                        harvester.clearLoad();
+                    }
                 }
 
             }
