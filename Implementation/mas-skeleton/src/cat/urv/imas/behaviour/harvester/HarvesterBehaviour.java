@@ -70,6 +70,8 @@ public class HarvesterBehaviour extends CyclicBehaviour {
     }
 
     private void provideCurrentPlan(ACLMessage msg) {
+        
+        harvester.setCoordinator(msg.getSender());
 
         try {
 

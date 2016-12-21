@@ -8,6 +8,7 @@ package cat.urv.imas.agent;
 import static cat.urv.imas.agent.ImasAgent.OWNER;
 import cat.urv.imas.behaviour.coordinator.harvester.CoordinateHarvestersBehaviour;
 import cat.urv.imas.onthology.Garbage;
+import cat.urv.imas.plan.Location;
 import jade.core.AID;
 import jade.domain.DFService;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
@@ -138,6 +139,23 @@ public class HarvesterCoordinatorAgent extends ImasAgent {
                 garbage.getLocation(), garbage.getDetectedAt(), amount);
         addUnassignedGarbage(remainingGarbage);
 //        log("Remaining after negotiation: "+remainingGarbage);
+    }
+
+    public void removeFromAssignedGarbage(Location loc, Integer amount) {
+        
+        Garbage toRemove = null;
+        for (Garbage garb : assignedGarbage) {
+            if (garb.getLocation().equals(loc) && garb.getAmount() == amount) {
+                toRemove = garb;
+            }
+        }
+        if (toRemove != null) {
+            assignedGarbage.remove(toRemove);
+        } else {
+            throw new RuntimeException("Tried to remove garbage from assigned garbages "
+                    + "that couldn't be found ");
+        }
+        
     }
 
 }

@@ -64,7 +64,7 @@ public class PerformVehicleActionsBehaviour extends CyclicBehaviour {
     private void handleRequestedActions(ACLMessage msg) {
 
         try {
-            Thread.sleep(300);
+            Thread.sleep(100);
         } catch (InterruptedException ex) {
             Logger.getLogger(PerformVehicleActionsBehaviour.class.getName()).log(Level.SEVERE, null, ex);
         }

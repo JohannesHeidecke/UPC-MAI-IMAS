@@ -154,7 +154,7 @@ public class CoordinateScoutsBehaviour extends CyclicBehaviour {
                         collisionDetected = true;
                     }
 
-                    // resolve found collision
+                    // try to resolve found collision
                     if (collisionDetected) {
                         int rowStep = ThreadLocalRandom.current().nextInt(-1, 1 + 1);
                         int colStep = ThreadLocalRandom.current().nextInt(-1, 1 + 1);

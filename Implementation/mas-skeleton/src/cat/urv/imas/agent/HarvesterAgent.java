@@ -17,18 +17,24 @@ import cat.urv.imas.map.utility.Permute;
 import cat.urv.imas.onthology.Garbage;
 import cat.urv.imas.onthology.GarbageType;
 import cat.urv.imas.onthology.HarvesterInfoAgent;
+import cat.urv.imas.onthology.Performatives;
 import cat.urv.imas.plan.Location;
 import cat.urv.imas.plan.Plan;
+import jade.core.AID;
 import jade.domain.DFService;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.domain.FIPAException;
+import jade.lang.acl.ACLMessage;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -39,6 +45,8 @@ public class HarvesterAgent extends ImasAgent {
     private Location location;
     private HarvesterInfoAgent infoAgent;
     private GarbageType[] garbageTypes;
+    
+    private AID myCoordinator;
 
     private static int capacity;
 
@@ -47,6 +55,9 @@ public class HarvesterAgent extends ImasAgent {
     private List<Location> pickUpOrder = new ArrayList<>();
     private Map<Location, Integer> pickUpPlan = new HashMap<>();
     private Location targetedRecyclingCenter;
+
+    private Location currentPickUpLoc = null;
+    private int currentPickupAmount = 0;
 
     private Cell[][] map;
 
@@ -318,26 +329,49 @@ public class HarvesterAgent extends ImasAgent {
     }
 
     public void pickUpOneUnit(Location loc) {
+
+        Location toRemove = null;
         for (Location pickUpLoc : this.pickUpPlan.keySet()) {
             if (loc.equals(pickUpLoc)) {
+                if (currentPickUpLoc == null) {
+                    currentPickUpLoc = loc;
+                    currentPickupAmount = pickUpPlan.get(pickUpLoc);
+                }
                 int currentAmount = pickUpPlan.get(pickUpLoc);
                 pickUpPlan.replace(pickUpLoc, currentAmount - 1);
                 if (currentAmount == 1) {
                     // all assigned garbage has been picked up
                     // remove from pick up order and pick up plan:
-                    pickUpPlan.remove(pickUpLoc);
+                    toRemove = pickUpLoc;
                     Iterator<Location> itOrder = pickUpOrder.iterator();
                     while (itOrder.hasNext()) {
                         Location pLoc = itOrder.next();
                         if (pLoc.equals(loc)) {
                             itOrder.remove();
-                            log("Done picking up garbage at "+loc);
+                            log("Done picking up garbage at " + loc);
+                            // Inform Coordinator about picked up garbage:
+                            ACLMessage msg = new ACLMessage(Performatives.INFORM_PICKUP);
+                            msg.setSender(this.getAID());
+                            Object[] contentObj = new Object[2];
+                            contentObj[0] = this.currentPickUpLoc;
+                            contentObj[1] = this.currentPickupAmount;
+                            try {
+                                msg.setContentObject(contentObj);
+                            } catch (IOException ex) {
+                                Logger.getLogger(HarvesterAgent.class.getName()).log(Level.SEVERE, null, ex);
+                            }
+                            msg.addReceiver(myCoordinator);
+                            send(msg);
+                            currentPickUpLoc = null;
                             break;
                         }
                     }
 
                 }
             }
+        }
+        if (toRemove != null) {
+            pickUpPlan.remove(toRemove);
         }
     }
 
@@ -354,6 +388,12 @@ public class HarvesterAgent extends ImasAgent {
         this.currentLoadType = null;
     }
     
+    public void setCoordinator(AID coord) {
+        this.myCoordinator = coord;
+    }
     
+    public AID getCoordinator() {
+        return this.myCoordinator;
+    }
 
 }

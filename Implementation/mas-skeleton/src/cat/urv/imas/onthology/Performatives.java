@@ -25,6 +25,7 @@ public class Performatives extends ACLMessage {
     public static final int REPLY_PLAN_HARVESTERS = 301;
     public static final int REQUEST_PLAN_HARVESTER = 302;
     public static final int REPLY_PLAN_HARVESTER = 303;
+    public static final int INFORM_PICKUP = 310;
     
     public static final int REQUEST_VEHICLE_ACTIONS = 400;
     public static final int REPLY_VEHICLE_ACTIONS = 401;

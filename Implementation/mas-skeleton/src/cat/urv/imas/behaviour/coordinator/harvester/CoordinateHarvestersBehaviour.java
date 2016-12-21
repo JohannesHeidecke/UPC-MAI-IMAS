@@ -12,7 +12,9 @@ import cat.urv.imas.map.Cell;
 import cat.urv.imas.onthology.Garbage;
 import cat.urv.imas.onthology.GarbageType;
 import cat.urv.imas.onthology.Performatives;
+import cat.urv.imas.plan.Action;
 import cat.urv.imas.plan.Location;
+import cat.urv.imas.plan.Movement;
 import cat.urv.imas.plan.Plan;
 import jade.core.AID;
 import jade.core.behaviours.CyclicBehaviour;
@@ -27,6 +29,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -43,7 +46,7 @@ public class CoordinateHarvestersBehaviour extends CyclicBehaviour {
 
     private List<AID> harvestersWithoutPlanReply;
     private HashMap<AID, Plan> currentPlans;
-    
+
     private boolean cnDone = false;
 
     public CoordinateHarvestersBehaviour(HarvesterCoordinatorAgent harvCoordinator) {
@@ -57,9 +60,10 @@ public class CoordinateHarvestersBehaviour extends CyclicBehaviour {
 
     @Override
     public void action() {
-        
-        MessageTemplate mt = MessageTemplate.or(MessageTemplate.MatchPerformative(Performatives.REQUEST_PLAN_HARVESTERS),
-                MessageTemplate.MatchPerformative(Performatives.REPLY_PLAN_HARVESTER));
+
+        MessageTemplate mt = MessageTemplate.or(MessageTemplate.MatchPerformative(Performatives.INFORM_PICKUP), 
+                MessageTemplate.or(MessageTemplate.MatchPerformative(Performatives.REQUEST_PLAN_HARVESTERS),
+                MessageTemplate.MatchPerformative(Performatives.REPLY_PLAN_HARVESTER)));
 
         ACLMessage msg = myAgent.receive(mt);
         if (msg != null) {
@@ -70,6 +74,9 @@ public class CoordinateHarvestersBehaviour extends CyclicBehaviour {
                     break;
                 case Performatives.REPLY_PLAN_HARVESTER:
                     handlePlanReply(msg);
+                    break;
+                case Performatives.INFORM_PICKUP:
+                    handlePickUpComplete(msg);
                     break;
                 default:
                     //TODO
@@ -105,6 +112,7 @@ public class CoordinateHarvestersBehaviour extends CyclicBehaviour {
 
             if (harvestersWithoutPlanReply.isEmpty()) {
 //                ((HarvesterCoordinatorAgent) myAgent).log("Received plans from all Harvesters.");
+                resolveCollisions();
                 sendPlans();
             }
 
@@ -129,45 +137,45 @@ public class CoordinateHarvestersBehaviour extends CyclicBehaviour {
     }
 
     private void detectNewUnassignedGarbage() {
-        
+
         for (int i = 0; i < map.length; i++) {
-            for(int j = 0; j < map[i].length; j++) {
+            for (int j = 0; j < map[i].length; j++) {
                 if (map[i][j] instanceof BuildingCell) {
-                    
+
                     Map<GarbageType, Integer> detectedGarbageMap = ((BuildingCell) map[i][j]).getGarbage();
-                    if(detectedGarbageMap.isEmpty()) {
+                    if (detectedGarbageMap.isEmpty()) {
                         continue;
                     }
-                    
+
                     GarbageType gType = (GarbageType) detectedGarbageMap.keySet().toArray(new GarbageType[1])[0];
-                    
+
                     int detectedAt = SystemAgent.getCurrentSimulationStep();
                     Garbage detectedGarbage = new Garbage(gType, new Location(i, j), detectedAt, detectedGarbageMap.get(gType));
-                    
+
                     // check if this garbage is new:
                     boolean isNewGarbage = true;
-                    
-                    for(Garbage garbage : harvCoordinator.getUnassignedGarbage()) {
+
+                    for (Garbage garbage : harvCoordinator.getUnassignedGarbage()) {
                         if (garbage.getLocation().equals(detectedGarbage.getLocation())) {
                             isNewGarbage = false;
                         }
                     }
-                    for(Garbage garbage : harvCoordinator.getInNegotiationGarbage()) {
+                    for (Garbage garbage : harvCoordinator.getInNegotiationGarbage()) {
                         if (garbage.getLocation().equals(detectedGarbage.getLocation())) {
                             isNewGarbage = false;
                         }
-                    } 
+                    }
                     for (Garbage garbage : harvCoordinator.getAssignedGarbage()) {
                         if (garbage.getLocation().equals(detectedGarbage.getLocation())) {
                             isNewGarbage = false;
                         }
                     }
-                    
+
                     if (isNewGarbage) {
-                        ((HarvesterCoordinatorAgent) myAgent).log("New garbage detected: "+detectedGarbage);
+                        ((HarvesterCoordinatorAgent) myAgent).log("New garbage detected: " + detectedGarbage);
                         harvCoordinator.addUnassignedGarbage(detectedGarbage);
                     }
-                    
+
                 }
             }
         }
@@ -177,7 +185,7 @@ public class CoordinateHarvestersBehaviour extends CyclicBehaviour {
     private void announceUnassignedGarbage() {
 
         Iterator<Garbage> iterator = harvCoordinator.getUnassignedGarbage().iterator();
-        while(iterator.hasNext()) {
+        while (iterator.hasNext()) {
             Garbage garbage = iterator.next();
             harvCoordinator.addInNegotiationGarbage(garbage);
             iterator.remove();
@@ -220,6 +228,67 @@ public class CoordinateHarvestersBehaviour extends CyclicBehaviour {
             Logger.getLogger(CoordinateHarvestersBehaviour.class.getName()).log(Level.SEVERE, null, ex);
         }
 
+    }
+
+    private void resolveCollisions() {
+
+        // TODO: base this on PerformanceMeasure, not random.
+        // Harvesters that collide with other scouts do a random movement in another direction:
+        List<AID> plannedHarvesters = new ArrayList<>(currentPlans.keySet());
+
+        boolean collisionDetected = true;
+        while (collisionDetected) {
+            collisionDetected = false;
+
+            outerFor:
+            for (int i = 0; i < plannedHarvesters.size(); i++) {
+                Action iStep = currentPlans.get(plannedHarvesters.get(i)).getActions().get(0);
+                if (!(iStep instanceof Movement)) {
+                    continue;
+                }
+                for (int j = i + 1; j < plannedHarvesters.size(); j++) {
+                    Action jStep = currentPlans.get(plannedHarvesters.get(j)).getActions().get(0);
+                    if (!(jStep instanceof Movement)) {
+                        continue;
+                    }
+                    Movement iMove = (Movement) iStep;
+                    Movement jMove = (Movement) jStep;
+
+                    // check for collisions
+                    if (iMove.getTo().equals(jMove.getTo())) {
+                        collisionDetected = true;
+                    }
+                    if (iMove.getFrom().equals(jMove.getTo()) && iMove.getTo().equals(jMove.getFrom())) {
+                        collisionDetected = true;
+                    }
+
+                    // resolve found collision
+                    if (collisionDetected) {
+                        int rowStep = ThreadLocalRandom.current().nextInt(-1, 1 + 1);
+                        int colStep = ThreadLocalRandom.current().nextInt(-1, 1 + 1);
+                        int rowOrCol = ThreadLocalRandom.current().nextInt(0, 2);
+                        int newRow = Math.max(0, jMove.getFrom().getRow() + rowStep * rowOrCol);
+                        int newCol = Math.max(0, jMove.getFrom().getCol() + colStep * (1 - rowOrCol));
+                        jMove.setRowTo(newRow);
+                        jMove.setColTo(newCol);
+                        break outerFor;
+                    }
+
+                }
+            }
+        }
+
+    }
+
+    private void handlePickUpComplete(ACLMessage msg) {
+        try {
+            Object[] contentObj = (Object[]) msg.getContentObject();
+            Location loc = (Location) contentObj[0];
+            Integer amount = (Integer) contentObj[1];
+            harvCoordinator.removeFromAssignedGarbage(loc, amount);
+        } catch (UnreadableException ex) {
+            Logger.getLogger(CoordinateHarvestersBehaviour.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
 }

@@ -9,6 +9,8 @@ import cat.urv.imas.agent.CoordinatorAgent;
 import cat.urv.imas.map.Cell;
 import cat.urv.imas.onthology.GameSettings;
 import cat.urv.imas.onthology.Performatives;
+import cat.urv.imas.plan.Action;
+import cat.urv.imas.plan.Movement;
 import cat.urv.imas.plan.Plan;
 import jade.core.AID;
 import jade.core.behaviours.CyclicBehaviour;
@@ -17,6 +19,7 @@ import jade.lang.acl.UnreadableException;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -48,7 +51,7 @@ public class CoordinateVehicleActionsBehaviour extends CyclicBehaviour {
 
     @Override
     public void onStart() {
-        ((CoordinatorAgent) myAgent).log("Started Behaviour: "+this.getClass().toString());
+        ((CoordinatorAgent) myAgent).log("Started Behaviour: " + this.getClass().toString());
         // Send initial Request to SystemAgent
         ACLMessage msg = new ACLMessage(Performatives.REQUEST_GAME);
         msg.setSender(myAgent.getAID());
@@ -107,7 +110,6 @@ public class CoordinateVehicleActionsBehaviour extends CyclicBehaviour {
         try {
 
 //            ((CoordinatorAgent) myAgent).log("Request new plans from HC and SC");
-
             Cell[][] map = ((GameSettings) msg.getContentObject()).getMap();
             // Send requests for new plans to HCoord and SCoord,
             // containing the updated map
@@ -157,8 +159,43 @@ public class CoordinateVehicleActionsBehaviour extends CyclicBehaviour {
     }
 
     private void resolveCollisions(HashMap<AID, Plan> harvestingPlan, HashMap<AID, Plan> scoutingPlan) {
-        // TODO
-        // TODO (also inform subordinate coordinators of changed plans)
+
+        // TODO: base collision resolving on state of Harvester, etc.
+        // quick implementation: harvesters have priority:
+        boolean collisionDetected = true;
+        while (collisionDetected) {
+            collisionDetected = false;
+            outerFor:
+            for (AID harvester : harvestingPlan.keySet()) {
+                Action nextStep = harvestingPlan.get(harvester).getActions().get(0);
+                if (nextStep instanceof Movement) {
+                    Movement hMove = (Movement) nextStep;
+                    for (AID scout : scoutingPlan.keySet()) {
+                        Movement sMove = (Movement) scoutingPlan.get(scout).getActions().get(0);
+
+                        // check for collision:
+                        if (hMove.getTo().equals(sMove.getTo())) {
+                            collisionDetected = true;
+                        }
+                        if (hMove.getFrom().equals(sMove.getTo()) && hMove.getTo().equals(sMove.getFrom())) {
+                            collisionDetected = true;
+                        }
+                        
+                        if (collisionDetected) {
+                        int rowStep = ThreadLocalRandom.current().nextInt(-1, 1 + 1);
+                        int colStep = ThreadLocalRandom.current().nextInt(-1, 1 + 1);
+                        int rowOrCol = ThreadLocalRandom.current().nextInt(0, 2);
+                        int newRow = Math.max(0, sMove.getFrom().getRow() + rowStep * rowOrCol);
+                        int newCol = Math.max(0, sMove.getFrom().getCol() + colStep * (1 - rowOrCol));
+                        sMove.setRowTo(newRow);
+                        sMove.setColTo(newCol);
+                        break outerFor;
+                    }
+                    }
+                }
+            }
+        }
+
     }
 
     private HashMap<AID, Plan> generateNextActions(HashMap<AID, Plan> harvestingPlan, HashMap<AID, Plan> scoutingPlan) {
