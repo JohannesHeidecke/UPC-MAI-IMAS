@@ -10,6 +10,7 @@ import cat.urv.imas.map.BuildingCell;
 import cat.urv.imas.map.Cell;
 import cat.urv.imas.map.SettableBuildingCell;
 import cat.urv.imas.onthology.GarbageType;
+import cat.urv.imas.plan.Location;
 import jade.core.behaviours.SimpleBehaviour;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -66,6 +67,8 @@ public class AddGarbageBehavior extends SimpleBehaviour {
                     }
                     
                     ((SettableBuildingCell)randomCell).setGarbage(garbageType, garbageAmount);
+                    Location loc = new Location(randomRow, randomCol);
+                    ((SystemAgent) myAgent).registerGeneratedGarbage(loc, garbageType, garbageAmount);
                     added = true;
                     
                 }

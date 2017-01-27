@@ -63,11 +63,11 @@ public class PerformVehicleActionsBehaviour extends CyclicBehaviour {
 
     private void handleRequestedActions(ACLMessage msg) {
 
-        try {
-            Thread.sleep(100);
-        } catch (InterruptedException ex) {
-            Logger.getLogger(PerformVehicleActionsBehaviour.class.getName()).log(Level.SEVERE, null, ex);
-        }
+//        try {
+//            Thread.sleep(100);
+//        } catch (InterruptedException ex) {
+//            Logger.getLogger(PerformVehicleActionsBehaviour.class.getName()).log(Level.SEVERE, null, ex);
+//        }
 
         try {
             
@@ -279,26 +279,26 @@ public class PerformVehicleActionsBehaviour extends CyclicBehaviour {
         // vehicle actually next to pick-up location?
         Location pickUpLoc = pickUp.getPickUpLoc();
         int minRow = Math.max(0, pickUpLoc.getRow()-1);
-        int minCol = Math.max(0, pickUpLoc.getRow()-1);
+        int minCol = Math.max(0, pickUpLoc.getCol()-1);
         int maxRow = Math.min(map.length-1, pickUpLoc.getRow()+1);
         int maxCol = Math.min(map[0].length-1, pickUpLoc.getCol()+1);
-        // TODO: uncomment and debug:
-//        boolean vehicleFound = false;
-//        for (int i = minRow; i <= maxRow; i++) {
-//            for (int j = minCol; j <= maxCol; j++) {
-//                if (map[i][j] instanceof StreetCell) {
-//                    if (((StreetCell) map[i][j]).isThereAnAgent()) {
-//                        if (((StreetCell) map[i][j]).getAgent().getAID().equals(vehicle)) {
-//                            vehicleFound = true;
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//        if (!vehicleFound) {
-//            throw new RuntimeException(vehicle.getLocalName() + " tried to perform an illegal pick-up. "
-//                    + "Not close enough to pick up the garbage.");
-//        }
+        
+        boolean vehicleFound = false;
+        for (int i = minRow; i <= maxRow; i++) {
+            for (int j = minCol; j <= maxCol; j++) {
+                if (map[i][j] instanceof StreetCell) {
+                    if (((StreetCell) map[i][j]).isThereAnAgent()) {
+                        if (((StreetCell) map[i][j]).getAgent().getAID().equals(vehicle)) {
+                            vehicleFound = true;
+                        }
+                    }
+                }
+            }
+        }
+        if (!vehicleFound) {
+            throw new RuntimeException(vehicle.getLocalName() + " tried to perform an illegal pick-up. "
+                    + "Not close enough to pick up the garbage.");
+        }
         
         // does garbage exist in this type and amount?
         
@@ -327,6 +327,7 @@ public class PerformVehicleActionsBehaviour extends CyclicBehaviour {
         
         // perform pick-up logic:
         ((BuildingCell) map[pickUpLoc.getRow()][pickUpLoc.getCol()]).removeGarbage();
+        ((SystemAgent) myAgent).registerPickUp(pickUpLoc);
         
     }
 
@@ -336,36 +337,36 @@ public class PerformVehicleActionsBehaviour extends CyclicBehaviour {
         // vehicle actually next to center's location?
         Location centerLoc = recycle.getCenterLoc();
         int minRow = Math.max(0, centerLoc.getRow()-1);
-        int minCol = Math.max(0, centerLoc.getRow()-1);
+        int minCol = Math.max(0, centerLoc.getCol()-1);
         int maxRow = Math.min(map.length-1, centerLoc.getRow()+1);
         int maxCol = Math.min(map[0].length-1, centerLoc.getCol()+1);
-        // TODO: uncomment and debug:
-//        boolean vehicleFound = false;
-//        for (int i = minRow; i <= maxRow; i++) {
-//            for (int j = minCol; j <= maxCol; j++) {
-//                if (map[i][j] instanceof StreetCell) {
-//                    if (((StreetCell) map[i][j]).isThereAnAgent()) {
-//                        if (((StreetCell) map[i][j]).getAgent().getAID().equals(vehicle)) {
-//                            vehicleFound = true;
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//        if (!vehicleFound) {
-//            throw new RuntimeException(vehicle.getLocalName() + " tried to perform an illegal recycling. "
-//                    + "Not close enough to the center");
-//        }
+        
+        boolean vehicleFound = false;
+        for (int i = minRow; i <= maxRow; i++) {
+            for (int j = minCol; j <= maxCol; j++) {
+                if (map[i][j] instanceof StreetCell) {
+                    if (((StreetCell) map[i][j]).isThereAnAgent()) {
+                        if (((StreetCell) map[i][j]).getAgent().getAID().equals(vehicle)) {
+                            vehicleFound = true;
+                        }
+                    }
+                }
+            }
+        }
+        if (!vehicleFound) {
+            throw new RuntimeException(vehicle.getLocalName() + " tried to perform an illegal recycling. "
+                    + "Not close enough to the center");
+        }
         
         // TODO: check if harvester has enough loaded.
-        
         
         // perform recycling logic:
         int price = ((RecyclingCenterCell) map[centerLoc.getRow()][centerLoc.getCol()])
                 .getPriceFor(recycle.getType());
         
         double benefits = price * recycle.getAmount();
-        ((SystemAgent) myAgent).log(recycle.getAmount() + " units of "+recycle.getType().toString()+" recycled for "+benefits+" points.");
+        ((SystemAgent) myAgent).log(recycle.getAmount() + " units of "+recycle.getType().toString()+" recycled for "+benefits+" points  by "+vehicle.getLocalName()+" at "+centerLoc+".");
+        
         
     }
 

@@ -16,7 +16,7 @@
  */
 package cat.urv.imas.agent;
 
-import cat.urv.imas.SystemConstants;
+import cat.urv.imas.behaviour.system.GarbageStatistic;
 import cat.urv.imas.behaviour.system.PerformVehicleActionsBehaviour;
 import cat.urv.imas.behaviour.system.ProvideGameBehaviour;
 import cat.urv.imas.onthology.InitialGameSettings;
@@ -26,17 +26,13 @@ import cat.urv.imas.map.Cell;
 import cat.urv.imas.map.StreetCell;
 import cat.urv.imas.map.utility.MapUtility;
 import cat.urv.imas.onthology.GarbageType;
-import cat.urv.imas.onthology.InfoAgent;
 import jade.core.*;
-import jade.core.behaviours.CyclicBehaviour;
-import jade.core.behaviours.TickerBehaviour;
 import jade.domain.*;
 import jade.domain.FIPAAgentManagement.*;
-import jade.domain.FIPANames.InteractionProtocol;
-import jade.lang.acl.*;
 import jade.wrapper.AgentController;
 import jade.wrapper.ContainerController;
 import jade.wrapper.StaleProxyException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -63,8 +59,9 @@ public class SystemAgent extends ImasAgent {
      * round.
      */
     private AID coordinatorAgent;
-    
+
     private static int simulationStep = 0;
+    private List<GarbageStatistic> garbageStatList = new ArrayList<>();
 
     /**
      * Builds the System agent.
@@ -230,9 +227,46 @@ public class SystemAgent extends ImasAgent {
         this.gui.updateGame();
         simulationStep++;
     }
-    
+
     public static int getCurrentSimulationStep() {
         return simulationStep;
+    }
+
+    public void registerGeneratedGarbage(cat.urv.imas.plan.Location loc, GarbageType type, int amount) {
+        GarbageStatistic garbStat = new GarbageStatistic(loc, type, amount, simulationStep);
+        garbageStatList.add(garbStat);
+    }
+
+    public void registerPickUp(cat.urv.imas.plan.Location loc) {
+        
+        GarbageStatistic garbageStat = null;
+        for (int i = 0; i < garbageStatList.size(); i++) {
+            garbageStat = garbageStatList.get(garbageStatList.size()-i-1);
+            if (garbageStat.getLocation().equals(loc)) {
+                break;
+            } else {
+                garbageStat = null;
+            }
+        }
+        garbageStat.registerPickUp(simulationStep);
+
+    }
+    
+    public double getAverageWaitTime() {
+        double result = 0;
+        
+        int doneCounter = 0;
+        for (GarbageStatistic stat : garbageStatList) {
+            if (stat.isPickedUp()) {
+                doneCounter++;
+                result += stat.getPickUpTime();
+            }
+        }
+        if (doneCounter != 0) {
+            result /= doneCounter;
+        }
+        
+        return result;
     }
 
 }

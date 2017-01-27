@@ -47,8 +47,6 @@ public class CoordinateHarvestersBehaviour extends CyclicBehaviour {
     private List<AID> harvestersWithoutPlanReply;
     private HashMap<AID, Plan> currentPlans;
 
-    private boolean cnDone = false;
-
     public CoordinateHarvestersBehaviour(HarvesterCoordinatorAgent harvCoordinator) {
         this.harvCoordinator = harvCoordinator;
     }
