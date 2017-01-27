@@ -51,6 +51,7 @@ public class HarvesterAgent extends ImasAgent {
     private static int capacity;
 
     private int currentLoad = 0;
+    private int currentPlannedLoad = 0;
     private GarbageType currentLoadType = null;
     private List<Location> pickUpOrder = new ArrayList<>();
     private Map<Location, Integer> pickUpPlan = new HashMap<>();
@@ -116,7 +117,7 @@ public class HarvesterAgent extends ImasAgent {
     }
 
     public int getFreeCapacity() {
-        return capacity - currentLoad;
+        return capacity - currentLoad - currentPlannedLoad;
     }
 
     public void setCurrentLocation(Location location) {
@@ -299,6 +300,15 @@ public class HarvesterAgent extends ImasAgent {
         if (!(currentLoadType == null) && !garbage.getType().equals(this.currentLoadType)) {
             throw new RuntimeException("Harvester was assigned to pick up wrong type");
         }
+        
+        if (amount <= 0) {
+            throw new RuntimeException("Invalid amount of garbage to harvest: " + amount);
+        }
+        
+        if (this.currentLoad + amount > capacity) {
+            throw new RuntimeException("Harvester capacity exceeded");
+        }
+        
         currentLoadType = garbage.getType();
         Location loc = garbage.getLocation();
 
@@ -309,6 +319,8 @@ public class HarvesterAgent extends ImasAgent {
         this.pickUpOrder.addAll(order.subList(0, (order.size() - 1)));
 
         this.targetedRecyclingCenter = order.get(order.size() - 1);
+        
+        this.currentPlannedLoad += amount;
 
     }
 
@@ -381,6 +393,7 @@ public class HarvesterAgent extends ImasAgent {
 
     public void loadOneUnit() {
         this.currentLoad++;
+        this.currentPlannedLoad--;
     }
 
     public void clearLoad() {
