@@ -14,7 +14,7 @@ import java.util.List;
 public class PerformanceMeasure {
     
     private static final double bWeight = 100;
-    private static final double wWeight = 2;
+    private static final double wWeight = 0.00002;
     
     
     

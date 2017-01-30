@@ -240,6 +240,13 @@ public class CoordinateScoutsBehaviour extends CyclicBehaviour {
                 // if there is a former tspPosition known: try to return there
                 if (lastKnownTspRoutePositions.keySet().contains(scout)) {
                     closestPosition = lastKnownTspRoutePositions.get(scout);
+                    if (closestPosition < 0) {
+                        //TODO: find better solution than this quick fix 
+                        // bug that occurs rarely (~once every 50k steps)
+                        // closestPosition is -1, for some reason
+                        // we set closestPosition to 0 instead as a quick fix
+                       closestPosition = 0;
+                    }
                     closestDistance = MapUtility.getShortestDistance(scoutPos, tspRoute.get(closestPosition));
                 } else {
                     // scout does not have a current or former tsp position

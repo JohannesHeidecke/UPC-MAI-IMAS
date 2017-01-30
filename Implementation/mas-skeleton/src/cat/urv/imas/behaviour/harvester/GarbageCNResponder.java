@@ -35,6 +35,7 @@ public class GarbageCNResponder extends ContractNetResponder {
     protected ACLMessage handleCfp(ACLMessage cfp) throws NotUnderstoodException, RefuseException {
         try {
             this.garbage = (Garbage) cfp.getContentObject();
+//            ((HarvesterAgent) myAgent).log("Received CFP for " + garbage.toString());
         } catch (UnreadableException ex) {
             Logger.getLogger(GarbageCNResponder.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -43,9 +44,22 @@ public class GarbageCNResponder extends ContractNetResponder {
 
         // refuse if capacity full or wrong garbage type:
         if (harvester.getFreeCapacity() == 0 || !harvester.canCarry(garbage.getType())
-                || (!(harvester.getCurrentLoadType() == null) 
+                || ((harvester.getCurrentLoadType() != null) 
                     && !garbage.getType().equals(harvester.getCurrentLoadType()))) {
+            
+            // TODO: the following 'reason' is just for debugging, delete
+            String reason = "";
+            if (harvester.getFreeCapacity() == 0) {
+                reason += "(HARVESTER FULL)";
+            } if (!harvester.canCarry(garbage.getType())) {
+                reason += "(CAN'T CARRY TYPE)";
+            } if (((harvester.getCurrentLoadType() != null) 
+                    && !garbage.getType().equals(harvester.getCurrentLoadType()))) {
+                reason += "(LOADED DIFFERENT TYPE)";
+            }
+            
             // Refuse the CFP
+//            harvester.log("Refusing garbage " +garbage.getLocation().toString() + " " + reason);
             ACLMessage reply = cfp.createReply();
             reply.setPerformative(ACLMessage.REFUSE);
             return reply;

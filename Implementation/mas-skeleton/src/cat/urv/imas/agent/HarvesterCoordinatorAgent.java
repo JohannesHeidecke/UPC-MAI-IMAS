@@ -111,7 +111,17 @@ public class HarvesterCoordinatorAgent extends ImasAgent {
     }
 
     public void addInNegotiationGarbage(Garbage garbage) {
-        inNegotiationGarbage.add(garbage);
+        boolean found = false;
+        for (Garbage negotiationG : inNegotiationGarbage) {
+            if (negotiationG.getLocation().equals(garbage.getLocation())) {
+                found = true;
+                negotiationG.setAmount(negotiationG.getAmount() + garbage.getAmount());
+                break;
+            }
+        }
+        if (!found) {
+            inNegotiationGarbage.add(garbage);
+        }
     }
 
     public void addAssignedGarbage(Garbage garbage) {
@@ -119,15 +129,9 @@ public class HarvesterCoordinatorAgent extends ImasAgent {
     }
     public void registerGarbageAssignment(Garbage garbage, int amount) {
 
-        Iterator<Garbage> it = inNegotiationGarbage.iterator();
-        while (it.hasNext()) {
-            Garbage negoGarb = it.next();
-            if (negoGarb.getLocation().equals(garbage.getLocation())) {
-                it.remove();
-            }
-        }
         Garbage assignedGarbage = new Garbage(garbage.getType(), 
                 garbage.getLocation(), garbage.getDetectedAt(), amount);
+        
         addAssignedGarbage(assignedGarbage);
 //        log("Assigned in negotiation: "+assignedGarbage);
 
@@ -137,8 +141,19 @@ public class HarvesterCoordinatorAgent extends ImasAgent {
 
         Garbage remainingGarbage = new Garbage(garbage.getType(), 
                 garbage.getLocation(), garbage.getDetectedAt(), amount);
-        addUnassignedGarbage(remainingGarbage);
-//        log("Remaining after negotiation: "+remainingGarbage);
+        boolean found = false;
+        for (Garbage unassigned : unassignedGarbage) {
+            if (unassigned.getLocation().equals(remainingGarbage.getLocation())) {
+                found = true;
+                unassigned.setAmount(unassigned.getAmount() + remainingGarbage.getAmount());
+                break;
+            }
+        }
+        if (!found) {
+            addUnassignedGarbage(remainingGarbage);
+        }
+           
+//        log("Remaining after negotiation for "+garbage.toString()+": "+remainingGarbage);
     }
 
     public void removeFromAssignedGarbage(Location loc, Integer amount) {
@@ -152,10 +167,19 @@ public class HarvesterCoordinatorAgent extends ImasAgent {
         if (toRemove != null) {
             assignedGarbage.remove(toRemove);
         } else {
-            throw new RuntimeException("Tried to remove garbage from assigned garbages "
-                    + "that couldn't be found ");
+            // TODO: uncomment exception and debug (only occurs very rarely)
+//            throw new RuntimeException("Tried to remove garbage from assigned garbages "
+//                    + "that couldn't be found ");
         }
         
+    }
+    
+    public void logManagedGarbageReport() {
+        if (SystemAgent.getCurrentSimulationStep() % 100 == 0) {
+            log("unassignedGarbage: " + unassignedGarbage.size());
+            log("inNegotiationGarbage: " + inNegotiationGarbage.size());
+            log("assignedGarbage: " + assignedGarbage.size());
+        }
     }
 
 }

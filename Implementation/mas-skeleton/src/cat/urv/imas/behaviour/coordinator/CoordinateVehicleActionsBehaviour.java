@@ -7,17 +7,23 @@ package cat.urv.imas.behaviour.coordinator;
 
 import cat.urv.imas.agent.CoordinatorAgent;
 import cat.urv.imas.map.Cell;
+import cat.urv.imas.map.StreetCell;
 import cat.urv.imas.onthology.GameSettings;
 import cat.urv.imas.onthology.Performatives;
 import cat.urv.imas.plan.Action;
+import cat.urv.imas.plan.Location;
 import cat.urv.imas.plan.Movement;
+import cat.urv.imas.plan.PickUp;
 import cat.urv.imas.plan.Plan;
+import cat.urv.imas.plan.Recycle;
 import jade.core.AID;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.UnreadableException;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.logging.Level;
@@ -39,6 +45,8 @@ public class CoordinateVehicleActionsBehaviour extends CyclicBehaviour {
 
     private HashMap<AID, Plan> currentHarvestingPlan;
     private HashMap<AID, Plan> currentScoutingPlan;
+
+    private Cell[][] map;
 
     public CoordinateVehicleActionsBehaviour(CoordinatorAgent coordinator) {
 
@@ -110,7 +118,7 @@ public class CoordinateVehicleActionsBehaviour extends CyclicBehaviour {
         try {
 
 //            ((CoordinatorAgent) myAgent).log("Request new plans from HC and SC");
-            Cell[][] map = ((GameSettings) msg.getContentObject()).getMap();
+            this.map = ((GameSettings) msg.getContentObject()).getMap();
             // Send requests for new plans to HCoord and SCoord,
             // containing the updated map
             ACLMessage request = new ACLMessage(Performatives.REQUEST_PLAN_HARVESTERS);
@@ -160,38 +168,106 @@ public class CoordinateVehicleActionsBehaviour extends CyclicBehaviour {
 
     private void resolveCollisions(HashMap<AID, Plan> harvestingPlan, HashMap<AID, Plan> scoutingPlan) {
 
-        // TODO: base collision resolving on state of Harvester, etc.
-        // quick implementation: harvesters have priority:
-        boolean collisionDetected = true;
-        while (collisionDetected) {
-            collisionDetected = false;
-            outerFor:
-            for (AID harvester : harvestingPlan.keySet()) {
-                Action nextStep = harvestingPlan.get(harvester).getActions().get(0);
-                if (nextStep instanceof Movement) {
-                    Movement hMove = (Movement) nextStep;
-                    for (AID scout : scoutingPlan.keySet()) {
-                        Movement sMove = (Movement) scoutingPlan.get(scout).getActions().get(0);
+        HashMap<AID, Plan> vehiclePlans = new HashMap<>();
+        vehiclePlans.putAll(harvestingPlan);
+        vehiclePlans.putAll(scoutingPlan);
 
-                        // check for collision:
-                        if (hMove.getTo().equals(sMove.getTo())) {
-                            collisionDetected = true;
-                        }
-                        if (hMove.getFrom().equals(sMove.getTo()) && hMove.getTo().equals(sMove.getFrom())) {
-                            collisionDetected = true;
-                        }
-                        
-                        if (collisionDetected) {
-                        int rowStep = ThreadLocalRandom.current().nextInt(-1, 1 + 1);
-                        int colStep = ThreadLocalRandom.current().nextInt(-1, 1 + 1);
-                        int rowOrCol = ThreadLocalRandom.current().nextInt(0, 2);
-                        int newRow = Math.max(0, sMove.getFrom().getRow() + rowStep * rowOrCol);
-                        int newCol = Math.max(0, sMove.getFrom().getCol() + colStep * (1 - rowOrCol));
-                        sMove.setRowTo(newRow);
-                        sMove.setColTo(newCol);
-                        break outerFor;
+        for (AID vehicle : vehiclePlans.keySet()) {
+            Plan plan = vehiclePlans.get(vehicle);
+            Action nextStep = plan.getActions().get(0);
+            if (nextStep instanceof Movement) {
+                Movement nextMove = (Movement) nextStep;
+                Location vehicleLoc = findVehiclePosition(vehicle);
+                Location moveFrom = new Location(nextMove.getRowFrom(), nextMove.getColFrom());
+                if (!vehicleLoc.equals(moveFrom)) {
+                    // TODO: this is a quick fix, look for origin of bug
+                    nextMove.setRowFrom(vehicleLoc.getRow());
+                    nextMove.setColFrom(vehicleLoc.getCol());
+                    nextMove.setRowTo(vehicleLoc.getRow());
+                    nextMove.setColTo(vehicleLoc.getCol());
+                }
+            }
+        }
+
+        boolean collisionFound = true;
+        while (collisionFound) {
+            collisionFound = false;
+            for (AID outerVehicle : vehiclePlans.keySet()) {
+                Plan outerPlan = vehiclePlans.get(outerVehicle);
+                Action outerStep = outerPlan.getActions().get(0);
+                Movement outerMove;
+                if (outerStep instanceof Movement) {
+                    outerMove = (Movement) outerStep;
+                } else {
+                    Location vehicleLoc = findVehiclePosition(outerVehicle);
+                    outerMove = new Movement(vehicleLoc.getRow(), vehicleLoc.getCol(),
+                            vehicleLoc.getRow(), vehicleLoc.getCol());
+                }
+                innerLoop:
+                for (AID innerVehicle : vehiclePlans.keySet()) {
+                    Plan innerPlan = vehiclePlans.get(innerVehicle);
+                    Action innerStep = innerPlan.getActions().get(0);
+                    Movement innerMove;
+                    if (innerStep instanceof Movement) {
+                        innerMove = (Movement) innerStep;
+                    } else {
+                        Location vehicleLoc = findVehiclePosition(innerVehicle);
+                        innerMove = new Movement(vehicleLoc.getRow(), vehicleLoc.getCol(),
+                                vehicleLoc.getRow(), vehicleLoc.getCol());
                     }
+
+                    if (outerMove.equals(innerMove)) {
+                        // vehicle can't collide with itself
+                        continue;
                     }
+                    // DETECT COLLISIONS:
+                    // moving onto same cell or switching positions:
+                    if ((outerMove.getRowTo() == innerMove.getRowTo()
+                            && outerMove.getColTo() == innerMove.getColTo())
+                            || (outerMove.getRowFrom() == innerMove.getRowTo()
+                            && outerMove.getColFrom() == innerMove.getColTo()
+                            && innerMove.getRowFrom() == outerMove.getRowTo()
+                            && innerMove.getColFrom() == outerMove.getColTo())) {
+                        collisionFound = true;
+
+                        int random = ThreadLocalRandom.current().nextInt(0, 2);
+                        Movement firstMove, secondMove;
+                        if (random == 0) {
+                            firstMove = outerMove;
+                            if (firstMove.getRowFrom() == firstMove.getRowTo()
+                                    && firstMove.getColFrom() == firstMove.getColTo()) {
+                                firstMove = innerMove;
+                            }
+                        } else {
+                            firstMove = innerMove;
+                        }
+
+                        boolean validRandStep = false;
+                        while (!validRandStep) {
+                            validRandStep = true;
+                            int min = -1;
+                            int max = 1;
+                            int rowStep = ThreadLocalRandom.current().nextInt(min, max + 1);
+                            int colStep = ThreadLocalRandom.current().nextInt(min, max + 1);
+                            int rowOrCol = ThreadLocalRandom.current().nextInt(0, 2);
+                            int newRow = Math.max(0, firstMove.getRowFrom() + rowStep * rowOrCol);
+                            int newCol = Math.max(0, firstMove.getColFrom() + colStep * (1 - rowOrCol));
+
+                            // check if valid randStep:
+
+                            if (!(map[newRow][newCol] instanceof StreetCell)) {
+                                validRandStep = false;
+                                continue;
+                            }
+
+                            firstMove.setRowTo(newRow);
+                            firstMove.setColTo(newCol);
+                            continue innerLoop;
+
+                        }
+
+                    }
+
                 }
             }
         }
@@ -218,6 +294,34 @@ public class CoordinateVehicleActionsBehaviour extends CyclicBehaviour {
         msg.setSender(myAgent.getAID());
         msg.addReceiver(system);
         myAgent.send(msg);
+    }
+
+    private Location findVehiclePosition(AID vehicleAID) {
+
+        int row = -1, col = -1;
+        outerLoop:
+        for (int i = 0; i < map.length; i++) {
+            for (int j = 0; j < map[i].length; j++) {
+                Cell cell = map[i][j];
+                if (cell instanceof StreetCell) {
+                    StreetCell sCell = (StreetCell) cell;
+                    if (sCell.isThereAnAgent()) {
+                        if (vehicleAID.equals(sCell.getAgent().getAID())) {
+                            row = i;
+                            col = j;
+                            break outerLoop;
+                        }
+                    }
+                }
+            }
+        }
+
+        if (row == -1 || col == -1) {
+            throw new RuntimeException("Vehicle not found on map: " + vehicleAID.toString());
+        }
+
+        return new Location(row, col);
+
     }
 
 }

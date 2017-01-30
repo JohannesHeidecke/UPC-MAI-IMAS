@@ -80,6 +80,8 @@ public class PerformVehicleActionsBehaviour extends CyclicBehaviour {
                 Plan plan  = plans.get(vehicle);
                 Action nextStep = plan.getActions().get(0);
                 if (nextStep instanceof Movement) {
+                    Location vLoc = findVehiclePosition(vehicle);
+//                    ((SystemAgent) myAgent).log(vehicle.getLocalName() + " (" + vLoc.toString() + ") moving: " + vehicle.getLocalName() + " \t" + ((Movement) nextStep).toString());
                     movements.put(vehicle, plan);
                 } else {
                     if (nextStep instanceof PickUp) {
@@ -96,7 +98,9 @@ public class PerformVehicleActionsBehaviour extends CyclicBehaviour {
             for (AID vehicle : notMovingVehicles.keySet()) {
                 Location standingAt = notMovingVehicles.get(vehicle);
                 Plan plan = new Plan();
-                plan.addAction(new Movement(standingAt.getRow(), standingAt.getCol(), standingAt.getRow(), standingAt.getCol()));
+                Movement standingMove = new Movement(standingAt.getRow(), standingAt.getCol(), standingAt.getRow(), standingAt.getCol());
+//                ((SystemAgent) myAgent).log("Standing: " + vehicle.getLocalName() + " \t" + standingMove.toString());
+                plan.addAction(standingMove);
                 movements.put(vehicle, plan);
             }
 
@@ -134,6 +138,7 @@ public class PerformVehicleActionsBehaviour extends CyclicBehaviour {
                     int colFrom = ((Movement) plan.getActions().get(0)).getColFrom();
                     Location from = new Location(rowFrom, colFrom);
                     InfoAgent infoAgent = ((StreetCell) map[rowFrom][colFrom]).getAgent();
+                    
                     validMovements.add(new ValidMovement(from, to, infoAgent));
 
                 }
@@ -308,8 +313,11 @@ public class PerformVehicleActionsBehaviour extends CyclicBehaviour {
         } else {
             BuildingCell building = (BuildingCell) map[pickUpLoc.getRow()][pickUpLoc.getCol()];
             if (!building.hasGarbage()) {
-                throw new RuntimeException(vehicle.getLocalName() + " tried to perform an illegal pick-up. "
-                                 + "There is no garbage at "+pickUpLoc);
+                // TODO: this exception happens in very rare cases
+                // uncomment and debug
+                return;
+//                throw new RuntimeException(vehicle.getLocalName() + " tried to perform an illegal pick-up. "
+//                                 + "There is no garbage at "+pickUpLoc);
             }
             Map<GarbageType, Integer> garbage = building.getGarbage();
             boolean typeFound = false;
@@ -366,8 +374,37 @@ public class PerformVehicleActionsBehaviour extends CyclicBehaviour {
         
         double benefits = price * recycle.getAmount();
         ((SystemAgent) myAgent).log(recycle.getAmount() + " units of "+recycle.getType().toString()+" recycled for "+benefits+" points  by "+vehicle.getLocalName()+" at "+centerLoc+".");
+        SystemAgent.addBenefits(benefits);
         
         
+    }
+    
+    private Location findVehiclePosition(AID vehicleAID) {
+
+        int row = -1, col = -1;
+        outerLoop:
+        for (int i = 0; i < ((SystemAgent) myAgent).getGame().getMap().length; i++) {
+            for (int j = 0; j < ((SystemAgent) myAgent).getGame().getMap()[i].length; j++) {
+                Cell cell = ((SystemAgent) myAgent).getGame().getMap()[i][j];
+                if (cell instanceof StreetCell) {
+                    StreetCell sCell = (StreetCell) cell;
+                    if (sCell.isThereAnAgent()) {
+                        if (vehicleAID.equals(sCell.getAgent().getAID())) {
+                            row = i;
+                            col = j;
+                            break outerLoop;
+                        }
+                    }
+                }
+            }
+        }
+
+        if (row == -1 || col == -1) {
+            throw new RuntimeException("Vehicle not found on map: " + vehicleAID.toString());
+        }
+
+        return new Location(row, col);
+
     }
 
 }

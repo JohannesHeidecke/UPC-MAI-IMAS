@@ -45,7 +45,7 @@ public class HarvesterAgent extends ImasAgent {
     private Location location;
     private HarvesterInfoAgent infoAgent;
     private GarbageType[] garbageTypes;
-    
+
     private AID myCoordinator;
 
     private static int capacity;
@@ -288,7 +288,7 @@ public class HarvesterAgent extends ImasAgent {
 
     public boolean canCarry(GarbageType type) {
         for (GarbageType myType : this.garbageTypes) {
-            if (myType.equals(type)) {
+            if (myType.getShortString().equals(type.getShortString())) {
                 return true;
             }
         }
@@ -300,15 +300,15 @@ public class HarvesterAgent extends ImasAgent {
         if (!(currentLoadType == null) && !garbage.getType().equals(this.currentLoadType)) {
             throw new RuntimeException("Harvester was assigned to pick up wrong type");
         }
-        
+
         if (amount <= 0) {
             throw new RuntimeException("Invalid amount of garbage to harvest: " + amount);
         }
-        
+
         if (this.currentLoad + amount > capacity) {
             throw new RuntimeException("Harvester capacity exceeded");
         }
-        
+
         currentLoadType = garbage.getType();
         Location loc = garbage.getLocation();
 
@@ -319,7 +319,7 @@ public class HarvesterAgent extends ImasAgent {
         this.pickUpOrder.addAll(order.subList(0, (order.size() - 1)));
 
         this.targetedRecyclingCenter = order.get(order.size() - 1);
-        
+
         this.currentPlannedLoad += amount;
 
     }
@@ -400,13 +400,18 @@ public class HarvesterAgent extends ImasAgent {
         this.currentLoad = 0;
         this.currentLoadType = null;
     }
-    
+
     public void setCoordinator(AID coord) {
         this.myCoordinator = coord;
     }
-    
+
     public AID getCoordinator() {
         return this.myCoordinator;
+    }
+
+    public void logStatusReport() {
+        log(location.toString() + ", current load: " + currentLoad + ", current planned load: "
+                + currentPlannedLoad + ", current type: " + currentLoadType);
     }
 
 }

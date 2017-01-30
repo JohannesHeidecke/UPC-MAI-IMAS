@@ -71,7 +71,7 @@ public class StreetCell extends Cell {
     public void removeAgent(InfoAgent oldInfoAgent) throws Exception {
         //System.out.println("Remove an agent to " + this.toString());
         if (!this.isThereAnAgent()) {
-            throw new Exception("There is no agent in cell");
+            throw new Exception("There is no agent in cell " + super.getRow() + "," + super.getCol());
         }
         if (oldInfoAgent == null) {
             throw new Exception("No valid agent to be remove (null).");

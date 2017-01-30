@@ -9,6 +9,7 @@ import cat.urv.imas.PerformanceMeasure;
 import cat.urv.imas.agent.HarvesterCoordinatorAgent;
 import cat.urv.imas.behaviour.harvester.CNTender;
 import cat.urv.imas.onthology.Garbage;
+import cat.urv.imas.onthology.Performatives;
 import jade.core.AID;
 import jade.core.Agent;
 import jade.lang.acl.ACLMessage;
@@ -16,6 +17,7 @@ import jade.lang.acl.UnreadableException;
 import jade.proto.ContractNetInitiator;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
@@ -42,7 +44,7 @@ public class GarbageCNInitiator extends ContractNetInitiator {
     @Override
     public void handleAllResponses(Vector responses,
             Vector acceptances) {
-
+        
         int garbageUnitsToDistribute = garbage.getAmount();
 
         Map<AID, Integer> chosenHarvestersAmounts = new HashMap<>();
@@ -70,6 +72,9 @@ public class GarbageCNInitiator extends ContractNetInitiator {
                             bestPerformanceMeasure = performanceMeasure;
                             chosenHarvester = msg.getSender();
                             chosenAmount = Math.min(garbageUnitsToDistribute, tender.getMaxAmount());
+                            if (chosenAmount <= 0) {
+                                throw new RuntimeException("A Harvester was chosen to harvest a zero or negative amount");
+                            }
                         }
 
                     } catch (UnreadableException ex) {
@@ -87,9 +92,25 @@ public class GarbageCNInitiator extends ContractNetInitiator {
 
         }
 
+        // Remove from the inNegotiation list:
+        Iterator<Garbage> it = ((HarvesterCoordinatorAgent) myAgent).getInNegotiationGarbage().iterator();
+        while (it.hasNext()) {
+            Garbage negoGarb = it.next();
+            if (negoGarb.getLocation().equals(garbage.getLocation())) {
+                it.remove();
+//                ((HarvesterCoordinatorAgent) myAgent).log("Done negotiating: " + garbage.toString());
+            }
+        }
+        // Send update message 
+        ACLMessage inform = new ACLMessage(Performatives.INFORM_NEGOTIATION_DONE);
+        inform.addReceiver(myAgent.getAID());
+        myAgent.send(inform);
+
+        // Store the remaining garbage that could not be assigned:
         if (garbageUnitsToDistribute > 0) {
             ((HarvesterCoordinatorAgent) myAgent).
                     registerRemainingUnassignedGarbage(garbage, garbageUnitsToDistribute);
+            ((HarvesterCoordinatorAgent) myAgent).log(garbageUnitsToDistribute + " remaining units after negotiation for " + garbage.toString());
         }
 
         // Send ACCEPT_PROPOSAL / REJECT_PROPOSAL
@@ -101,7 +122,7 @@ public class GarbageCNInitiator extends ContractNetInitiator {
                     reply.setPerformative(ACLMessage.ACCEPT_PROPOSAL);
                     reply.setContent(chosenHarvestersAmounts.get(msg.getSender()).toString());
 
-                    ((HarvesterCoordinatorAgent) myAgent).registerGarbageAssignment(garbage, 
+                    ((HarvesterCoordinatorAgent) myAgent).registerGarbageAssignment(garbage,
                             chosenHarvestersAmounts.get(msg.getSender()));
 
                 } else {

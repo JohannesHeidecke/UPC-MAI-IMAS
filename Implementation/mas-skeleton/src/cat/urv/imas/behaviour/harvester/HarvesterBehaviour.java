@@ -58,6 +58,7 @@ public class HarvesterBehaviour extends CyclicBehaviour {
             switch (msg.getPerformative()) {
                 case Performatives.REQUEST_PLAN_HARVESTER:
                     provideCurrentPlan(msg);
+//                    harvester.logStatusReport();
                     break;
                 default:
                     //TODO:

@@ -46,6 +46,14 @@ public class Movement extends Action implements Serializable {
         return colTo;
     }
 
+    public void setRowFrom(int rowFrom) {
+        this.rowFrom = rowFrom;
+    }
+
+    public void setColFrom(int colFrom) {
+        this.colFrom = colFrom;
+    }
+
     public void setRowTo(int rowTo) {
         this.rowTo = rowTo;
     }
@@ -53,6 +61,39 @@ public class Movement extends Action implements Serializable {
     public void setColTo(int colTo) {
         this.colTo = colTo;
     }
+
+    @Override
+    public String toString() {
+        return "Movement{" + "rowFrom=" + rowFrom + ", colFrom=" + colFrom + ", rowTo=" + rowTo + ", colTo=" + colTo + '}';
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Movement other = (Movement) obj;
+        if (this.rowFrom != other.rowFrom) {
+            return false;
+        }
+        if (this.colFrom != other.colFrom) {
+            return false;
+        }
+        if (this.rowTo != other.rowTo) {
+            return false;
+        }
+        if (this.colTo != other.colTo) {
+            return false;
+        }
+        return true;
+    }
+    
+    
+    
+    
     
     
     

@@ -27,6 +27,10 @@ public class AddGarbageBehavior extends SimpleBehaviour {
         int maxNumberBuildingsWithGarbage = ((SystemAgent) myAgent).getGame().getMaxNumberBuildingWithNewGargabe();
         int newGarbageProbability = ((SystemAgent) myAgent).getGame().getNewGarbageProbability();
         
+        // TODO: delete next 2 rows
+//        maxAmountOfNewGarbage = 500;
+//        maxNumberBuildingsWithGarbage = 10;
+        
         int min = 1;
         int max = 100;
         boolean addGarbage = newGarbageProbability >= ThreadLocalRandom.current().nextInt(min, max + 1);

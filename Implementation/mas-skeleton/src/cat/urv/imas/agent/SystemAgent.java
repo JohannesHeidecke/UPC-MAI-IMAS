@@ -61,6 +61,7 @@ public class SystemAgent extends ImasAgent {
     private AID coordinatorAgent;
 
     private static int simulationStep = 0;
+    private static double benefits = 0;
     private List<GarbageStatistic> garbageStatList = new ArrayList<>();
 
     /**
@@ -162,7 +163,7 @@ public class SystemAgent extends ImasAgent {
             // Harvester Coordinator
             agentController = cc.createNewAgent("HarvesterCoordinator", "cat.urv.imas.agent.HarvesterCoordinatorAgent", null);
             agentController.start();
-            
+
             // before continueing make sure 
             // that ScoutCoordinator and HarvesterCoordinator are created:
             ServiceDescription searchCriterion = new ServiceDescription();
@@ -171,7 +172,7 @@ public class SystemAgent extends ImasAgent {
             searchCriterion = new ServiceDescription();
             searchCriterion.setType(AgentType.HARVESTER_COORDINATOR.toString());
             UtilsAgents.searchAgent(this, searchCriterion);
-            
+
             // Create Harvesters and Scouts according to game settings:
             Map<AgentType, List<Cell>> agents = this.game.getAgentList();
             GarbageType[][] garbageTypes = this.game.getAllowedGarbageTypePerHarvester();
@@ -218,7 +219,7 @@ public class SystemAgent extends ImasAgent {
         this.addBehaviour(new PerformVehicleActionsBehaviour());
 
     }
-    
+
     public void writeStatisticMessage(String msg) {
         this.gui.showStatistics(msg);
     }
@@ -267,6 +268,14 @@ public class SystemAgent extends ImasAgent {
         }
         
         return result;
+    }
+    
+    public static void addBenefits(double b) {
+        benefits += b;
+    }
+    
+    public static double getBenefitsPerStep() {
+        return benefits / simulationStep;
     }
 
 }

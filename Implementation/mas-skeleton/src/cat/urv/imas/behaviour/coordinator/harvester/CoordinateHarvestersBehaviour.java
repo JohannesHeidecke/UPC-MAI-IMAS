@@ -9,6 +9,7 @@ import cat.urv.imas.agent.HarvesterCoordinatorAgent;
 import cat.urv.imas.agent.SystemAgent;
 import cat.urv.imas.map.BuildingCell;
 import cat.urv.imas.map.Cell;
+import cat.urv.imas.map.StreetCell;
 import cat.urv.imas.onthology.Garbage;
 import cat.urv.imas.onthology.GarbageType;
 import cat.urv.imas.onthology.Performatives;
@@ -39,13 +40,16 @@ import java.util.logging.Logger;
  */
 public class CoordinateHarvestersBehaviour extends CyclicBehaviour {
 
-    private HarvesterCoordinatorAgent harvCoordinator;
+    private final HarvesterCoordinatorAgent harvCoordinator;
     private AID coordinator;
 
     private Cell[][] map;
 
-    private List<AID> harvestersWithoutPlanReply;
+    private List<AID> harvestersWithoutPlanReply = new ArrayList<>();
     private HashMap<AID, Plan> currentPlans;
+    
+    private boolean allNegotiationsDone = false;
+    private boolean allPlansReceived = false;
 
     public CoordinateHarvestersBehaviour(HarvesterCoordinatorAgent harvCoordinator) {
         this.harvCoordinator = harvCoordinator;
@@ -59,16 +63,19 @@ public class CoordinateHarvestersBehaviour extends CyclicBehaviour {
     @Override
     public void action() {
 
-        MessageTemplate mt = MessageTemplate.or(MessageTemplate.MatchPerformative(Performatives.INFORM_PICKUP), 
+        MessageTemplate mt = MessageTemplate.or(MessageTemplate.MatchPerformative(Performatives.INFORM_NEGOTIATION_DONE), 
+                MessageTemplate.or(MessageTemplate.MatchPerformative(Performatives.INFORM_PICKUP),
                 MessageTemplate.or(MessageTemplate.MatchPerformative(Performatives.REQUEST_PLAN_HARVESTERS),
-                MessageTemplate.MatchPerformative(Performatives.REPLY_PLAN_HARVESTER)));
+                        MessageTemplate.MatchPerformative(Performatives.REPLY_PLAN_HARVESTER))));
 
         ACLMessage msg = myAgent.receive(mt);
         if (msg != null) {
             switch (msg.getPerformative()) {
                 case Performatives.REQUEST_PLAN_HARVESTERS:
                     handlePlansRequest(msg);
-                    requestPlansFromHarvesters();
+                    break;
+                case Performatives.INFORM_NEGOTIATION_DONE:
+                    handleNegotiationDone();
                     break;
                 case Performatives.REPLY_PLAN_HARVESTER:
                     handlePlanReply(msg);
@@ -82,6 +89,17 @@ public class CoordinateHarvestersBehaviour extends CyclicBehaviour {
             }
         } else {
             block();
+        }
+        
+        if (allNegotiationsDone) {
+            requestPlansFromHarvesters();
+            allNegotiationsDone = false;
+        }
+
+        if (allPlansReceived) {
+            resolveCollisions();
+            sendPlans();
+            allPlansReceived = false;
         }
 
     }
@@ -98,6 +116,7 @@ public class CoordinateHarvestersBehaviour extends CyclicBehaviour {
         detectNewUnassignedGarbage();
         orderUnassignedGarbage();
         announceUnassignedGarbage();
+        
 
     }
 
@@ -107,11 +126,9 @@ public class CoordinateHarvestersBehaviour extends CyclicBehaviour {
             Plan plan = (Plan) msg.getContentObject();
             currentPlans.put(msg.getSender(), plan);
             harvestersWithoutPlanReply.remove(msg.getSender());
-
+            
             if (harvestersWithoutPlanReply.isEmpty()) {
-//                ((HarvesterCoordinatorAgent) myAgent).log("Received plans from all Harvesters.");
-                resolveCollisions();
-                sendPlans();
+                allPlansReceived = true;
             }
 
         } catch (UnreadableException ex) {
@@ -120,6 +137,9 @@ public class CoordinateHarvestersBehaviour extends CyclicBehaviour {
     }
 
     private void sendPlans() {
+
+        // TODO: remove next line?
+        ((HarvesterCoordinatorAgent) myAgent).logManagedGarbageReport();
 
         try {
             // Send all plans to Coordinator:
@@ -181,16 +201,28 @@ public class CoordinateHarvestersBehaviour extends CyclicBehaviour {
     }
 
     private void announceUnassignedGarbage() {
+        
+        if (harvCoordinator.getUnassignedGarbage().isEmpty()) {
+            allNegotiationsDone = true;
+            return;
+        }
+        
+//        harvCoordinator.log("Negotiating " + harvCoordinator.getUnassignedGarbage().size() + " occurences of garbage this turn");
 
         Iterator<Garbage> iterator = harvCoordinator.getUnassignedGarbage().iterator();
-        while (iterator.hasNext()) {
+        // TODO: this counter limits to announcing 1 garbage per turn
+        // this fixed collisions when assigning several garbages at once
+        // might be more efficient to remove the counter and resolve collisions
+        int counter = 0;
+        while (iterator.hasNext() && counter < 1) {
+            counter++;
             Garbage garbage = iterator.next();
             harvCoordinator.addInNegotiationGarbage(garbage);
             iterator.remove();
             try {
                 ACLMessage cnMessage = new ACLMessage(ACLMessage.CFP);
                 cnMessage.setProtocol(FIPANames.InteractionProtocol.FIPA_CONTRACT_NET);
-                cnMessage.setReplyByDate(new Date(System.currentTimeMillis() + 100));
+                cnMessage.setReplyByDate(new Date(System.currentTimeMillis() + 1000));
                 cnMessage.setContentObject(garbage);
                 cnMessage.setSender(myAgent.getAID());
                 for (AID harvester : this.harvCoordinator.getCoordinatedHarvesters()) {
@@ -209,6 +241,9 @@ public class CoordinateHarvestersBehaviour extends CyclicBehaviour {
     }
 
     private void requestPlansFromHarvesters() {
+        
+//        harvCoordinator.log("Requesting plans from all Harvesters");
+        
         List<AID> harvesters = this.harvCoordinator.getCoordinatedHarvesters();
         harvestersWithoutPlanReply = new ArrayList<>();
         harvestersWithoutPlanReply.addAll(harvesters);
@@ -231,7 +266,7 @@ public class CoordinateHarvestersBehaviour extends CyclicBehaviour {
     private void resolveCollisions() {
 
         // TODO: base this on PerformanceMeasure, not random.
-        // Harvesters that collide with other scouts do a random movement in another direction:
+        // Harvesters that collide with other harvesters do a random movement in another direction:
         List<AID> plannedHarvesters = new ArrayList<>(currentPlans.keySet());
 
         boolean collisionDetected = true;
@@ -287,6 +322,41 @@ public class CoordinateHarvestersBehaviour extends CyclicBehaviour {
         } catch (UnreadableException ex) {
             Logger.getLogger(CoordinateHarvestersBehaviour.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+
+    private void handleNegotiationDone() {
+        if (harvCoordinator.getInNegotiationGarbage().isEmpty()) {
+//            harvCoordinator.log("Negotiated all unassigned garbage.");
+            allNegotiationsDone = true;
+        }
+    }
+    
+    private Location findVehiclePosition(AID vehicleAID) {
+
+        int row = -1, col = -1;
+        outerLoop:
+        for (int i = 0; i < map.length; i++) {
+            for (int j = 0; j < map[i].length; j++) {
+                Cell cell = map[i][j];
+                if (cell instanceof StreetCell) {
+                    StreetCell sCell = (StreetCell) cell;
+                    if (sCell.isThereAnAgent()) {
+                        if (vehicleAID.equals(sCell.getAgent().getAID())) {
+                            row = i;
+                            col = j;
+                            break outerLoop;
+                        }
+                    }
+                }
+            }
+        }
+
+        if (row == -1 || col == -1) {
+            throw new RuntimeException("Vehicle not found on map: " + vehicleAID.toString());
+        }
+
+        return new Location(row, col);
+
     }
 
 }
