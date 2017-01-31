@@ -8,6 +8,8 @@ Outline for report and presentation
 What does not work perfectly.
 We have solutions for this, but not yet implemented.
 
+
+
 ### Collisions
 
 ##### Current implementation
@@ -24,28 +26,46 @@ This happens only on complicated maps with narrow dead ends and/or one-way stree
 
 As proposed in last delivery
 
-Coalition of collided vehicles, with list of priorities
+Coalition of collided vehicles, with list of vehicle priorities
+
+
 
 ### Idle HarvesterAgents
 
 ##### Current implementation
 
-After recycling, idle HarvesterAgents make random steps
+After leaving garbage in a recycling center, HarvesterAgents become idle, without new assignments and only make random steps henceforth
 
 ##### Problem
 
-Idle HarvesterAgents tend to accumulate near recycling centers, sometime causing collisions
+Idle HarvesterAgents tend to accumulate near recycling centers, sometime causing collisions with other vehicles
 
 ##### Solution
 
 As proposed in last delivery
 
 Coalitions between HarvesterAgents and ScoutAgents
-HarvesterAgents follow ScoutAgents
+Idle HarvesterAgents follow ScoutAgents, in order to be as close as possible to newly detected garbage
 
-### Garbage
 
-Garbage announcement step
+
+### Garbage Assignment
+
+Garbage announcement step in Contract Net
+
+##### Current implementation
+
+New garbage is assigned to HarvesterAgents in the order in which it is discovered
+
+##### Problem
+
+Garbage assignment order is random and HarvesterAgents may be busy collecting garbage that earns few benefits, while valuable garbage is left to wait.
+
+##### Solution
+
+As proposed in last delivery
+
+Voting protocol to order pending garbage according to a rank which is calculated using the performance measure
 
 
 
