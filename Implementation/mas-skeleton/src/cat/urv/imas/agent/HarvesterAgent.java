@@ -227,6 +227,16 @@ public class HarvesterAgent extends ImasAgent {
                 bestCenter = center;
             }
         }
+        // pick the closest recycling center:
+//        double bestDistance = Double.MAX_VALUE;
+//        RecyclingCenterCell bestCenter = null;
+//        for (RecyclingCenterCell center : recyclingCenters) {
+//            double distance = shortestDistanceByCenter.get(center);
+//            if (distance < bestDistance) {
+//                bestDistance = distance;
+//                bestCenter = center;
+//            }
+//        }
 
         // add all to result list
         Integer[] bestCenterPermut = shortestPathByCenter.get(bestCenter);

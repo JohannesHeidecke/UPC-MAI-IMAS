@@ -62,7 +62,14 @@ public class SystemAgent extends ImasAgent {
 
     private static int simulationStep = 0;
     private static double benefits = 0;
+    public static int unitsDiscovered = 0;
+    public static int unitsCollected = 0;
     private List<GarbageStatistic> garbageStatList = new ArrayList<>();
+    private List<Integer> noUndetectedGarbage = new ArrayList<>();
+    private List<Integer> noDetectedGarbage = new ArrayList<>();
+    private List<Integer> noCollectedGarbage = new ArrayList<>();
+    public static List<cat.urv.imas.plan.Location> newlyDetectedGarbage = new ArrayList<>();
+    private int globallyLoadedAmount = 0;
 
     /**
      * Builds the System agent.
@@ -136,7 +143,8 @@ public class SystemAgent extends ImasAgent {
         }
 
         // 2. Load game settings.
-        this.game = InitialGameSettings.load("game.group7.test4.settings");
+//        this.game = InitialGameSettings.load("game.group7.test4.settings");
+        this.game = InitialGameSettings.load("game.firstcall1617.settings");
         log("Initial configuration settings loaded");
         MapUtility.initialize(game.getMap());
         log("Initialized MapUtility structures");
@@ -249,18 +257,54 @@ public class SystemAgent extends ImasAgent {
                 garbageStat = null;
             }
         }
+        globallyLoadedAmount++;
         garbageStat.registerPickUp(simulationStep);
 
     }
     
-    public double getAverageWaitTime() {
+    public void registerRecycle(int amount) {
+        globallyLoadedAmount -= amount;
+    }
+    
+    public void registerDetection(cat.urv.imas.plan.Location loc) {
+        GarbageStatistic garbageStat = null;
+        for (int i = 0; i < garbageStatList.size(); i++) {
+            garbageStat = garbageStatList.get(garbageStatList.size()-i-1);
+            if (garbageStat.getLocation().equals(loc)) {
+                break;
+            } else {
+                garbageStat = null;
+            }
+        }
+        garbageStat.registerDetection(simulationStep);
+        SystemAgent.unitsDiscovered += garbageStat.getAmount();
+    }
+    
+    public double getAverageTimeCollecting() {
         double result = 0;
         
         int doneCounter = 0;
         for (GarbageStatistic stat : garbageStatList) {
-            if (stat.isPickedUp()) {
+            if (stat.isPartiallyPickedUp()) {
                 doneCounter++;
-                result += stat.getPickUpTime();
+                result += stat.getFirstPickUpTime();
+            }
+        }
+        if (doneCounter != 0) {
+            result /= doneCounter;
+        }
+        
+        return result;
+    }
+    
+    public double getAverageTimeDiscovering() {
+        double result = 0;
+        
+        int doneCounter = 0;
+        for (GarbageStatistic stat : garbageStatList) {
+            if (stat.isPartiallyPickedUp()) {
+                doneCounter++;
+                result += stat.getDiscoveryTime();
             }
         }
         if (doneCounter != 0) {
@@ -277,5 +321,65 @@ public class SystemAgent extends ImasAgent {
     public static double getBenefitsPerStep() {
         return benefits / simulationStep;
     }
+    
+    public List<GarbageStatistic> getGarbageStatList() {
+        return this.garbageStatList;
+    }
+    
+    public void addNoUndetectedGarbage(int n) {
+        this.noUndetectedGarbage.add(n);
+    }
+
+    public void addNoDetectedGarbage(int counter) {
+        this.noDetectedGarbage.add(counter);
+    }
+    
+    public double getMeanDiscoveredRatio() {
+        double undetected = 0;
+        double detected = 0;
+        for (int i = 0; i < noUndetectedGarbage.size(); i++) {
+            undetected += noUndetectedGarbage.get(i);
+            detected += noDetectedGarbage.get(i);
+        }
+        return detected / undetected;
+    }
+    
+    public double getMeanUndetected() {
+        double undetected = 0;
+        int counter = 0;
+        for (int i = 0; i < noUndetectedGarbage.size(); i++) {
+            counter++;
+            undetected += noUndetectedGarbage.get(i);
+        }
+        return undetected / counter;
+    }
+    
+    public double getMeanDetected() {
+        double detected = 0;
+        int counter = 0;
+        for (int i = 0; i < noDetectedGarbage.size(); i++) {
+            counter++;
+            detected += noDetectedGarbage.get(i);
+        }
+        return detected / counter;
+    }
+    
+    public double getMeanCollected() {
+        double collected = 0;
+        int counter = 0;
+        for (int i = 0; i < noCollectedGarbage.size(); i++) {
+            counter++;
+            collected += noCollectedGarbage.get(i);
+        }
+        return collected / counter;
+    }
+
+    public void addNoCollectedGarbage() {
+        this.noCollectedGarbage.add(globallyLoadedAmount);
+    }
+    
+    
+    
+    
 
 }

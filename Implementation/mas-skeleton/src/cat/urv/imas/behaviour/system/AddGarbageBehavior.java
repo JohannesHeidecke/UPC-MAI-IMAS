@@ -19,6 +19,8 @@ import java.util.concurrent.ThreadLocalRandom;
  * @author Ihcrul
  */
 public class AddGarbageBehavior extends SimpleBehaviour {
+    
+    public static int noGarbageGenerated = 0;
 
     @Override
     public void action() {
@@ -27,59 +29,63 @@ public class AddGarbageBehavior extends SimpleBehaviour {
         int maxNumberBuildingsWithGarbage = ((SystemAgent) myAgent).getGame().getMaxNumberBuildingWithNewGargabe();
         int newGarbageProbability = ((SystemAgent) myAgent).getGame().getNewGarbageProbability();
         
-        // TODO: delete next 2 rows
-//        maxAmountOfNewGarbage = 500;
-//        maxNumberBuildingsWithGarbage = 10;
+
+        newGarbageProbability /= 2;
         
         int min = 1;
         int max = 100;
         boolean addGarbage = newGarbageProbability >= ThreadLocalRandom.current().nextInt(min, max + 1);
-        
+
         if (!addGarbage) {
             return;
         }
-        
-        if (currentNumberBuildingsWithGarbage() >= maxNumberBuildingsWithGarbage) {
-            return;
-        }
-        
+
+//        if (currentNumberBuildingsWithGarbage() >= maxNumberBuildingsWithGarbage) {
+//            return;
+//        }
+
         Cell[][] map = ((SystemAgent) myAgent).getGame().getMap();
-        
-        boolean added = false;
-        int minRow = 0;
-        int minCol = 0;
-        int maxRow = map.length;
-        int maxCol = map[0].length;
-        while (!added) {
-            int randomRow = ThreadLocalRandom.current().nextInt(minRow, maxRow);
-            int randomCol = ThreadLocalRandom.current().nextInt(minCol, maxCol);
-            Cell randomCell = map[randomRow][randomCol];
-            if (randomCell instanceof SettableBuildingCell) {
-                if (!((BuildingCell) randomCell).hasGarbage()) {
-                    int garbageAmount = ThreadLocalRandom.current().nextInt(1, maxAmountOfNewGarbage + 1);
-                    int randomType = ThreadLocalRandom.current().nextInt(0, 3);
-                    GarbageType garbageType = null;
-                    switch (randomType) {
-                        case 0:
-                            garbageType = GarbageType.GLASS;
-                            break;
-                        case 1:
-                            garbageType = GarbageType.PAPER;
-                            break;
-                        case 2:
-                            garbageType = GarbageType.PLASTIC;
+
+        min = 1;
+        max = maxNumberBuildingsWithGarbage;
+        int nOBuildings = ThreadLocalRandom.current().nextInt(min, max + 1);
+
+        for (int i = 0; i < nOBuildings; i++) {
+            boolean added = false;
+            int minRow = 0;
+            int minCol = 0;
+            int maxRow = map.length;
+            int maxCol = map[0].length;
+            while (!added) {
+                int randomRow = ThreadLocalRandom.current().nextInt(minRow, maxRow);
+                int randomCol = ThreadLocalRandom.current().nextInt(minCol, maxCol);
+                Cell randomCell = map[randomRow][randomCol];
+                if (randomCell instanceof SettableBuildingCell) {
+                    if (!((BuildingCell) randomCell).hasGarbage()) {
+                        int garbageAmount = ThreadLocalRandom.current().nextInt(1, maxAmountOfNewGarbage + 1);
+                        int randomType = ThreadLocalRandom.current().nextInt(0, 3);
+                        GarbageType garbageType = null;
+                        switch (randomType) {
+                            case 0:
+                                garbageType = GarbageType.GLASS;
+                                break;
+                            case 1:
+                                garbageType = GarbageType.PAPER;
+                                break;
+                            case 2:
+                                garbageType = GarbageType.PLASTIC;
+                        }
+
+                        ((SettableBuildingCell) randomCell).setGarbage(garbageType, garbageAmount);
+                        Location loc = new Location(randomRow, randomCol);
+                        ((SystemAgent) myAgent).registerGeneratedGarbage(loc, garbageType, garbageAmount);
+                        added = true;
+                        noGarbageGenerated += garbageAmount;
+
                     }
-                    
-                    ((SettableBuildingCell)randomCell).setGarbage(garbageType, garbageAmount);
-                    Location loc = new Location(randomRow, randomCol);
-                    ((SystemAgent) myAgent).registerGeneratedGarbage(loc, garbageType, garbageAmount);
-                    added = true;
-                    
                 }
             }
         }
-        
-        
 
     }
 
@@ -87,7 +93,7 @@ public class AddGarbageBehavior extends SimpleBehaviour {
         int result = 0;
         Cell[][] map = ((SystemAgent) myAgent).getGame().getMap();
         for (int i = 0; i < map.length; i++) {
-            for (int j = 0; j< map[i].length; j++) {
+            for (int j = 0; j < map[i].length; j++) {
                 if (map[i][j] instanceof SettableBuildingCell) {
                     if (((BuildingCell) map[i][j]).hasGarbage()) {
                         result++;

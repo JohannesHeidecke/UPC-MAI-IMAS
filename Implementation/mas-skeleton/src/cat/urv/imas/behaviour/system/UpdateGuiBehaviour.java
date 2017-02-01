@@ -21,12 +21,23 @@ public class UpdateGuiBehaviour extends OneShotBehaviour {
         if ((SystemAgent.getCurrentSimulationStep()) % 100 == 0) {
             
             DecimalFormat df = new DecimalFormat("#.##");
-            double meanWaitTime = ((SystemAgent) myAgent).getAverageWaitTime();
-            String waitS = df.format(meanWaitTime);
+            double meanCollectingTime = ((SystemAgent) myAgent).getAverageTimeCollecting();
+            double meanDiscoveryTime = ((SystemAgent) myAgent).getAverageTimeDiscovering();
+            double meanUndiscovered = ((SystemAgent) myAgent).getMeanUndetected();
+            double meanDiscovered = ((SystemAgent) myAgent).getMeanDetected();
+            double meanCollected = ((SystemAgent) myAgent).getMeanCollected();
+            String waitColS = df.format(meanCollectingTime);
+            String waitDisS = df.format(meanDiscoveryTime);
+            String mUndisS = df.format(meanUndiscovered);
+            String mDisS = df.format(meanDiscovered);
+            String mCols = df.format(meanCollected);
             String beneS = df.format(SystemAgent.getBenefitsPerStep());
-            
-            ((SystemAgent) myAgent).writeStatisticMessage("Mean Garbage Waiting Time: " + waitS);
-            ((SystemAgent) myAgent).writeStatisticMessage("\t|\tBenefits/Step: "+ beneS + "\n");
+            ((SystemAgent) myAgent).writeStatisticMessage("Mean Discovery Time: " + waitDisS);
+            ((SystemAgent) myAgent).writeStatisticMessage("\t\tMean Collecting Time: " + waitColS);
+            ((SystemAgent) myAgent).writeStatisticMessage("\t|\tBenefits/Step: "+ beneS);
+            ((SystemAgent) myAgent).writeStatisticMessage("\t|\tMean Undiscovered: "+ mUndisS);
+            ((SystemAgent) myAgent).writeStatisticMessage("\t|\tMean Discovered: "+ mDisS);
+            ((SystemAgent) myAgent).writeStatisticMessage("\t|\tMean Collected: "+ mCols + "\n");
         }
         ((SystemAgent) myAgent).updateGUI();
         

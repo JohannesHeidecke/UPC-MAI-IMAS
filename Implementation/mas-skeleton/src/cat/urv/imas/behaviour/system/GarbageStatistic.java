@@ -22,7 +22,10 @@ public class GarbageStatistic {
     private int generatedAt;
     private int detectedAt;
     private List<Integer> pickedUpAt = new ArrayList<>();
-    private boolean isPickedUp = false;
+    
+    private boolean isPartiallyPickedUp = false;
+    private boolean isCompletelyPickedUp = false;
+    private boolean isDetected = false;
 
     public GarbageStatistic(Location location, GarbageType type, int amount, int generatedAt) {
         this.location = location;
@@ -32,14 +35,15 @@ public class GarbageStatistic {
     }
     
     public void registerDetection(int timestep) {
-        this.detectedAt = detectedAt;
-        System.err.println("detected after " + (detectedAt-generatedAt));
+        this.isDetected = true;
+        this.detectedAt = timestep;
     }
 
     public void registerPickUp(int timestep) {
         pickedUpAt.add(timestep);
+        isPartiallyPickedUp = true;
         if (pickedUpAt.size() == amount) {
-            isPickedUp = true;
+            isCompletelyPickedUp = true;
         }
     }
     
@@ -47,16 +51,32 @@ public class GarbageStatistic {
         return this.location;
     }
     
-    public boolean isPickedUp() {
-        return isPickedUp;
+    public boolean isPartiallyPickedUp() {
+        return isPartiallyPickedUp;
     }
     
-    public double getPickUpTime() {
-        int sum = 0;
-        for (int at : pickedUpAt) {
-            sum += at - generatedAt;
-        }
-        return (double) sum / pickedUpAt.size();
+    public boolean isCompletelyPickedUp() {
+        return isCompletelyPickedUp;
+    }
+    
+    public double getFirstPickUpTime() {
+        return this.pickedUpAt.get(0) - this.detectedAt;
+    }
+    
+    public double getDiscoveryTime() {
+        return this.detectedAt - this.generatedAt;
+    }
+    
+    public boolean isDetected() {
+        return this.isDetected;
+    }
+    
+    public int getAmount() {
+        return this.amount;
+    }
+    
+    public int getRemainingAmountToPickUp() {
+        return amount - pickedUpAt.size();
     }
     
 }

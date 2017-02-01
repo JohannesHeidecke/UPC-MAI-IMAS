@@ -17,8 +17,10 @@
  */
 package cat.urv.imas.map;
 
+import cat.urv.imas.agent.SystemAgent;
 import cat.urv.imas.gui.CellVisualizer;
 import cat.urv.imas.onthology.GarbageType;
+import cat.urv.imas.plan.Location;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -60,6 +62,7 @@ public class BuildingCell extends Cell {
      */
     public Map<GarbageType, Integer> detectGarbage() {
         if (!found && !garbage.isEmpty()) {
+            SystemAgent.newlyDetectedGarbage.add(new Location(super.getRow(), super.getCol()));
             found = true;
         }
         

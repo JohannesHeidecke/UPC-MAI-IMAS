@@ -13,8 +13,8 @@ import java.util.List;
  */
 public class PerformanceMeasure {
     
-    private static final double bWeight = 100;
-    private static final double wWeight = 0.00002;
+    private static final double BWEIGHT = 0.5;
+    private static final double WWEIGHT = 1;
     
     
     
@@ -27,7 +27,7 @@ public class PerformanceMeasure {
     }
     
     public static double getPerformanceMeasure(double benefitsPerStep, double waitingValue) {
-        return bWeight * benefitsPerStep - wWeight * waitingValue;
+        return BWEIGHT * benefitsPerStep - WWEIGHT * waitingValue;
     }
 
 }
