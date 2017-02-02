@@ -1,0 +1,23 @@
+All tabs initialized successfully!Mean Discovery Time: 0		Mean Collecting Time: 0	|	Benefits/Step: �	|	Mean Undiscovered: 0	|	Mean Discovered: 0	|	Mean Collected: 0
+Mean Discovery Time: 9,33		Mean Collecting Time: 12,33	|	Benefits/Step: 0,32	|	Mean Undiscovered: 10,87	|	Mean Discovered: 1,87	|	Mean Collected: 0,43
+Mean Discovery Time: 36,17		Mean Collecting Time: 17,11	|	Benefits/Step: 1,98	|	Mean Undiscovered: 14,67	|	Mean Discovered: 6,94	|	Mean Collected: 4,76
+Mean Discovery Time: 33,41		Mean Collecting Time: 23,88	|	Benefits/Step: 2,85	|	Mean Undiscovered: 19,52	|	Mean Discovered: 13,69	|	Mean Collected: 6,69
+Mean Discovery Time: 37,91		Mean Collecting Time: 31,58	|	Benefits/Step: 2,99	|	Mean Undiscovered: 17,58	|	Mean Discovered: 18,66	|	Mean Collected: 8,53
+Mean Discovery Time: 36,35		Mean Collecting Time: 45,26	|	Benefits/Step: 2,98	|	Mean Undiscovered: 18,13	|	Mean Discovered: 24,34	|	Mean Collected: 9,05
+Mean Discovery Time: 38,8		Mean Collecting Time: 57,9	|	Benefits/Step: 3,35	|	Mean Undiscovered: 15,39	|	Mean Discovered: 26,84	|	Mean Collected: 10,08
+
+
+
+- - - - - - - - - - - - - - -
+Units of garbage generated: 232
+Units of garbage discovered: 229
+Units of garbage collected: 202
+Benefits/Step: 3.3410981697171382
+Benefits Total: 2008.0
+Mean time for discovering garbage: 38.8
+Mean time for collecting garbage: 57.9
+Mean ratio of discovered garbage: 1.7437310851707737
+Mean ratio of collected garbage: 0.3753796566044753
+Final ratio of discovered garbage: 0.9
+Final ratio of collected garbage: 0.8706896551724138
+- - - - - - - - - - - - - - -
