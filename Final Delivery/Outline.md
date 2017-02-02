@@ -7,19 +7,19 @@ Outline for report and presentation
 
 We have identified some specific areas of our implementation that have not been completed as described in our second delivery report, and which could be improved with more time. These are the last of our "project milestones", which we completed in order of task importance.
 
-### Collisions
+### Avoiding Collisions
 
 ##### Current implementation
 
-Vehicles make random steps until situation is resolved.
+Currently, whenever two vehicles cross each other’s paths, they make random steps, trying to step out of each other’s way, until the situation is resolved.
 
 ##### Problem
 
-This results in several vehicles colliding in difficult locations and can lead to a deadlock. This occurs only on complicated maps with narrow dead ends and/or one-way streets, and approximately only every 50,000 steps.
+Whenever several vehicles collide in difficult locations this can lead to a deadlock. Usually, this only occurs on complicated maps with narrow dead ends and/or one-way streets, and approximately only every 50,000 steps.
 
 ##### Solution
 
-As proposed in the second delivery; one solution would be to form a coalition of vehicles that are due to collide in n steps, using a list of vehicle priorities decide which vehicle is able to continue its journey unchanged and which must wait in their place to avoid this collision.
+As proposed in the second delivery, one solution would be to let the CoordinatorAgent avoid collisions through GPGP and a list of vehicle priorities. It receives partial plans of all vehicles’ paths and plans. When it detects an impending collision of two or more vehicles within n steps, the CoordinatorAgent decides which vehicle is able to continue its journey unchanged and which must wait in their place or back up to avoid the collision.
 
 
 ### Idle HarvesterAgents
@@ -37,7 +37,7 @@ Idle HarvesterAgents tend to accumulate near recycling centers, which sometimes 
 As proposed in the second delivery; ScoutAgents and idle HarvesterAgents could form coalitions. In these coalitions, idle HarvesterAgents would follow ScoutAgents in order to be as close as possible to newly detected garbage.
 
 
-### Garbage Assignment
+### Ranking garbage
 
 ##### Current implementation
 
