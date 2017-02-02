@@ -71,19 +71,29 @@ public class PerformVehicleActionsBehaviour extends CyclicBehaviour {
         
         if (SystemAgent.getCurrentSimulationStep() > ((SystemAgent) myAgent).getGame().getSimulationSteps()) {
             SystemAgent sa = ((SystemAgent) myAgent);
+            
+            double finalDiscoveredR = (double) (SystemAgent.unitsDiscovered - SystemAgent.unitsCollected) 
+                    / (AddGarbageBehavior.noGarbageGenerated - SystemAgent.unitsCollected);
+            
+            double finalCollectedR = (double) SystemAgent.unitsCollected / AddGarbageBehavior.noGarbageGenerated;
+          
             String out = "\n- - - - - - - - - - - - - - -\n";
             out += "Units of garbage generated: " + AddGarbageBehavior.noGarbageGenerated;
             out += "\nUnits of garbage discovered: " + SystemAgent.unitsDiscovered;
             out += "\nUnits of garbage collected: " + SystemAgent.unitsCollected;
             out += "\nBenefits/Step: " + SystemAgent.getBenefitsPerStep();
+            out += "\nBenefits Total: " + SystemAgent.getBenefitsPerStep() * SystemAgent.getCurrentSimulationStep();
             out += "\nMean time for discovering garbage: " + sa.getAverageTimeDiscovering();
             out += "\nMean time for collecting garbage: " + sa.getAverageTimeCollecting();
             double discoveredRatio = sa.getMeanDetected() / sa.getMeanUndetected();
-            out += "\nMean ration of discovered garbage: " + discoveredRatio;
+            out += "\nMean ratio of discovered garbage: " + discoveredRatio;
             double collectedRatio = sa.getMeanCollected() / sa.getMeanDetected();
-            out += "\nMean ration of collected garbage: " + collectedRatio;
+            out += "\nMean ratio of collected garbage: " + collectedRatio;
+            out += "\nFinal ratio of discovered garbage: " + finalDiscoveredR;
+            out += "\nFinal ratio of collected garbage: " + finalCollectedR;
             out += "\n- - - - - - - - - - - - - - -\n";
             System.out.println(out);
+            ((SystemAgent) myAgent).writeStatisticMessage("\n\n" + out);
             try {
             Thread.sleep(300);
             } catch (InterruptedException ex) {
